@@ -1,4 +1,4 @@
-import { useDashboardContext } from "../context/DashboardContext";
+import { useDashboardContext } from "../hooks/useDashboardContext";
 import { Container, Card, Alert } from "react-bootstrap";
 
 export default function DashboardView() {

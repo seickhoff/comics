@@ -41,14 +41,25 @@ const AppNavbar: React.FC = () => {
     return routes.map((route, index) => {
       if (route.children) {
         // Check if the children also have children (nested dropdown case)
-        const hasNestedDropdown = route.children.some(child => child.children);
+        const hasNestedDropdown = route.children.some(
+          (child) => child.children
+        );
 
         return hasNestedDropdown ? (
-          <NavDropdown key={index} title={route.label} id={`navbar-${route.label}`}>
+          <NavDropdown
+            key={index}
+            title={route.label}
+            id={`navbar-${route.label}`}
+          >
             {route.children.map((child, childIndex) =>
               child.children ? (
                 // Nested Dropdown
-                <NavDropdown key={childIndex} title={child.label} id={`nav-dropdown-${child.label}`} drop="end">
+                <NavDropdown
+                  key={childIndex}
+                  title={child.label}
+                  id={`nav-dropdown-${child.label}`}
+                  drop="end"
+                >
                   {child.children.map((subChild, subIndex) => (
                     <NavDropdown.Item
                       key={subIndex}
@@ -76,7 +87,11 @@ const AppNavbar: React.FC = () => {
           </NavDropdown>
         ) : (
           // Regular Dropdown
-          <NavDropdown key={index} title={route.label} id={`navbar-${route.label}`}>
+          <NavDropdown
+            key={index}
+            title={route.label}
+            id={`navbar-${route.label}`}
+          >
             {route.children.map((child, childIndex) => (
               <NavDropdown.Item
                 key={childIndex}
@@ -117,7 +132,6 @@ const AppNavbar: React.FC = () => {
             height="40"
             className="d-inline-block align-top"
           />
-
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">

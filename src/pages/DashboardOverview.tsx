@@ -1,5 +1,5 @@
-import { useAppContext } from "../context/AppContext";
-import { useDashboardContext } from "../context/DashboardContext";
+import { useAppContext } from "../hooks/useAppContext";
+import { useDashboardContext } from "../hooks/useDashboardContext";
 import { Container, Card, Button, ListGroup, Alert } from "react-bootstrap";
 
 export default function DashboardOverview() {
@@ -26,7 +26,9 @@ export default function DashboardOverview() {
           <Card.Title>Filters</Card.Title>
           <Button
             variant="primary"
-            onClick={() => setFilters([...filters, `Filter ${filters.length + 1}`])}
+            onClick={() =>
+              setFilters([...filters, `Filter ${filters.length + 1}`])
+            }
           >
             Add Filter
           </Button>

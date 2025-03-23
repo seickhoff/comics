@@ -1,7 +1,6 @@
 import { Container, Card } from "react-bootstrap";
 
 export default function Settings() {
-
   return (
     <Container className="mt-4">
       <h1 className="mb-3">Settings</h1>

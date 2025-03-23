@@ -1,7 +1,7 @@
 import { BrowserRouter as Router } from "react-router-dom";
-import { AppProvider } from "./context/AppContext";
+import { AppProvider } from "./context/AppProvider";
 import AppNavbar from "./components/AppNavbar";
-import AppRoutes from "./routes/AppRoutes"; 
+import AppRoutes from "./routes/AppRoutes";
 
 export default function App() {
   return (
@@ -9,7 +9,7 @@ export default function App() {
       <Router>
         <AppNavbar />
         <div className="container mt-4">
-            <AppRoutes />
+          <AppRoutes />
         </div>
       </Router>
     </AppProvider>

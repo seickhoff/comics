@@ -90,3 +90,25 @@ src/
 ├── App.tsx                # Main entry point of the app, uses AppProvider
 └── ...
 ```
+
+## Adding New Routes
+
+The `AppNavbar.tsx` file defines a responsive navigation bar using react-bootstrap components (Navbar, Nav, NavDropdown, and Container) and integrates it with `react-router-dom` for navigation.
+
+1. Update the navRoutes array in `AppNavbar.tsx`:
+
+    - Add new routes with path and label.
+    - If the route has sub-routes, nest them under the children key.
+
+2. Create New Page Components:
+
+    - Place new components in the `src/pages/` directory.
+    - Example: `src/pages/NewPage.tsx`.
+
+3. Update Routing:
+
+    - Define new `<Route />` elements for the paths in the routes file, under `src/routes/`.
+
+4. Ensure Navbar Reflects New Routes:
+
+    - If the new route is a dropdown or submenu, ensure it’s added to the `navRoutes` array correctly.

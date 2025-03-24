@@ -10,6 +10,8 @@ export type AppState = {
   setUser: (user: User) => void;
   loading: boolean;
   setLoading: (loading: boolean) => void;
+  jsonData: any;
+  setJsonData: (data: any) => void;
 };
 
 // Context declaration

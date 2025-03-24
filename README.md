@@ -97,18 +97,18 @@ The `AppNavbar.tsx` file defines a responsive navigation bar using react-bootstr
 
 1. Update the navRoutes array in `AppNavbar.tsx`:
 
-    - Add new routes with path and label.
-    - If the route has sub-routes, nest them under the children key.
+   - Add new routes with path and label.
+   - If the route has sub-routes, nest them under the children key.
 
 2. Create New Page Components:
 
-    - Place new components in the `src/pages/` directory.
-    - Example: `src/pages/NewPage.tsx`.
+   - Place new components in the `src/pages/` directory.
+   - Example: `src/pages/NewPage.tsx`.
 
 3. Update Routing:
 
-    - Define new `<Route />` elements for the paths in the routes file, under `src/routes/`.
+   - Define new `<Route />` elements for the paths in the routes file, under `src/routes/`.
 
 4. Ensure Navbar Reflects New Routes:
 
-    - If the new route is a dropdown or submenu, ensure it’s added to the `navRoutes` array correctly.
+   - If the new route is a dropdown or submenu, ensure it’s added to the `navRoutes` array correctly.

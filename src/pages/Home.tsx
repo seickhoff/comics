@@ -2,9 +2,11 @@ import { LoadingSpinner } from "../components/LoadingSpinner";
 import { useAppContext } from "../hooks/useAppContext";
 import { Button, Card, Alert, Container } from "react-bootstrap";
 import { loginUser } from "../services/userService";
+import JsonFileUploader from "../components/JsonFileUploader";
+import JsonFileDownloader from "../components/JsonFileDownloader";
 
 export default function Home() {
-  const { user, setUser, loading, setLoading } = useAppContext(); // Get loading state from AppContext
+  const { user, setUser, loading, setLoading, jsonData } = useAppContext();
 
   const handleLogin = async () => {
     setLoading(true); // Set loading to true when starting the login
@@ -34,6 +36,16 @@ export default function Home() {
           </Button>
         </Alert>
       )}
+
+      <JsonFileUploader />
+
+      {jsonData && (
+        <Card className="mt-4">
+          <pre>{JSON.stringify(jsonData, null, 2)}</pre>
+        </Card>
+      )}
+
+      <JsonFileDownloader />
     </Container>
   );
 }

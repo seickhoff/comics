@@ -1,4 +1,4 @@
-# Vite Template
+# Comics
 
 This is a Vite-based template for building React applications with TypeScript. The template includes configurations for linting, formatting, routing, and development.
 

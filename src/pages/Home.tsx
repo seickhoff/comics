@@ -4,6 +4,7 @@ import { Button, Card, Alert, Container } from "react-bootstrap";
 import { loginUser } from "../services/userService";
 import JsonFileUploader from "../components/JsonFileUploader";
 import JsonFileDownloader from "../components/JsonFileDownloader";
+import { GradeCode, GradeDescription } from "../interfaces/ComicBook";
 
 export default function Home() {
   const { user, setUser, loading, setLoading, jsonData } = useAppContext();
@@ -17,7 +18,7 @@ export default function Home() {
 
   return (
     <Container className="mt-4">
-      <h1 className="mb-3">Home Page</h1>
+      <h1 className="mb-3">Home Page - {GradeDescription[GradeCode.FN]}</h1>
 
       {loading ? (
         <LoadingSpinner />

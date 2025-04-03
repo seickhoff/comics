@@ -25,7 +25,14 @@ const navRoutes: NavRoute[] = [
       },
     ],
   },
-  { path: "/settings", label: "Settings" },
+  { 
+    path: "/file", 
+    label: "File",
+    children: [
+      { path: "/file/open", label: "Open" },
+      { path: "/file/save", label: "Save" },
+    ],
+  },
 ];
 
 const AppNavbar: React.FC = () => {

@@ -1,9 +1,9 @@
 import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { useAppContext } from "../../hooks/useAppContext";
 import { Card, Container } from "react-bootstrap";
-import JsonFileUploader from "../../components/JsonFileUploader";
+import { JsonFileUploader } from "../../components/JsonFileUploader";
 
-export default function Open() {
+export function Open() {
   const { loading, jsonData } = useAppContext();
 
   return (
@@ -17,13 +17,10 @@ export default function Open() {
       {jsonData && (
         <Card className="mt-4">
           <Card.Body>
-
             <p>File loaded</p>
-
           </Card.Body>
         </Card>
       )}
-
     </Container>
   );
 }

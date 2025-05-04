@@ -14,14 +14,14 @@ export interface ComicBook {
 }
 
 export enum GradeCode {
-  MT = "MT", 
-  NM = "NM", 
-  VF = "VF", 
-  FN = "FN", 
-  VG = "VG", 
-  GD = "GD", 
-  FR = "FR", 
-  PR = "PR", 
+  MT = "MT",
+  NM = "NM",
+  VF = "VF",
+  FN = "FN",
+  VG = "VG",
+  GD = "GD",
+  FR = "FR",
+  PR = "PR",
 }
 
 export const GradeDescription: Record<GradeCode, string> = {
@@ -33,4 +33,24 @@ export const GradeDescription: Record<GradeCode, string> = {
   [GradeCode.GD]: "Good (3.0 - 1.8) - Significant wear, possibly detached cover or pages.",
   [GradeCode.FR]: "Fair (1.5 - 1.0) - Heavy damage, but still complete.",
   [GradeCode.PR]: "Poor (0.5) - Very damaged, missing pages, or severe defects.",
+};
+
+export type ColumnKey =
+  | "title"
+  | "publisher"
+  | "volume"
+  | "issue"
+  | "month"
+  | "year"
+  | "quantity"
+  | "value"
+  | "condition"
+  | "writer"
+  | "artist"
+  | "comments";
+
+export type ColumnConfig = {
+  label: string;
+  key: ColumnKey;
+  visible: boolean;
 };

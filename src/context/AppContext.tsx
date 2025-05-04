@@ -1,5 +1,6 @@
 // src/context/AppContext.tsx
-import { createContext } from "react";
+import { createContext, Dispatch, SetStateAction } from "react";
+import { ColumnConfig, ColumnKey, ComicBook } from "../interfaces/ComicBook";
 
 // Type for User
 export type User = { id: string; name: string } | null;
@@ -10,8 +11,14 @@ export type AppState = {
   setUser: (user: User) => void;
   loading: boolean;
   setLoading: (loading: boolean) => void;
-  jsonData: any;
-  setJsonData: (data: any) => void;
+  jsonData: ComicBook[];
+  setJsonData: (data: ComicBook[]) => void;
+  columns: ColumnConfig[];
+  setColumns: Dispatch<SetStateAction<ColumnConfig[]>>;
+  filters: Record<ColumnKey, string>;
+  setFilters: Dispatch<SetStateAction<Record<ColumnKey, string>>>;
+  useOrFiltering: boolean;
+  setUseOrFiltering: (value: boolean) => void;
 };
 
 // Context declaration

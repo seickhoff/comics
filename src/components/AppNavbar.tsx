@@ -11,6 +11,7 @@ interface NavRoute {
 // Define the navRoutes configuration
 const navRoutes: NavRoute[] = [
   { path: "/", label: "Home" },
+  { path: "/report", label: "Report" },
   {
     label: "Dashboard",
     children: [
@@ -25,8 +26,8 @@ const navRoutes: NavRoute[] = [
       },
     ],
   },
-  { 
-    path: "/file", 
+  {
+    path: "/file",
     label: "File",
     children: [
       { path: "/file/open", label: "Open" },
@@ -35,38 +36,26 @@ const navRoutes: NavRoute[] = [
   },
 ];
 
-const AppNavbar: React.FC = () => {
+export function AppNavbar() {
   const location = useLocation();
   const [expanded, setExpanded] = React.useState(false);
 
   const handleSelect = () => setExpanded(false);
 
-  const isActive = (path?: string) =>
-    path && location.pathname.startsWith(path) ? "active" : "";
+  const isActive = (path?: string) => (path && location.pathname.startsWith(path) ? "active" : "");
 
   const renderNavItems = (routes: NavRoute[]) => {
     return routes.map((route, index) => {
       if (route.children) {
         // Check if the children also have children (nested dropdown case)
-        const hasNestedDropdown = route.children.some(
-          (child) => child.children
-        );
+        const hasNestedDropdown = route.children.some((child) => child.children);
 
         return hasNestedDropdown ? (
-          <NavDropdown
-            key={index}
-            title={route.label}
-            id={`navbar-${route.label}`}
-          >
+          <NavDropdown key={index} title={route.label} id={`navbar-${route.label}`}>
             {route.children.map((child, childIndex) =>
               child.children ? (
                 // Nested Dropdown
-                <NavDropdown
-                  key={childIndex}
-                  title={child.label}
-                  id={`nav-dropdown-${child.label}`}
-                  drop="end"
-                >
+                <NavDropdown key={childIndex} title={child.label} id={`nav-dropdown-${child.label}`} drop="end">
                   {child.children.map((subChild, subIndex) => (
                     <NavDropdown.Item
                       key={subIndex}
@@ -94,11 +83,7 @@ const AppNavbar: React.FC = () => {
           </NavDropdown>
         ) : (
           // Regular Dropdown
-          <NavDropdown
-            key={index}
-            title={route.label}
-            id={`navbar-${route.label}`}
-          >
+          <NavDropdown key={index} title={route.label} id={`navbar-${route.label}`}>
             {route.children.map((child, childIndex) => (
               <NavDropdown.Item
                 key={childIndex}
@@ -116,13 +101,7 @@ const AppNavbar: React.FC = () => {
 
       // Regular Nav Link
       return (
-        <Nav.Link
-          key={index}
-          as={Link}
-          to={route.path || "#"}
-          className={isActive(route.path)}
-          onClick={handleSelect}
-        >
+        <Nav.Link key={index} as={Link} to={route.path || "#"} className={isActive(route.path)} onClick={handleSelect}>
           {route.label}
         </Nav.Link>
       );
@@ -147,6 +126,4 @@ const AppNavbar: React.FC = () => {
       </Container>
     </Navbar>
   );
-};
-
-export default AppNavbar;
+}

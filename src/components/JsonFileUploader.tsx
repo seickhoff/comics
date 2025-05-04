@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAppContext } from "../hooks/useAppContext";
 import { Card, Button, Alert, Spinner } from "react-bootstrap";
 
-export default function JsonFileUploader() {
+export function JsonFileUploader() {
   const { setJsonData, setLoading } = useAppContext();
   const [loading, setLocalLoading] = useState(false);
 
@@ -19,6 +19,7 @@ export default function JsonFileUploader() {
         const data = JSON.parse(e.target?.result as string);
         setJsonData(data);
       } catch (error) {
+        console.log(error);
         alert("Error parsing JSON file");
       } finally {
         setLoading(false);
@@ -38,21 +39,10 @@ export default function JsonFileUploader() {
               {loading ? <Spinner animation="border" size="sm" /> : "Choose File"}
             </label>
           </Button>
-          <input
-            type="file"
-            id="file-upload"
-            accept=".json"
-            onChange={handleFileChange}
-            hidden
-            disabled={loading}
-          />
+          <input type="file" id="file-upload" accept=".json" onChange={handleFileChange} hidden disabled={loading} />
         </div>
         {loading && <Alert variant="warning">Loading file...</Alert>}
-        {!loading && (
-          <Alert variant="info">
-            Click the button to select a JSON file to upload
-          </Alert>
-        )}
+        {!loading && <Alert variant="info">Click the button to select a JSON file to upload</Alert>}
       </Card.Body>
     </Card>
   );

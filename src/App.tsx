@@ -1,9 +1,9 @@
 import { BrowserRouter as Router } from "react-router-dom";
 import { AppProvider } from "./context/AppProvider";
-import AppNavbar from "./components/AppNavbar";
-import AppRoutes from "./routes/AppRoutes";
+import { AppNavbar } from "./components/AppNavbar";
+import { AppRoutes } from "./routes/AppRoutes";
 
-export default function App() {
+export function App() {
   return (
     <AppProvider>
       <Router>

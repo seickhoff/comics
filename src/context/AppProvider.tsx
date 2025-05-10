@@ -26,6 +26,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [columns, setColumns] = useState<ColumnConfig[]>(defaultColumns);
   const [filters, setFilters] = useState<Record<ColumnKey, string>>({} as Record<ColumnKey, string>);
   const [useOrFiltering, setUseOrFiltering] = useState(false);
+  const [fileName, setFileName] = useState<string | null>(null);
 
   return (
     <AppContext.Provider
@@ -42,6 +43,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setFilters,
         useOrFiltering,
         setUseOrFiltering,
+        fileName,
+        setFileName,
       }}
     >
       {children}

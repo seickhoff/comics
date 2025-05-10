@@ -29,7 +29,7 @@ export function Report() {
 
       {jsonData.length === 0 ? (
         <Alert key="danger" variant="danger">
-          No data loaded. Please go <Alert.Link href="/">Home</Alert.Link> and open a data file to get started.
+          No data loaded. Please <Alert.Link href="/file">open</Alert.Link> a data file to get started.
         </Alert>
       ) : (
         <ReportTable data={jsonData} columns={columns} filters={filters} useOrFiltering={useOrFiltering} />

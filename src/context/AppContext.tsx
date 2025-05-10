@@ -19,6 +19,8 @@ export type AppState = {
   setFilters: Dispatch<SetStateAction<Record<ColumnKey, string>>>;
   useOrFiltering: boolean;
   setUseOrFiltering: (value: boolean) => void;
+  fileName: string | null;
+  setFileName: (value: string | null) => void;
 };
 
 // Context declaration

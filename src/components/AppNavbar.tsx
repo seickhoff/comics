@@ -12,28 +12,15 @@ interface NavRoute {
 const navRoutes: NavRoute[] = [
   { path: "/", label: "Home" },
   { path: "/report", label: "Report" },
-  {
-    label: "Dashboard",
-    children: [
-      { path: "/dashboard/overview", label: "Overview" },
-      { path: "/dashboard/view", label: "View" },
-      {
-        label: "Analytics",
-        children: [
-          { path: "/dashboard/analytics/reports", label: "Reports" },
-          { path: "/dashboard/analytics/stats", label: "Stats" },
-        ],
-      },
-    ],
-  },
-  {
-    path: "/file",
-    label: "File",
-    children: [
-      { path: "/file/open", label: "Open" },
-      { path: "/file/save", label: "Save" },
-    ],
-  },
+  { path: "/file", label: "File" },
+  // {
+  //   path: "/file",
+  //   label: "File",
+  //   children: [
+  //     { path: "/file/open", label: "Open" },
+  //     { path: "/file/save", label: "Save" },
+  //   ],
+  // },
 ];
 
 export function AppNavbar() {

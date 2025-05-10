@@ -3,15 +3,16 @@ import { useAppContext } from "../hooks/useAppContext";
 import { Card, Button, Alert, Spinner } from "react-bootstrap";
 
 export function JsonFileUploader() {
-  const { setJsonData, setLoading } = useAppContext();
+  const { setJsonData, setLoading, setFileName } = useAppContext();
   const [loading, setLocalLoading] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setLoading(true); // Global loading state
-    setLocalLoading(true); // Local loading state
+    setLoading(true);
+    setLocalLoading(true);
+    setFileName(file.name);
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -32,7 +33,7 @@ export function JsonFileUploader() {
   return (
     <Card className="mt-4">
       <Card.Body>
-        <Card.Title>Upload JSON File</Card.Title>
+        <Card.Title>Open Comic Book File</Card.Title>
         <div className="d-flex justify-content-center">
           <Button variant="primary" className="mb-3" disabled={loading}>
             <label htmlFor="file-upload" className="w-100">

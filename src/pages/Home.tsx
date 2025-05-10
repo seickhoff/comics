@@ -2,8 +2,6 @@ import { LoadingSpinner } from "../components/LoadingSpinner";
 import { useAppContext } from "../hooks/useAppContext";
 import { Button, Card, Alert, Container } from "react-bootstrap";
 import { loginUser } from "../services/userService";
-import { JsonFileUploader } from "../components/JsonFileUploader";
-import { JsonFileDownloader } from "../components/JsonFileDownloader";
 import { GradeCode, GradeDescription } from "../interfaces/ComicBook";
 
 export function Home() {
@@ -38,15 +36,11 @@ export function Home() {
         </Alert>
       )}
 
-      <JsonFileUploader />
-
       {jsonData && (
         <Card className="mt-4">
           <pre>{JSON.stringify(jsonData, null, 2)}</pre>
         </Card>
       )}
-
-      <JsonFileDownloader />
     </Container>
   );
 }

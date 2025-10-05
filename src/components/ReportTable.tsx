@@ -29,9 +29,7 @@ export const ReportTable = ({ data, columns, filters, useOrFiltering }: ReportTa
       } else {
         // Toggle asc → desc → remove
         if (existing.direction === "asc") {
-          return prev.map((s) =>
-            s.key === key ? { ...s, direction: "desc" } : s
-          );
+          return prev.map((s) => (s.key === key ? { ...s, direction: "desc" } : s));
         } else {
           return prev.filter((s) => s.key !== key);
         }
@@ -106,9 +104,7 @@ export const ReportTable = ({ data, columns, filters, useOrFiltering }: ReportTa
                 {col.label}
                 {activeSort && (
                   <span style={{ display: "inline-flex", alignItems: "center", marginLeft: "5px" }}>
-                    <span style={{ marginRight: "5px" }}>
-                      {activeSort.direction === "asc" ? "↑" : "↓"}
-                    </span>
+                    <span style={{ marginRight: "5px" }}>{activeSort.direction === "asc" ? "↑" : "↓"}</span>
                     {sortPriority}
                   </span>
                 )}
@@ -130,5 +126,4 @@ export const ReportTable = ({ data, columns, filters, useOrFiltering }: ReportTa
       </tbody>
     </Table>
   );
-
-}  
+};

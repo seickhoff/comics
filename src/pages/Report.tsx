@@ -4,6 +4,7 @@ import { Alert, Container } from "react-bootstrap";
 import { ReportTable } from "../components/ReportTable";
 import { ReportConfiguration } from "../components/ReportConfiguration";
 import { ColumnConfig, ColumnKey } from "../interfaces/ComicBook";
+import Overstreet from "../components/OverstreetReport";
 
 export function Report() {
   const { columns, setColumns, jsonData, filters, setFilters, useOrFiltering, setUseOrFiltering } = useAppContext();
@@ -32,7 +33,10 @@ export function Report() {
           No data loaded. Please <Alert.Link href="/file">open</Alert.Link> a data file to get started.
         </Alert>
       ) : (
-        <ReportTable data={jsonData} columns={columns} filters={filters} useOrFiltering={useOrFiltering} />
+        <>
+          <Overstreet comics={jsonData} />
+          <ReportTable data={jsonData} columns={columns} filters={filters} useOrFiltering={useOrFiltering} />
+        </>
       )}
     </Container>
   );

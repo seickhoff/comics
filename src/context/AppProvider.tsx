@@ -20,31 +20,34 @@ const defaultColumns: ColumnConfig[] = [
 
 // AppProvider component that provides the global context
 export const AppProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<null | { id: string; name: string }>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [jsonData, setJsonData] = useState<ComicBook[]>([]);
   const [columns, setColumns] = useState<ColumnConfig[]>(defaultColumns);
-  const [filters, setFilters] = useState<Record<ColumnKey, string>>({} as Record<ColumnKey, string>);
-  const [useOrFiltering, setUseOrFiltering] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [filters, setFilters] = useState<Record<ColumnKey, string>>({} as Record<ColumnKey, string>);
+  const [isConfigOpen, setIsConfigOpen] = useState<boolean>(false);
+  const [jsonData, setJsonData] = useState<ComicBook[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [useOrFiltering, setUseOrFiltering] = useState(false);
+  const [user, setUser] = useState<null | { id: string; name: string }>(null);
 
   return (
     <AppContext.Provider
       value={{
-        user,
-        setUser,
-        loading,
-        setLoading,
-        jsonData,
-        setJsonData,
         columns,
-        setColumns,
-        filters,
-        setFilters,
-        useOrFiltering,
-        setUseOrFiltering,
         fileName,
+        filters,
+        isConfigOpen,
+        jsonData,
+        loading,
+        setColumns,
         setFileName,
+        setFilters,
+        setIsConfigOpen,
+        setJsonData,
+        setLoading,
+        setUseOrFiltering,
+        setUser,
+        useOrFiltering,
+        user,
       }}
     >
       {children}

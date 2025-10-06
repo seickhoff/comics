@@ -16,7 +16,15 @@ type SortConfig = {
   direction: SortDirection;
 }[];
 
-export const ReportTable = ({ data, columns, filters, useOrFiltering }: ReportTableProps) => {
+// --- helper: normalize title for sorting ---
+function normalizeTitle(title: string): string {
+  if (title.startsWith("The ")) {
+    return title.slice(4) + ", The";
+  }
+  return title;
+}
+
+export const TableReport = ({ data, columns, filters, useOrFiltering }: ReportTableProps) => {
   const visibleColumns = columns.filter((col) => col.visible);
 
   const [sortConfig, setSortConfig] = useState<SortConfig>([]);
@@ -59,10 +67,16 @@ export const ReportTable = ({ data, columns, filters, useOrFiltering }: ReportTa
 
   const sortedData = [...filteredData].sort((a, b) => {
     for (const { key, direction } of sortConfig) {
-      const aValue = a[key];
-      const bValue = b[key];
+      let aValue = a[key];
+      let bValue = b[key];
 
       if (aValue == null || bValue == null) continue;
+
+      // Normalize title for sorting only
+      if (key === "title") {
+        aValue = normalizeTitle(String(aValue));
+        bValue = normalizeTitle(String(bValue));
+      }
 
       const aNum = Number(aValue);
       const bNum = Number(bValue);

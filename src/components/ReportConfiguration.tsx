@@ -1,6 +1,7 @@
+import { Card } from "react-bootstrap";
 import { ColumnConfig, ColumnKey } from "../interfaces/ComicBook";
 
-type ReportConfigurationProps = {
+export type ReportConfigurationProps = {
   columns: ColumnConfig[];
   onToggle: (key: ColumnKey) => void;
   filters: Record<ColumnKey, string>;
@@ -18,47 +19,97 @@ export const ReportConfiguration: React.FC<ReportConfigurationProps> = ({
   setUseOrFiltering,
 }) => {
   return (
-    <div className="mb-4">
-      <h5>Report Configuration</h5>
-      {columns.map((col) => (
-        <div key={col.key} className="form-group d-flex align-items-center mb-2">
+    <Card className="mb-4 shadow-sm">
+      <Card.Body>
+        <div className="row">
+          {columns.map((col) => (
+            <div key={col.key} className="col-12 col-md-6 col-lg-4 mb-3">
+              <div className="form-group d-flex align-items-center">
+                <input
+                  type="checkbox"
+                  className="form-check-input me-2"
+                  id={`toggle-${col.key}`}
+                  checked={col.visible}
+                  onChange={() => onToggle(col.key)}
+                />
+                <label className="form-check-label me-2" htmlFor={`toggle-${col.key}`} style={{ minWidth: "100px" }}>
+                  {col.label}
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Regex filter"
+                  value={filters[col.key] || ""}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      [col.key]: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="form-check mt-3">
           <input
             type="checkbox"
-            className="form-check-input me-2"
-            id={`toggle-${col.key}`}
-            checked={col.visible}
-            onChange={() => onToggle(col.key)}
+            className="form-check-input"
+            id="or-filter-toggle"
+            checked={useOrFiltering}
+            onChange={() => setUseOrFiltering(!useOrFiltering)}
           />
-          <label className="form-check-label me-3" htmlFor={`toggle-${col.key}`} style={{ minWidth: "100px" }}>
-            {col.label}
+          <label className="form-check-label" htmlFor="or-filter-toggle">
+            Use <strong>OR</strong> logic across filters
           </label>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Regex filter"
-            value={filters[col.key] || ""}
-            onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                [col.key]: e.target.value,
-              }))
-            }
-          />
         </div>
-      ))}
-
-      <div className="form-check mt-3">
-        <input
-          type="checkbox"
-          className="form-check-input"
-          id="or-filter-toggle"
-          checked={useOrFiltering}
-          onChange={() => setUseOrFiltering(!useOrFiltering)}
-        />
-        <label className="form-check-label" htmlFor="or-filter-toggle">
-          Use <strong>OR</strong> logic across filters
-        </label>
-      </div>
-    </div>
+      </Card.Body>
+    </Card>
   );
 };
+
+//   return (
+//     <div className="mb-4">
+//       {columns.map((col) => (
+//         <div key={col.key} className="form-group d-flex align-items-center mb-2">
+//           <input
+//             type="checkbox"
+//             className="form-check-input me-2"
+//             id={`toggle-${col.key}`}
+//             checked={col.visible}
+//             onChange={() => onToggle(col.key)}
+//           />
+//           <label className="form-check-label me-3" htmlFor={`toggle-${col.key}`} style={{ minWidth: "100px" }}>
+//             {col.label}
+//           </label>
+//           <input
+//             type="text"
+//             className="form-control"
+//             placeholder="Regex filter"
+//             value={filters[col.key] || ""}
+//             onChange={(e) =>
+//               setFilters((prev) => ({
+//                 ...prev,
+//                 [col.key]: e.target.value,
+//               }))
+//             }
+//           />
+//         </div>
+//       ))}
+
+//       <div className="form-check mt-3">
+//         <input
+//           type="checkbox"
+//           className="form-check-input"
+//           id="or-filter-toggle"
+//           checked={useOrFiltering}
+//           onChange={() => setUseOrFiltering(!useOrFiltering)}
+//         />
+//         <label className="form-check-label" htmlFor="or-filter-toggle">
+//           Use <strong>OR</strong> logic across filters
+//         </label>
+//       </div>
+//     </div>
+//   );
+// };

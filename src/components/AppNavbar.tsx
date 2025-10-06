@@ -11,16 +11,20 @@ interface NavRoute {
 // Define the navRoutes configuration
 const navRoutes: NavRoute[] = [
   { path: "/", label: "Home" },
-  { path: "/report", label: "Report" },
+  {
+    path: "",
+    label: "Report",
+    children: [
+      { path: "/report/table", label: "Table" },
+      { path: "/report/overstreet", label: "Overstreet" },
+    ],
+  },
+  {
+    path: "/",
+    label: "Maintenance",
+    children: [{ path: "/maintenance/list", label: "List" }],
+  },
   { path: "/file", label: "File" },
-  // {
-  //   path: "/file",
-  //   label: "File",
-  //   children: [
-  //     { path: "/file/open", label: "Open" },
-  //     { path: "/file/save", label: "Save" },
-  //   ],
-  // },
 ];
 
 export function AppNavbar() {

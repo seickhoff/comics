@@ -2,7 +2,7 @@ import { ComicBook } from "../interfaces/ComicBook";
 
 interface OverstreetProps {
   comics: ComicBook[];
-  width?: number; // default 32
+  width?: number;
 }
 
 function formatCurrency(value: string | number): string {
@@ -119,7 +119,7 @@ function buildIssueLines(issues: ComicBook[], width: number): string[] {
   return lines;
 }
 
-export default function Overstreet({ comics, width = 32 }: OverstreetProps) {
+export default function OverstreetReport({ comics, width = 32 }: OverstreetProps) {
   const groups = groupByTitlePublisherVolume(comics);
 
   return (

@@ -5,6 +5,15 @@ import { ColumnConfig, ColumnKey, ComicBook } from "../interfaces/ComicBook";
 // Type for User
 export type User = { id: string; name: string } | null;
 
+// Type for sort direction
+export type SortDirection = "asc" | "desc";
+
+// Type for a sort configuration for a single table
+export type SortConfig = {
+  key: keyof ComicBook;
+  direction: SortDirection;
+}[];
+
 // Type for the state
 export type AppState = {
   user: User;
@@ -14,7 +23,7 @@ export type AppState = {
   setLoading: (loading: boolean) => void;
 
   jsonData: ComicBook[];
-  setJsonData: (data: ComicBook[]) => void;
+  setJsonData: Dispatch<SetStateAction<ComicBook[]>>;
 
   columns: ColumnConfig[];
   setColumns: Dispatch<SetStateAction<ColumnConfig[]>>;
@@ -30,6 +39,10 @@ export type AppState = {
 
   fileName: string | null;
   setFileName: (value: string | null) => void;
+
+  // --- NEW: sorting configuration per table ---
+  tableSortConfig: Record<string, SortConfig>; // keyed by table ID
+  setTableSortConfig: Dispatch<SetStateAction<Record<string, SortConfig>>>;
 };
 
 // Context declaration

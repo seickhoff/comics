@@ -1,6 +1,6 @@
 // src/context/AppProvider.tsx
 import { useState, ReactNode } from "react";
-import { AppContext } from "./AppContext";
+import { AppContext, SortConfig } from "./AppContext";
 import { ColumnConfig, ColumnKey, ComicBook } from "../interfaces/ComicBook";
 
 const defaultColumns: ColumnConfig[] = [
@@ -28,6 +28,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [useOrFiltering, setUseOrFiltering] = useState(false);
   const [user, setUser] = useState<null | { id: string; name: string }>(null);
+  const [tableSortConfig, setTableSortConfig] = useState<Record<string, SortConfig>>({});
 
   return (
     <AppContext.Provider
@@ -48,6 +49,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setUser,
         useOrFiltering,
         user,
+        tableSortConfig,
+        setTableSortConfig,
       }}
     >
       {children}

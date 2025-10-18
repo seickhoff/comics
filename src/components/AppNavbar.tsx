@@ -22,7 +22,10 @@ const navRoutes: NavRoute[] = [
   {
     path: "/",
     label: "Maintenance",
-    children: [{ path: "/maintenance/list", label: "List" }],
+    children: [
+      { path: "/maintenance/add", label: "Add One" },
+      { path: "/maintenance/list", label: "List" },
+    ],
   },
   { path: "/file", label: "File" },
 ];

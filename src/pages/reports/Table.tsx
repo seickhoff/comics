@@ -31,7 +31,13 @@ export function Table() {
             useOrFiltering={useOrFiltering}
             setUseOrFiltering={setUseOrFiltering}
           />
-          <TableReport data={jsonData} columns={columns} filters={filters} useOrFiltering={useOrFiltering} />
+          <TableReport
+            tableId="main-comics-table"
+            data={jsonData}
+            columns={columns}
+            filters={filters}
+            useOrFiltering={useOrFiltering}
+          />
         </>
       )}
     </Container>

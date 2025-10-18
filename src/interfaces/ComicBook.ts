@@ -1,7 +1,7 @@
 export interface ComicBook {
   title: string;
   publisher: string;
-  volume: number;
+  volume: string;
   issue: string;
   month?: string;
   year: string;

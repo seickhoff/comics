@@ -2,27 +2,32 @@ import { ComicBook } from "../interfaces/ComicBook";
 
 interface OverstreetProps {
   comics: ComicBook[];
-  width?: number;
 }
 
+// Format currency without $
 function formatCurrency(value: string | number): string {
   const num = typeof value === "string" ? Number(value) : value;
   return num.toLocaleString("en-US", { style: "currency", currency: "USD" }).replace("$", "");
 }
 
+// Parse issue number
 function parseIssue(issue: string): number | null {
   const num = Number(issue);
   return Number.isFinite(num) ? num : null;
 }
 
-// Format line with filler dots
-function formatLine(left: string, right: string, width: number): string {
-  const formatted = formatCurrency(right);
-  const dots = ".".repeat(Math.max(1, width - left.length - formatted.length - 1));
-  return `${left}${dots}$${formatted}`;
+// JSX-based line with responsive dotted leader and hover background
+function Line({ left, right }: { left: string; right: string }) {
+  return (
+    <div className="d-flex align-items-center font-monospace text-nowrap w-100 px-1 py-0.5 line-hover">
+      <span className="flex-shrink-0">{left}</span>
+      <span className="flex-grow-1 mx-2" style={{ borderBottom: "1px dotted gray", height: "0.6em" }}></span>
+      <span className="flex-shrink-0">${formatCurrency(right)}</span>
+    </div>
+  );
 }
 
-// Move leading "The " to the end
+// Normalize "The " in titles
 function normalizeTitle(title: string): string {
   if (title.startsWith("The ")) {
     return title.slice(4) + ", The";
@@ -33,12 +38,9 @@ function normalizeTitle(title: string): string {
 // Group comics by Title → Publisher → Volume
 function groupByTitlePublisherVolume(comics: ComicBook[]) {
   const map = new Map<string, ComicBook[]>();
-
   for (const comic of comics) {
     const key = `${comic.title}||${comic.publisher}||${comic.volume}`;
-    if (!map.has(key)) {
-      map.set(key, []);
-    }
+    if (!map.has(key)) map.set(key, []);
     map.get(key)!.push(comic);
   }
 
@@ -47,41 +49,35 @@ function groupByTitlePublisherVolume(comics: ComicBook[]) {
     return { title, publisher, volume, issues };
   });
 
-  // Sort groups: title → publisher → volume
   groups.sort((a, b) => {
     const t = normalizeTitle(a.title).localeCompare(normalizeTitle(b.title));
     if (t !== 0) return t;
-
     const p = a.publisher.localeCompare(b.publisher);
     if (p !== 0) return p;
-
     const av = Number(a.volume);
     const bv = Number(b.volume);
-    if (Number.isFinite(av) && Number.isFinite(bv)) {
-      return av - bv;
-    }
+    if (Number.isFinite(av) && Number.isFinite(bv)) return av - bv;
     return a.volume.localeCompare(b.volume);
   });
 
   return groups;
 }
 
-// Build issue lines, merging consecutive numeric issues and adjacent ranges with the same value
-function buildIssueLines(issues: ComicBook[], width: number): string[] {
+// Build issue lines
+function buildIssueLines(issues: ComicBook[]): { label: string; value: string }[] {
   const numeric = issues.filter((i) => parseIssue(i.issue) !== null);
   const nonNumeric = issues.filter((i) => parseIssue(i.issue) === null);
 
   numeric.sort((a, b) => parseIssue(a.issue)! - parseIssue(b.issue)!);
   nonNumeric.sort((a, b) => a.issue.localeCompare(b.issue));
 
-  // Step 1: build initial runs of consecutive issues
   const runs: { label: string; value: string }[] = [];
   let runStart: ComicBook | null = null;
   let prev: ComicBook | null = null;
 
   for (const comic of numeric) {
     if (runStart && prev && parseIssue(prev.issue)! + 1 === parseIssue(comic.issue)! && prev.value === comic.value) {
-      prev = comic; // continue run
+      prev = comic;
     } else {
       if (runStart && prev) {
         const label = runStart.issue === prev.issue ? runStart.issue : `${runStart.issue}-${prev.issue}`;
@@ -97,7 +93,7 @@ function buildIssueLines(issues: ComicBook[], width: number): string[] {
     runs.push({ label, value: runStart.value });
   }
 
-  // Step 2: merge runs with the same value into comma-separated labels
+  // Merge consecutive runs with same value
   const merged: { label: string; value: string }[] = [];
   for (const run of runs) {
     const last = merged[merged.length - 1];
@@ -108,33 +104,30 @@ function buildIssueLines(issues: ComicBook[], width: number): string[] {
     }
   }
 
-  // Step 3: format lines
-  const lines: string[] = merged.map((r) => formatLine(r.label, r.value, width));
-
-  // Add non-numeric after numeric
+  // Append non-numeric
   for (const comic of nonNumeric) {
-    lines.push(formatLine(comic.issue, comic.value, width));
+    merged.push({ label: comic.issue, value: comic.value });
   }
 
-  return lines;
+  return merged;
 }
 
-export default function OverstreetReport({ comics, width = 32 }: OverstreetProps) {
+export default function OverstreetReport({ comics }: OverstreetProps) {
   const groups = groupByTitlePublisherVolume(comics);
 
   return (
-    <pre className="font-mono text-sm leading-tight">
+    <div className="font-monospace text-sm leading-tight" style={{ maxWidth: "500px", overflowX: "auto" }}>
       {groups.map((g, idx) => (
         <div key={idx} className="mb-4">
           <div className="font-bold">{g.title}</div>
           <div>
             ({g.publisher}, v{g.volume})
           </div>
-          {buildIssueLines(g.issues, width).map((line, i) => (
-            <div key={i}>{line}</div>
+          {buildIssueLines(g.issues).map((r, i) => (
+            <Line key={i} left={r.label} right={r.value} />
           ))}
         </div>
       ))}
-    </pre>
+    </div>
   );
 }

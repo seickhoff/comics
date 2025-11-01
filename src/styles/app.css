@@ -1,0 +1,19 @@
+/* Hover highlight for OverstreetReport lines */
+.line-hover:hover {
+  background-color: #f0f0f0; /* light gray */
+  cursor: default;
+}
+
+/* Monospace font for the report */
+.font-monospace {
+  font-family: monospace;
+}
+
+/* Optional: small text and tight line spacing */
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.leading-tight {
+  line-height: 1.25;
+}

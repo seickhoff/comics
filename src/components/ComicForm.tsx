@@ -1,12 +1,16 @@
-import { useState, useMemo } from "react";
+// src/components/ComicForm.tsx
+import { useState, useMemo, useEffect } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
-import { ComicBook } from "../interfaces/ComicBook";
 import Select from "react-select/creatable";
-import { GradeCode, GradeDescription } from "../interfaces/ComicBook";
+import { ComicBook, GradeCode, GradeDescription } from "../interfaces/ComicBook";
+import { useToast } from "../context/ToastContext";
 
-type AddComicFormProps = {
+type ComicFormProps = {
+  mode: "add" | "edit";
   existingComics: ComicBook[];
-  onAdd: (comic: ComicBook) => void;
+  initialComic?: ComicBook;
+  onSubmit: (comic: ComicBook) => void;
+  onCancel?: () => void;
 };
 
 function getUniqueValues<T extends keyof ComicBook>(comics: ComicBook[], key: T): string[] {
@@ -19,37 +23,11 @@ function getUniqueValues<T extends keyof ComicBook>(comics: ComicBook[], key: T)
   return unique.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 }
 
-export function AddComicForm({ existingComics, onAdd }: AddComicFormProps) {
-  const [comic, setComic] = useState<Partial<ComicBook>>({
-    title: "",
-    publisher: "",
-    volume: "",
-    issue: "",
-    value: "",
-    writer: [],
-    artist: [],
-    month: "",
-    year: "",
-    quantity: 1,
-    condition: GradeCode.NM,
-  });
+export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCancel }: ComicFormProps) {
+  const isEdit = mode === "edit";
 
-  const titleOptions = useMemo(() => getUniqueValues(existingComics, "title"), [existingComics]);
-  const publisherOptions = useMemo(() => getUniqueValues(existingComics, "publisher"), [existingComics]);
-  const monthOptions = useMemo(() => getUniqueValues(existingComics, "month"), [existingComics]);
-  const yearOptions = useMemo(() => getUniqueValues(existingComics, "year"), [existingComics]);
-  const volumeOptions = useMemo(() => getUniqueValues(existingComics, "volume"), [existingComics]);
-  const writerOptions = useMemo(() => getUniqueValues(existingComics, "writer"), [existingComics]);
-  const artistOptions = useMemo(() => getUniqueValues(existingComics, "artist"), [existingComics]);
-
-  const handleChange = (key: keyof ComicBook, value: string | string[] | number) => {
-    setComic((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onAdd(comic as ComicBook);
-    setComic({
+  const [comic, setComic] = useState<Partial<ComicBook>>(
+    initialComic || {
       title: "",
       publisher: "",
       volume: "",
@@ -61,11 +39,64 @@ export function AddComicForm({ existingComics, onAdd }: AddComicFormProps) {
       year: "",
       quantity: 1,
       condition: GradeCode.NM,
-    });
+    }
+  );
+
+  const { addToast } = useToast();
+
+  // reset when editing a different comic
+  useEffect(() => {
+    if (isEdit && initialComic) setComic(initialComic);
+  }, [initialComic]);
+
+  const titleOptions = useMemo(() => getUniqueValues(existingComics, "title"), [existingComics]);
+  const publisherOptions = useMemo(() => getUniqueValues(existingComics, "publisher"), [existingComics]);
+  const volumeOptions = useMemo(() => getUniqueValues(existingComics, "volume"), [existingComics]);
+  const issueOptions = useMemo(() => getUniqueValues(existingComics, "issue"), [existingComics]);
+  const valueOptions = useMemo(() => getUniqueValues(existingComics, "value"), [existingComics]);
+  const monthOptions = useMemo(() => getUniqueValues(existingComics, "month"), [existingComics]);
+  const yearOptions = useMemo(() => getUniqueValues(existingComics, "year"), [existingComics]);
+  const writerOptions = useMemo(() => getUniqueValues(existingComics, "writer"), [existingComics]);
+  const artistOptions = useMemo(() => getUniqueValues(existingComics, "artist"), [existingComics]);
+
+  const handleChange = (key: keyof ComicBook, value: string | string[] | number) => {
+    setComic((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(comic as ComicBook);
+
+    if (!isEdit) {
+      setComic({
+        title: "",
+        publisher: "",
+        volume: "",
+        issue: "",
+        value: "",
+        writer: [],
+        artist: [],
+        month: "",
+        year: "",
+        quantity: 1,
+        condition: GradeCode.NM,
+      });
+      addToast({
+        title: "Comic Added",
+        body: "Successfully added to your collection.",
+        bg: "success",
+      });
+    } else {
+      addToast({
+        title: "Comic Updated",
+        body: "Changes saved successfully.",
+        bg: "info",
+      });
+    }
   };
 
   return (
-    <Form onSubmit={handleSubmit} className="p-3 border rounded shadow-sm mt-3">
+    <Form onSubmit={handleSubmit} className="p-3 border rounded shadow-sm mt-2">
       <Row className="g-3">
         {/* Title */}
         <Col lg={6}>
@@ -78,7 +109,7 @@ export function AddComicForm({ existingComics, onAdd }: AddComicFormProps) {
           />
           <datalist id="title-options">
             {titleOptions.map((opt) => (
-              <option key={`title-${opt}`} value={opt} />
+              <option key={opt} value={opt} />
             ))}
           </datalist>
         </Col>
@@ -94,7 +125,7 @@ export function AddComicForm({ existingComics, onAdd }: AddComicFormProps) {
           />
           <datalist id="publisher-options">
             {publisherOptions.map((opt) => (
-              <option key={`publisher-${opt}`} value={opt} />
+              <option key={opt} value={opt} />
             ))}
           </datalist>
         </Col>
@@ -110,7 +141,7 @@ export function AddComicForm({ existingComics, onAdd }: AddComicFormProps) {
           />
           <datalist id="volume-options">
             {volumeOptions.map((opt) => (
-              <option key={`volume-${opt}`} value={opt} />
+              <option key={opt} value={opt} />
             ))}
           </datalist>
         </Col>
@@ -119,10 +150,16 @@ export function AddComicForm({ existingComics, onAdd }: AddComicFormProps) {
         <Col lg={1}>
           <Form.Label>Issue</Form.Label>
           <Form.Control
+            list="issue-options"
             value={comic.issue || ""}
             onChange={(e) => handleChange("issue", e.target.value)}
             placeholder="#"
           />
+          <datalist id="issue-options">
+            {issueOptions.map((opt) => (
+              <option key={opt} value={opt} />
+            ))}
+          </datalist>
         </Col>
 
         {/* Month */}
@@ -174,10 +211,16 @@ export function AddComicForm({ existingComics, onAdd }: AddComicFormProps) {
           <Form.Control
             type="number"
             step="0.01"
+            list="value-options"
             value={comic.value || ""}
             onChange={(e) => handleChange("value", e.target.value)}
             placeholder="0.00"
           />
+          <datalist id="value-options">
+            {valueOptions.map((opt) => (
+              <option key={opt} value={opt} />
+            ))}
+          </datalist>
         </Col>
 
         {/* Condition */}
@@ -221,8 +264,13 @@ export function AddComicForm({ existingComics, onAdd }: AddComicFormProps) {
       </Row>
 
       <div className="mt-3 text-end">
-        <Button type="submit" variant="primary">
-          Add Comic
+        {isEdit && onCancel && (
+          <Button variant="secondary" className="me-2" onClick={onCancel}>
+            Cancel
+          </Button>
+        )}
+        <Button type="submit" variant={isEdit ? "info" : "primary"}>
+          {isEdit ? "Save Changes" : "Add Comic"}
         </Button>
       </div>
     </Form>

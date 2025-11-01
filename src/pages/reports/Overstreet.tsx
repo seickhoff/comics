@@ -15,7 +15,7 @@ export function Overstreet() {
         </Alert>
       ) : (
         <>
-          <OverstreetReport comics={jsonData} width={48} />
+          <OverstreetReport comics={jsonData} />
         </>
       )}
     </Container>

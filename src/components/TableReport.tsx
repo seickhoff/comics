@@ -52,6 +52,18 @@ export const TableReport = ({ tableId }: TableReportProps) => {
   const getComicKey = (c: ComicBook) => `${c.title}||${c.publisher}||${c.volume}||${c.issue}`;
 
   const handleSave = (updatedComic: ComicBook) => {
+    // Format value if not blank
+    if (updatedComic.value && updatedComic.value.trim() !== "") {
+      const num = Number(updatedComic.value);
+      updatedComic.value = isNaN(num) ? updatedComic.value : num.toFixed(2);
+    }
+
+    // Format month if not blank
+    if (updatedComic.month && updatedComic.month.trim() !== "") {
+      const monthNum = Number(updatedComic.month);
+      updatedComic.month = isNaN(monthNum) ? updatedComic.month : monthNum.toString().padStart(2, "0");
+    }
+
     const key = getComicKey(updatedComic);
 
     // Update local tableData
@@ -138,14 +150,31 @@ export const TableReport = ({ tableId }: TableReportProps) => {
         </thead>
         <tbody>
           {sortedData.map((row) => {
-            // Create a stable unique key for each comic
-            const key = `${row.title}||${row.publisher}||${row.volume}||${row.issue}`;
+            const key = getComicKey(row);
             return (
               <tr key={key} onClick={() => handleRowClick(row)} style={{ cursor: "pointer" }}>
                 {visibleColumns.map((col) => {
-                  const value = row[col.key];
+                  let value = row[col.key];
+
+                  // Format money column
+                  if (col.key === "value" && typeof value === "string") {
+                    const num = Number(value);
+                    value = isNaN(num) ? value : num.toLocaleString("en-US", { style: "currency", currency: "USD" });
+                  }
+
                   const display = Array.isArray(value) ? value.join(", ") : value;
-                  return <td key={col.key}>{display}</td>;
+
+                  // Alignment
+                  const centerCols: (keyof ComicBook)[] = ["issue", "month", "year", "quantity", "condition"];
+                  const style: React.CSSProperties = {};
+                  if (col.key === "value") style.textAlign = "right";
+                  else if (centerCols.includes(col.key)) style.textAlign = "center";
+
+                  return (
+                    <td key={col.key} style={style}>
+                      {display}
+                    </td>
+                  );
                 })}
               </tr>
             );

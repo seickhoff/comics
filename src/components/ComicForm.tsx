@@ -39,6 +39,7 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
       year: "",
       quantity: 1,
       condition: GradeCode.NM,
+      comments: "",
     }
   );
 
@@ -259,6 +260,18 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
             options={artistOptions.map((a) => ({ value: a, label: a }))}
             value={(comic.artist || []).map((a) => ({ value: a, label: a }))}
             onChange={(selected) => handleChange("artist", selected ? selected.map((s) => s.value) : [])}
+          />
+        </Col>
+
+        {/* Comments */}
+        <Col lg={12}>
+          <Form.Label>Comments</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={2}
+            value={comic.comments || ""}
+            onChange={(e) => handleChange("comments", e.target.value)}
+            placeholder="Add any comments here"
           />
         </Col>
       </Row>

@@ -5,6 +5,7 @@ import { ReportConfiguration, ReportConfigurationProps } from "./ReportConfigura
 import { useAppContext } from "../hooks/useAppContext";
 import { ComicForm } from "./ComicForm";
 import { ComicBook } from "../interfaces/ComicBook";
+import { normalizeComicBook } from "../utils/normalizeComicBook";
 
 export default function ReportConfigWrapper(props: ReportConfigurationProps) {
   const {
@@ -17,6 +18,7 @@ export default function ReportConfigWrapper(props: ReportConfigurationProps) {
     handleBatchEdit,
   } = useAppContext();
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleClose = () => setShowAddModal(false);
   const handleShow = (e: React.MouseEvent) => {
@@ -24,10 +26,15 @@ export default function ReportConfigWrapper(props: ReportConfigurationProps) {
     setShowAddModal(true);
   };
 
-  const handleAddComic = (newComic: ComicBook) => {
-    // Add to local state
-    setTableData([...tableData, newComic]);
-    setShowAddModal(false);
+  const handleAddComic = (newComic: ComicBook, isLastInBulk?: boolean) => {
+    // Normalize the comic before adding
+    const normalized = normalizeComicBook(newComic);
+    setTableData((prev) => [...prev, normalized]);
+
+    // Only close modal after the last comic in a bulk add
+    if (isLastInBulk !== false) {
+      setShowAddModal(false);
+    }
   };
 
   const handleEditSelected = (e: React.MouseEvent) => {
@@ -40,6 +47,20 @@ export default function ReportConfigWrapper(props: ReportConfigurationProps) {
   const handleClearSelection = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedKeys(new Set());
+  };
+
+  const handleDeleteSelected = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (selectedKeys.size === 0) return;
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = () => {
+    const getComicKey = (c: ComicBook) => `${c.title}||${c.publisher}||${c.volume}||${c.issue}`;
+    const filtered = tableData.filter((c) => !selectedKeys.has(getComicKey(c)));
+    setTableData(filtered);
+    setSelectedKeys(new Set());
+    setShowDeleteConfirm(false);
   };
 
   return (
@@ -62,6 +83,9 @@ export default function ReportConfigWrapper(props: ReportConfigurationProps) {
               </span>
               <Button variant="primary" size="sm" onClick={handleEditSelected}>
                 Edit Selected
+              </Button>
+              <Button variant="danger" size="sm" onClick={handleDeleteSelected}>
+                Delete Selected
               </Button>
               <Button variant="secondary" size="sm" onClick={handleClearSelection}>
                 Clear
@@ -100,6 +124,27 @@ export default function ReportConfigWrapper(props: ReportConfigurationProps) {
             onSubmit={handleAddComic}
           />
         </Modal.Body>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteConfirm} onHide={() => setShowDeleteConfirm(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>
+            Are you sure you want to delete <strong>{selectedKeys.size}</strong> selected comic(s)?
+          </p>
+          <p className="text-danger mb-0">This action cannot be undone.</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
       </Modal>
     </div>
   );

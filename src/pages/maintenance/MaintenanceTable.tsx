@@ -5,7 +5,7 @@ import { TableReport } from "../../components/TableReport";
 import ReportConfigWrapper from "../../components/ReportConfigurationWrapper";
 
 export function MaintenanceTable() {
-  const { columns, setColumns, jsonData, filters, setFilters, useOrFiltering, setUseOrFiltering } = useAppContext();
+  const { columns, setColumns, fileName, filters, setFilters, useOrFiltering, setUseOrFiltering } = useAppContext();
 
   const toggleColumnVisibility = (key: ColumnKey) => {
     setColumns((cols: ColumnConfig[]) =>
@@ -17,9 +17,10 @@ export function MaintenanceTable() {
     <Container className="mt-4">
       <h1 className="mb-3">Maintenance</h1>
 
-      {jsonData.length === 0 ? (
-        <Alert key="danger" variant="danger">
-          No data loaded. Please <Alert.Link href="/file">open</Alert.Link> a data file to get started.
+      {!fileName ? (
+        <Alert key="info" variant="info">
+          No data loaded. Please visit the <Alert.Link href="/file">File</Alert.Link> page to load an existing file or
+          start a new collection.
         </Alert>
       ) : (
         <>

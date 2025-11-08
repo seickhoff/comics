@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { ComicBook } from "../interfaces/ComicBook";
 import { useAppContext } from "../hooks/useAppContext";
 import { ComicForm } from "./ComicForm";
+import { normalizeComicBook } from "../utils/normalizeComicBook";
 
 type SortDirection = "asc" | "desc";
 type SortConfig = { key: keyof ComicBook; direction: SortDirection }[];
@@ -123,18 +124,6 @@ export const TableReport = ({ tableId }: TableReportProps) => {
     return () => setHandleBatchEdit(null);
   }, [tableData, selectedKeys, setHandleBatchEdit]);
 
-  const formatFieldValue = (field: keyof ComicBook, value: any): any => {
-    if (field === "value" && value && value.trim() !== "") {
-      const num = Number(value);
-      return isNaN(num) ? value : num.toFixed(2);
-    }
-    if (field === "month" && value && value.trim() !== "") {
-      const monthNum = Number(value);
-      return isNaN(monthNum) ? value : monthNum.toString().padStart(2, "0");
-    }
-    return value;
-  };
-
   const isEmptyValue = (value: any): boolean => {
     return value === undefined || value === null || value === "" || (Array.isArray(value) && value.length === 0);
   };
@@ -169,10 +158,10 @@ export const TableReport = ({ tableId }: TableReportProps) => {
               }
               // Empty strings and empty arrays mean "no change" in batch mode
               else if (!isEmptyValue(newValue)) {
-                (updated as any)[field] = formatFieldValue(field, newValue);
+                (updated as any)[field] = newValue;
               }
             });
-            return updated;
+            return normalizeComicBook(updated);
           }
           return c;
         })
@@ -193,10 +182,10 @@ export const TableReport = ({ tableId }: TableReportProps) => {
                   (updated as any)[field] = "";
                 }
               } else if (!isEmptyValue(newValue)) {
-                (updated as any)[field] = formatFieldValue(field, newValue);
+                (updated as any)[field] = newValue;
               }
             });
-            return updated;
+            return normalizeComicBook(updated);
           }
           return c;
         })
@@ -204,15 +193,11 @@ export const TableReport = ({ tableId }: TableReportProps) => {
 
       setSelectedKeys(new Set());
     } else {
-      // Single update
-      const formatted = { ...updatedComic };
-      (Object.keys(formatted) as (keyof ComicBook)[]).forEach((field) => {
-        (formatted as any)[field] = formatFieldValue(field, formatted[field]);
-      });
-
-      const key = getComicKey(formatted);
-      setTableData((prev) => prev.map((c) => (getComicKey(c) === key ? formatted : c)));
-      setJsonData((prev) => prev.map((c) => (getComicKey(c) === key ? formatted : c)));
+      // Single update - normalize the entire comic
+      const normalized = normalizeComicBook(updatedComic);
+      const key = getComicKey(normalized);
+      setTableData((prev) => prev.map((c) => (getComicKey(c) === key ? normalized : c)));
+      setJsonData((prev) => prev.map((c) => (getComicKey(c) === key ? normalized : c)));
     }
 
     setShowEditModal(false);

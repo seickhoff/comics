@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useAppContext } from "../hooks/useAppContext";
 import { Card, Button, Alert, Spinner } from "react-bootstrap";
+import { normalizeComicBook } from "../utils/normalizeComicBook";
+import { ComicBook } from "../interfaces/ComicBook";
 
 export function JsonFileUploader() {
   const { setJsonData, setLoading, setFileName } = useAppContext();
@@ -20,7 +22,7 @@ export function JsonFileUploader() {
     return title;
   }
 
-  function sortComics(data: any[]) {
+  function sortComics(data: ComicBook[]) {
     return [...data].sort((a, b) => {
       // 1. Title (normalize for sorting)
       const t = normalizeTitle(a.title).localeCompare(normalizeTitle(b.title));
@@ -32,7 +34,7 @@ export function JsonFileUploader() {
       if (av !== null && bv !== null) {
         if (av !== bv) return av - bv;
       } else {
-        const v = String(a.volume).localeCompare(String(b.volume));
+        const v = a.volume.localeCompare(b.volume);
         if (v !== 0) return v;
       }
 
@@ -42,7 +44,7 @@ export function JsonFileUploader() {
       if (ai !== null && bi !== null) {
         return ai - bi;
       }
-      return String(a.issue).localeCompare(String(b.issue));
+      return a.issue.localeCompare(b.issue);
     });
   }
 
@@ -57,8 +59,9 @@ export function JsonFileUploader() {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const data = JSON.parse(e.target?.result as string);
-        const sorted = sortComics(data);
+        const rawData = JSON.parse(e.target?.result as string);
+        const normalized = Array.isArray(rawData) ? rawData.map(normalizeComicBook) : [];
+        const sorted = sortComics(normalized);
         setJsonData(sorted);
       } catch (error) {
         console.log(error);
@@ -71,20 +74,29 @@ export function JsonFileUploader() {
     reader.readAsText(file);
   };
 
+  const handleStartNew = () => {
+    setJsonData([]);
+    setFileName("new-collection.json");
+  };
+
   return (
     <Card className="mt-4">
       <Card.Body>
         <Card.Title>Open Comic Book File</Card.Title>
-        <div className="d-flex justify-content-center">
+        <div className="d-flex justify-content-center gap-2">
           <Button variant="primary" className="mb-3" disabled={loading}>
-            <label htmlFor="file-upload" className="w-100">
+            <label htmlFor="file-upload" className="w-100" style={{ cursor: "pointer", margin: 0 }}>
               {loading ? <Spinner animation="border" size="sm" /> : "Choose File"}
             </label>
           </Button>
           <input type="file" id="file-upload" accept=".json" onChange={handleFileChange} hidden disabled={loading} />
+
+          <Button variant="success" className="mb-3" onClick={handleStartNew} disabled={loading}>
+            Start New Collection
+          </Button>
         </div>
         {loading && <Alert variant="warning">Loading file...</Alert>}
-        {!loading && <Alert variant="info">Click the button to select a JSON file to upload</Alert>}
+        {!loading && <Alert variant="info">Load an existing JSON file or start a new collection from scratch</Alert>}
       </Card.Body>
     </Card>
   );

@@ -9,7 +9,7 @@ type ComicFormProps = {
   mode: "add" | "edit";
   existingComics: ComicBook[];
   initialComic?: ComicBook;
-  onSubmit: (comic: ComicBook) => void;
+  onSubmit: (comic: ComicBook, isLastInBulk?: boolean) => void;
   onCancel?: () => void;
   isBatchMode?: boolean;
 };
@@ -44,6 +44,9 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
     }
   );
 
+  // For bulk add mode
+  const [endingIssue, setEndingIssue] = useState<string>("");
+
   const { addToast } = useToast();
 
   // reset when editing a different comic
@@ -67,9 +70,59 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(comic as ComicBook);
 
-    if (!isEdit) {
+    // Check if bulk add mode is active (add mode with ending issue filled)
+    if (!isEdit && endingIssue && comic.issue && comic.month && comic.year) {
+      const startIssue = parseFloat(comic.issue);
+      const endIssue = parseFloat(endingIssue);
+
+      if (isNaN(startIssue) || isNaN(endIssue)) {
+        addToast({
+          title: "Invalid Input",
+          body: "Issue and Ending Issue must be valid numbers for bulk add.",
+          bg: "danger",
+        });
+        return;
+      }
+
+      if (endIssue < startIssue) {
+        addToast({
+          title: "Invalid Range",
+          body: "Ending Issue must be greater than or equal to Issue.",
+          bg: "danger",
+        });
+        return;
+      }
+
+      // Generate multiple comics
+      const comicsToAdd: ComicBook[] = [];
+      let currentIssue = startIssue;
+      let currentMonth = parseInt(comic.month);
+      let currentYear = parseInt(comic.year);
+
+      while (currentIssue <= endIssue) {
+        comicsToAdd.push({
+          ...comic,
+          issue: String(currentIssue),
+          month: String(currentMonth).padStart(2, "0"),
+          year: String(currentYear),
+        } as ComicBook);
+
+        currentIssue++;
+        currentMonth++;
+        if (currentMonth > 12) {
+          currentMonth = 1;
+          currentYear++;
+        }
+      }
+
+      // Submit each comic, marking the last one
+      comicsToAdd.forEach((c, index) => {
+        const isLast = index === comicsToAdd.length - 1;
+        onSubmit(c, isLast);
+      });
+
+      // Reset form
       setComic({
         title: "",
         publisher: "",
@@ -83,22 +136,75 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
         quantity: 1,
         condition: GradeCode.NM,
       });
+      setEndingIssue("");
+
       addToast({
-        title: "Comic Added",
-        body: "Successfully added to your collection.",
+        title: "Comics Added",
+        body: `Successfully added ${comicsToAdd.length} comics to your collection.`,
         bg: "success",
       });
     } else {
-      addToast({
-        title: "Comic Updated",
-        body: "Changes saved successfully.",
-        bg: "info",
-      });
+      // Single comic add or edit
+      onSubmit(comic as ComicBook);
+
+      if (!isEdit) {
+        setComic({
+          title: "",
+          publisher: "",
+          volume: "",
+          issue: "",
+          value: "",
+          writer: [],
+          artist: [],
+          month: "",
+          year: "",
+          quantity: 1,
+          condition: GradeCode.NM,
+        });
+        setEndingIssue("");
+        addToast({
+          title: "Comic Added",
+          body: "Successfully added to your collection.",
+          bg: "success",
+        });
+      } else {
+        addToast({
+          title: "Comic Updated",
+          body: "Changes saved successfully.",
+          bg: "info",
+        });
+      }
     }
   };
 
+  // Calculate how many comics will be added
+  const bulkAddCount = useMemo(() => {
+    if (!isEdit && endingIssue && comic.issue && comic.month && comic.year) {
+      const start = parseFloat(comic.issue);
+      const end = parseFloat(endingIssue);
+      if (!isNaN(start) && !isNaN(end) && end >= start) {
+        return Math.floor(end - start + 1);
+      }
+    }
+    return 0;
+  }, [isEdit, endingIssue, comic.issue, comic.month, comic.year]);
+
   return (
     <Form onSubmit={handleSubmit} className="p-3 border rounded shadow-sm mt-2">
+      {bulkAddCount > 1 && (
+        <div
+          style={{
+            marginBottom: 15,
+            padding: 10,
+            backgroundColor: "#d1ecf1",
+            borderRadius: 5,
+            border: "1px solid #bee5eb",
+          }}
+        >
+          <strong>Bulk Add Mode:</strong> Will create {bulkAddCount} comics (Issues {comic.issue} - {endingIssue}),
+          incrementing month/year automatically.
+        </div>
+      )}
       <Row className="g-3">
         {/* Title */}
         <Col lg={6}>
@@ -163,6 +269,22 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
             ))}
           </datalist>
         </Col>
+
+        {/* Ending Issue - only show in add mode */}
+        {!isEdit && (
+          <Col lg={1}>
+            <Form.Label>End Issue</Form.Label>
+            <Form.Control
+              value={endingIssue}
+              onChange={(e) => setEndingIssue(e.target.value)}
+              placeholder="#"
+              title="Fill this to add multiple issues in sequence"
+            />
+            <Form.Text className="text-muted" style={{ fontSize: "0.7rem" }}>
+              Bulk add
+            </Form.Text>
+          </Col>
+        )}
 
         {/* Month */}
         <Col lg={1}>

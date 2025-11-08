@@ -43,6 +43,14 @@ export type AppState = {
   // --- NEW: sorting configuration per table ---
   tableSortConfig: Record<string, SortConfig>; // keyed by table ID
   setTableSortConfig: Dispatch<SetStateAction<Record<string, SortConfig>>>;
+
+  // --- NEW: selected rows for batch editing ---
+  selectedKeys: Set<string>;
+  setSelectedKeys: Dispatch<SetStateAction<Set<string>>>;
+
+  // Batch edit handler - set by TableReport, called by ReportConfigWrapper
+  handleBatchEdit: (() => void) | null;
+  setHandleBatchEdit: (handler: (() => void) | null) => void;
 };
 
 // Context declaration

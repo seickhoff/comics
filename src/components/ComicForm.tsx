@@ -11,6 +11,7 @@ type ComicFormProps = {
   initialComic?: ComicBook;
   onSubmit: (comic: ComicBook) => void;
   onCancel?: () => void;
+  isBatchMode?: boolean;
 };
 
 function getUniqueValues<T extends keyof ComicBook>(comics: ComicBook[], key: T): string[] {
@@ -23,7 +24,7 @@ function getUniqueValues<T extends keyof ComicBook>(comics: ComicBook[], key: T)
   return unique.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 }
 
-export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCancel }: ComicFormProps) {
+export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCancel, isBatchMode }: ComicFormProps) {
   const isEdit = mode === "edit";
 
   const [comic, setComic] = useState<Partial<ComicBook>>(
@@ -200,9 +201,10 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
           <Form.Label>Quantity</Form.Label>
           <Form.Control
             type="number"
-            min={1}
-            value={comic.quantity || 1}
-            onChange={(e) => handleChange("quantity", Number(e.target.value))}
+            min={isBatchMode ? undefined : 1}
+            value={comic.quantity ?? ""}
+            onChange={(e) => handleChange("quantity", e.target.value === "" ? "" : Number(e.target.value))}
+            placeholder={isBatchMode ? "No change" : "1"}
           />
         </Col>
 
@@ -215,7 +217,7 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
             list="value-options"
             value={comic.value || ""}
             onChange={(e) => handleChange("value", e.target.value)}
-            placeholder="0.00"
+            placeholder={isBatchMode ? "No change" : "0.00"}
           />
           <datalist id="value-options">
             {valueOptions.map((opt) => (
@@ -228,9 +230,10 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
         <Col lg={6}>
           <Form.Label>Condition</Form.Label>
           <Form.Select
-            value={comic.condition || GradeCode.NM}
+            value={comic.condition || (isBatchMode ? "" : GradeCode.NM)}
             onChange={(e) => handleChange("condition", e.target.value)}
           >
+            {isBatchMode && <option value="">-- No Change --</option>}
             {Object.entries(GradeDescription).map(([code, desc]) => (
               <option key={code} value={code}>
                 {code} - {desc}
@@ -245,10 +248,19 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
           <Select
             isMulti
             isClearable
-            options={writerOptions.map((w) => ({ value: w, label: w }))}
+            options={[
+              ...(isBatchMode ? [{ value: "__CLEAR__", label: "⚠️ Clear All Writers" }] : []),
+              ...writerOptions.map((w) => ({ value: w, label: w })),
+            ]}
             value={(comic.writer || []).map((w) => ({ value: w, label: w }))}
             onChange={(selected) => handleChange("writer", selected ? selected.map((s) => s.value) : [])}
+            placeholder={isBatchMode ? "No change (leave as is)" : "Select writers..."}
           />
+          {isBatchMode && (
+            <Form.Text className="text-muted">
+              Empty = no change. Select "Clear All Writers" to remove all writers.
+            </Form.Text>
+          )}
         </Col>
 
         {/* Artists */}
@@ -257,10 +269,19 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
           <Select
             isMulti
             isClearable
-            options={artistOptions.map((a) => ({ value: a, label: a }))}
+            options={[
+              ...(isBatchMode ? [{ value: "__CLEAR__", label: "⚠️ Clear All Artists" }] : []),
+              ...artistOptions.map((a) => ({ value: a, label: a })),
+            ]}
             value={(comic.artist || []).map((a) => ({ value: a, label: a }))}
             onChange={(selected) => handleChange("artist", selected ? selected.map((s) => s.value) : [])}
+            placeholder={isBatchMode ? "No change (leave as is)" : "Select artists..."}
           />
+          {isBatchMode && (
+            <Form.Text className="text-muted">
+              Empty = no change. Select "Clear All Artists" to remove all artists.
+            </Form.Text>
+          )}
         </Col>
 
         {/* Comments */}
@@ -271,8 +292,13 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
             rows={2}
             value={comic.comments || ""}
             onChange={(e) => handleChange("comments", e.target.value)}
-            placeholder="Add any comments here"
+            placeholder={isBatchMode ? "No change (leave as is)" : "Add any comments here"}
           />
+          {isBatchMode && (
+            <Form.Text className="text-muted">
+              Empty = no change. Type a space " " to clear comments on all selected comics.
+            </Form.Text>
+          )}
         </Col>
       </Row>
 

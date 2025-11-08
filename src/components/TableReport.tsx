@@ -12,8 +12,18 @@ export type TableReportProps = {
 };
 
 export const TableReport = ({ tableId }: TableReportProps) => {
-  const { columns, jsonData, setJsonData, filters, useOrFiltering, tableSortConfig, setTableSortConfig } =
-    useAppContext();
+  const {
+    columns,
+    jsonData,
+    setJsonData,
+    filters,
+    useOrFiltering,
+    tableSortConfig,
+    setTableSortConfig,
+    selectedKeys,
+    setSelectedKeys,
+    setHandleBatchEdit,
+  } = useAppContext();
 
   const visibleColumns = columns.filter((col) => col.visible);
 
@@ -22,6 +32,7 @@ export const TableReport = ({ tableId }: TableReportProps) => {
   const [sortConfig, setSortConfig] = useState<SortConfig>(tableSortConfig[tableId] || []);
   const [selectedComic, setSelectedComic] = useState<ComicBook | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [isBatchMode, setIsBatchMode] = useState(false);
 
   // Keep local table in sync with context
   useEffect(() => {
@@ -46,34 +57,167 @@ export const TableReport = ({ tableId }: TableReportProps) => {
 
   const handleRowClick = (comic: ComicBook) => {
     setSelectedComic(comic);
+    setIsBatchMode(false);
     setShowEditModal(true);
   };
 
   const getComicKey = (c: ComicBook) => `${c.title}||${c.publisher}||${c.volume}||${c.issue}`;
 
+  const toggleSelection = (key: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setSelectedKeys((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(key)) {
+        newSet.delete(key);
+      } else {
+        newSet.add(key);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedKeys.size === sortedData.length) {
+      setSelectedKeys(new Set());
+    } else {
+      setSelectedKeys(new Set(sortedData.map(getComicKey)));
+    }
+  };
+
+  const handleEditSelected = () => {
+    if (selectedKeys.size === 0) return;
+
+    const selectedComics = tableData.filter((c) => selectedKeys.has(getComicKey(c)));
+    const mergedComic: Partial<ComicBook> = {};
+    const firstComic = selectedComics[0];
+
+    (Object.keys(firstComic) as (keyof ComicBook)[]).forEach((field) => {
+      const firstValue = firstComic[field];
+      const allMatch = selectedComics.every((c) => {
+        const value = c[field];
+        if (Array.isArray(firstValue) && Array.isArray(value)) {
+          return JSON.stringify(firstValue.sort()) === JSON.stringify(value.sort());
+        }
+        return String(value) === String(firstValue);
+      });
+
+      if (allMatch) {
+        (mergedComic as any)[field] = firstValue;
+      } else {
+        if (Array.isArray(firstValue)) {
+          (mergedComic as any)[field] = [];
+        } else {
+          (mergedComic as any)[field] = "";
+        }
+      }
+    });
+
+    setSelectedComic(mergedComic as ComicBook);
+    setIsBatchMode(true);
+    setShowEditModal(true);
+  };
+
+  // Register the batch edit handler in context so ReportConfigWrapper can call it
+  useEffect(() => {
+    setHandleBatchEdit(() => handleEditSelected);
+    return () => setHandleBatchEdit(null);
+  }, [tableData, selectedKeys, setHandleBatchEdit]);
+
+  const formatFieldValue = (field: keyof ComicBook, value: any): any => {
+    if (field === "value" && value && value.trim() !== "") {
+      const num = Number(value);
+      return isNaN(num) ? value : num.toFixed(2);
+    }
+    if (field === "month" && value && value.trim() !== "") {
+      const monthNum = Number(value);
+      return isNaN(monthNum) ? value : monthNum.toString().padStart(2, "0");
+    }
+    return value;
+  };
+
+  const isEmptyValue = (value: any): boolean => {
+    return value === undefined || value === null || value === "" || (Array.isArray(value) && value.length === 0);
+  };
+
+  const shouldClearField = (value: any): boolean => {
+    // Check if value is a single space (for text fields)
+    if (value === " ") return true;
+    // Check if array contains __CLEAR__ marker
+    if (Array.isArray(value) && value.includes("__CLEAR__")) return true;
+    return false;
+  };
+
   const handleSave = (updatedComic: ComicBook) => {
-    // Format value if not blank
-    if (updatedComic.value && updatedComic.value.trim() !== "") {
-      const num = Number(updatedComic.value);
-      updatedComic.value = isNaN(num) ? updatedComic.value : num.toFixed(2);
+    if (isBatchMode && selectedKeys.size > 0) {
+      // Batch update: apply changes to all selected comics
+      setTableData((prev) =>
+        prev.map((c) => {
+          const key = getComicKey(c);
+          if (selectedKeys.has(key)) {
+            // Merge updates, only overwrite non-empty fields
+            const updated = { ...c };
+            (Object.keys(updatedComic) as (keyof ComicBook)[]).forEach((field) => {
+              const newValue = updatedComic[field];
+
+              // Check if user wants to clear this field
+              if (shouldClearField(newValue)) {
+                if (Array.isArray(newValue)) {
+                  (updated as any)[field] = [];
+                } else {
+                  (updated as any)[field] = "";
+                }
+              }
+              // Empty strings and empty arrays mean "no change" in batch mode
+              else if (!isEmptyValue(newValue)) {
+                (updated as any)[field] = formatFieldValue(field, newValue);
+              }
+            });
+            return updated;
+          }
+          return c;
+        })
+      );
+
+      setJsonData((prev) =>
+        prev.map((c) => {
+          const key = getComicKey(c);
+          if (selectedKeys.has(key)) {
+            const updated = { ...c };
+            (Object.keys(updatedComic) as (keyof ComicBook)[]).forEach((field) => {
+              const newValue = updatedComic[field];
+
+              if (shouldClearField(newValue)) {
+                if (Array.isArray(newValue)) {
+                  (updated as any)[field] = [];
+                } else {
+                  (updated as any)[field] = "";
+                }
+              } else if (!isEmptyValue(newValue)) {
+                (updated as any)[field] = formatFieldValue(field, newValue);
+              }
+            });
+            return updated;
+          }
+          return c;
+        })
+      );
+
+      setSelectedKeys(new Set());
+    } else {
+      // Single update
+      const formatted = { ...updatedComic };
+      (Object.keys(formatted) as (keyof ComicBook)[]).forEach((field) => {
+        (formatted as any)[field] = formatFieldValue(field, formatted[field]);
+      });
+
+      const key = getComicKey(formatted);
+      setTableData((prev) => prev.map((c) => (getComicKey(c) === key ? formatted : c)));
+      setJsonData((prev) => prev.map((c) => (getComicKey(c) === key ? formatted : c)));
     }
-
-    // Format month if not blank
-    if (updatedComic.month && updatedComic.month.trim() !== "") {
-      const monthNum = Number(updatedComic.month);
-      updatedComic.month = isNaN(monthNum) ? updatedComic.month : monthNum.toString().padStart(2, "0");
-    }
-
-    const key = getComicKey(updatedComic);
-
-    // Update local tableData
-    setTableData((prev) => prev.map((c) => (getComicKey(c) === key ? updatedComic : c)));
-
-    // Update context
-    setJsonData((prev) => prev.map((c) => (getComicKey(c) === key ? updatedComic : c)));
 
     setShowEditModal(false);
     setSelectedComic(null);
+    setIsBatchMode(false);
   };
 
   // Filtering
@@ -128,6 +272,13 @@ export const TableReport = ({ tableId }: TableReportProps) => {
       <Table striped bordered hover responsive>
         <thead>
           <tr>
+            <th
+              style={{ width: 40, textAlign: "center", cursor: "pointer", userSelect: "none" }}
+              onClick={toggleSelectAll}
+              title="Select/deselect all"
+            >
+              {sortedData.length > 0 && selectedKeys.size === sortedData.length ? "✓" : ""}
+            </th>
             {visibleColumns.map((col) => {
               const activeSort = sortConfig.find((s) => s.key === col.key);
               const sortPriority = sortConfig.findIndex((s) => s.key === col.key) + 1;
@@ -151,8 +302,28 @@ export const TableReport = ({ tableId }: TableReportProps) => {
         <tbody>
           {sortedData.map((row) => {
             const key = getComicKey(row);
+            const isSelected = selectedKeys.has(key);
             return (
-              <tr key={key} onClick={() => handleRowClick(row)} style={{ cursor: "pointer" }}>
+              <tr
+                key={key}
+                onClick={() => handleRowClick(row)}
+                style={{
+                  cursor: "pointer",
+                  backgroundColor: isSelected ? "#e3f2fd" : undefined,
+                }}
+              >
+                <td
+                  style={{
+                    textAlign: "center",
+                    cursor: "pointer",
+                    userSelect: "none",
+                    fontWeight: "bold",
+                    fontSize: "1.2em",
+                  }}
+                  onClick={(e) => toggleSelection(key, e)}
+                >
+                  {isSelected ? "✓" : ""}
+                </td>
                 {visibleColumns.map((col) => {
                   let value = row[col.key];
 
@@ -185,17 +356,26 @@ export const TableReport = ({ tableId }: TableReportProps) => {
       {/* Edit Modal */}
       <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered size="xl">
         <Modal.Header closeButton>
-          <Modal.Title>Edit Comic</Modal.Title>
+          <Modal.Title>{isBatchMode ? `Edit ${selectedKeys.size} Comics` : "Edit Comic"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {selectedComic && (
-            <ComicForm
-              mode="edit"
-              existingComics={tableData}
-              initialComic={selectedComic}
-              onSubmit={handleSave}
-              onCancel={() => setShowEditModal(false)}
-            />
+            <>
+              {isBatchMode && (
+                <div style={{ marginBottom: 15, padding: 10, backgroundColor: "#fff3cd", borderRadius: 5 }}>
+                  <strong>Batch Edit Mode:</strong> Only fields you modify will be updated across all{" "}
+                  {selectedKeys.size} selected comics.
+                </div>
+              )}
+              <ComicForm
+                mode="edit"
+                existingComics={tableData}
+                initialComic={selectedComic}
+                onSubmit={handleSave}
+                onCancel={() => setShowEditModal(false)}
+                isBatchMode={isBatchMode}
+              />
+            </>
           )}
         </Modal.Body>
       </Modal>

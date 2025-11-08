@@ -7,7 +7,15 @@ import { ComicForm } from "./ComicForm";
 import { ComicBook } from "../interfaces/ComicBook";
 
 export default function ReportConfigWrapper(props: ReportConfigurationProps) {
-  const { isConfigOpen, setIsConfigOpen, jsonData: tableData, setJsonData: setTableData } = useAppContext(); // tableData should be in context
+  const {
+    isConfigOpen,
+    setIsConfigOpen,
+    jsonData: tableData,
+    setJsonData: setTableData,
+    selectedKeys,
+    setSelectedKeys,
+    handleBatchEdit,
+  } = useAppContext();
   const [showAddModal, setShowAddModal] = useState(false);
 
   const handleClose = () => setShowAddModal(false);
@@ -22,6 +30,18 @@ export default function ReportConfigWrapper(props: ReportConfigurationProps) {
     setShowAddModal(false);
   };
 
+  const handleEditSelected = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (handleBatchEdit) {
+      handleBatchEdit();
+    }
+  };
+
+  const handleClearSelection = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedKeys(new Set());
+  };
+
   return (
     <div className="mb-3">
       {/* Header row with icon and Add button */}
@@ -34,9 +54,24 @@ export default function ReportConfigWrapper(props: ReportConfigurationProps) {
           <strong>Report Configuration</strong>
         </div>
 
-        <Button variant="outline-primary" size="sm" onClick={handleShow} className="d-flex align-items-center">
-          <Plus className="me-1" /> Add
-        </Button>
+        <div className="d-flex align-items-center gap-2">
+          {selectedKeys.size > 0 && (
+            <>
+              <span style={{ fontSize: "0.9rem", marginRight: 5 }}>
+                <strong>{selectedKeys.size}</strong> selected
+              </span>
+              <Button variant="primary" size="sm" onClick={handleEditSelected}>
+                Edit Selected
+              </Button>
+              <Button variant="secondary" size="sm" onClick={handleClearSelection}>
+                Clear
+              </Button>
+            </>
+          )}
+          <Button variant="outline-primary" size="sm" onClick={handleShow} className="d-flex align-items-center">
+            <Plus className="me-1" /> Add
+          </Button>
+        </div>
       </div>
 
       {/* Collapsible body */}

@@ -29,6 +29,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [useOrFiltering, setUseOrFiltering] = useState(false);
   const [user, setUser] = useState<null | { id: string; name: string }>(null);
   const [tableSortConfig, setTableSortConfig] = useState<Record<string, SortConfig>>({});
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [handleBatchEdit, setHandleBatchEdit] = useState<(() => void) | null>(null);
 
   return (
     <AppContext.Provider
@@ -51,6 +53,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         user,
         tableSortConfig,
         setTableSortConfig,
+        selectedKeys,
+        setSelectedKeys,
+        handleBatchEdit,
+        setHandleBatchEdit,
       }}
     >
       {children}

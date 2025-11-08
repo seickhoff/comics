@@ -3,9 +3,11 @@ import { useAppContext } from "../hooks/useAppContext";
 import { Card, Button, Alert, Spinner } from "react-bootstrap";
 import { normalizeComicBook } from "../utils/normalizeComicBook";
 import { ComicBook } from "../interfaces/ComicBook";
+import { ExportFormat } from "../interfaces/ExportFormat";
 
 export function JsonFileUploader() {
-  const { setJsonData, setLoading, setFileName } = useAppContext();
+  const { setJsonData, setLoading, setFileName, setColumns, setFilters, setUseOrFiltering, setTableSortConfig } =
+    useAppContext();
   const [loading, setLocalLoading] = useState(false);
 
   // --- helpers ---
@@ -48,6 +50,13 @@ export function JsonFileUploader() {
     });
   }
 
+  // Type guard to check if data is in new ExportFormat
+  function isExportFormat(data: unknown): data is ExportFormat {
+    return (
+      typeof data === "object" && data !== null && "comics" in data && Array.isArray((data as ExportFormat).comics)
+    );
+  }
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -60,9 +69,25 @@ export function JsonFileUploader() {
     reader.onload = (e) => {
       try {
         const rawData = JSON.parse(e.target?.result as string);
-        const normalized = Array.isArray(rawData) ? rawData.map(normalizeComicBook) : [];
-        const sorted = sortComics(normalized);
-        setJsonData(sorted);
+
+        // Check if it's the new format or legacy format
+        if (isExportFormat(rawData)) {
+          // New format: restore all app context settings
+          const normalized = rawData.comics.map(normalizeComicBook);
+          const sorted = sortComics(normalized);
+          setJsonData(sorted);
+
+          // Restore app context settings
+          if (rawData.columns) setColumns(rawData.columns);
+          if (rawData.filters) setFilters(rawData.filters);
+          if (typeof rawData.useOrFiltering === "boolean") setUseOrFiltering(rawData.useOrFiltering);
+          if (rawData.tableSortConfig) setTableSortConfig(rawData.tableSortConfig);
+        } else {
+          // Legacy format: just an array of comics
+          const normalized = Array.isArray(rawData) ? rawData.map(normalizeComicBook) : [];
+          const sorted = sortComics(normalized);
+          setJsonData(sorted);
+        }
       } catch (error) {
         console.log(error);
         alert("Error parsing JSON file");
@@ -82,21 +107,26 @@ export function JsonFileUploader() {
   return (
     <Card className="mt-4">
       <Card.Body>
-        <Card.Title>Open Comic Book File</Card.Title>
+        <Card.Title>Collection Management</Card.Title>
         <div className="d-flex justify-content-center gap-2">
           <Button variant="primary" className="mb-3" disabled={loading}>
             <label htmlFor="file-upload" className="w-100" style={{ cursor: "pointer", margin: 0 }}>
-              {loading ? <Spinner animation="border" size="sm" /> : "Choose File"}
+              {loading ? <Spinner animation="border" size="sm" /> : "Load Collection"}
             </label>
           </Button>
           <input type="file" id="file-upload" accept=".json" onChange={handleFileChange} hidden disabled={loading} />
 
           <Button variant="success" className="mb-3" onClick={handleStartNew} disabled={loading}>
-            Start New Collection
+            New Collection
           </Button>
         </div>
-        {loading && <Alert variant="warning">Loading file...</Alert>}
-        {!loading && <Alert variant="info">Load an existing JSON file or start a new collection from scratch</Alert>}
+        {loading && <Alert variant="warning">Loading collection...</Alert>}
+        {!loading && (
+          <Alert variant="info">
+            Load an existing collection or start a new one. Collections saved from this app will restore all your
+            settings (filters, sorting, columns). Legacy files with just comic data are also supported.
+          </Alert>
+        )}
       </Card.Body>
     </Card>
   );

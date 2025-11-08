@@ -4,6 +4,7 @@ import { Container } from "react-bootstrap";
 import { JsonFileUploader } from "../components/JsonFileUploader";
 import { CurrentComicBookFile } from "../components/CurrentComicBookFile";
 import { JsonFileDownloader } from "../components/JsonFileDownloader";
+import { JsonDataViewer } from "../components/JsonDataViewer";
 
 export function File() {
   const { loading } = useAppContext();
@@ -19,6 +20,8 @@ export function File() {
       <CurrentComicBookFile />
 
       <JsonFileDownloader />
+
+      <JsonDataViewer />
     </Container>
   );
 }

@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useAppContext } from "../hooks/useAppContext";
 import { Card, Button, Alert, Form, InputGroup } from "react-bootstrap";
 import { normalizeComicBook } from "../utils/normalizeComicBook";
+import { ExportFormat } from "../interfaces/ExportFormat";
 
 export function JsonFileDownloader() {
-  const { jsonData, fileName } = useAppContext();
+  const { jsonData, fileName, columns, filters, useOrFiltering, tableSortConfig } = useAppContext();
   const [downloadName, setDownloadName] = useState(fileName || "comics.json");
 
   // Update downloadName when fileName changes
@@ -38,7 +39,20 @@ export function JsonFileDownloader() {
   const handleDownload = () => {
     // Normalize all data before download to ensure consistent types
     const normalized = jsonData.map(normalizeComicBook);
-    const dataStr = JSON.stringify(normalized, null, 2);
+
+    // Create export format with metadata and app context
+    const exportData: ExportFormat = {
+      appName: "Comic Book Collection Manager",
+      version: "2.0",
+      exportDate: new Date().toISOString(),
+      columns,
+      filters,
+      useOrFiltering,
+      tableSortConfig,
+      comics: normalized,
+    };
+
+    const dataStr = JSON.stringify(exportData, null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
 
@@ -56,7 +70,7 @@ export function JsonFileDownloader() {
   return (
     <Card className="mt-4">
       <Card.Body>
-        <Card.Title>Download JSON Data</Card.Title>
+        <Card.Title>Save Collection</Card.Title>
         <Form.Group className="mb-3">
           <Form.Label>Filename</Form.Label>
           <InputGroup>
@@ -73,10 +87,12 @@ export function JsonFileDownloader() {
         </Form.Group>
         <div className="d-flex justify-content-center">
           <Button variant="success" onClick={handleDownload} disabled={!jsonData} className="mb-3">
-            Download JSON
+            Save Collection
           </Button>
         </div>
-        <Alert variant="info">Click the button to download the current JSON data</Alert>
+        <Alert variant="info">
+          Saves your collection with all settings (filters, sorting, columns) so you can restore your workspace later
+        </Alert>
       </Card.Body>
     </Card>
   );

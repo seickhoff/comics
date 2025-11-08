@@ -270,22 +270,6 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
           </datalist>
         </Col>
 
-        {/* Ending Issue - only show in add mode */}
-        {!isEdit && (
-          <Col lg={1}>
-            <Form.Label>End Issue</Form.Label>
-            <Form.Control
-              value={endingIssue}
-              onChange={(e) => setEndingIssue(e.target.value)}
-              placeholder="#"
-              title="Fill this to add multiple issues in sequence"
-            />
-            <Form.Text className="text-muted" style={{ fontSize: "0.7rem" }}>
-              Bulk add
-            </Form.Text>
-          </Col>
-        )}
-
         {/* Month */}
         <Col lg={1}>
           <Form.Label>Month</Form.Label>
@@ -363,6 +347,26 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
             ))}
           </Form.Select>
         </Col>
+
+        {/* Ending Issue - only show in add mode */}
+        {!isEdit && comic.issue && comic.month && comic.year && (
+          <>
+            <Col lg={1}>
+              <Form.Label>End Issue</Form.Label>
+              <Form.Control
+                value={endingIssue}
+                onChange={(e) => setEndingIssue(e.target.value)}
+                placeholder="#"
+                title="Fill this to add multiple issues in sequence"
+              />
+              <Form.Text className="text-muted" style={{ fontSize: "0.7rem" }}>
+                Bulk add
+              </Form.Text>
+            </Col>
+
+            <Col lg={11} />
+          </>
+        )}
 
         {/* Writers */}
         <Col lg={6}>

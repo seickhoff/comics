@@ -1,6 +1,6 @@
-import { useAppContext } from "../../hooks/useAppContext";
+import { useAppContext } from "../hooks/useAppContext";
 import { Alert, Container } from "react-bootstrap";
-import OverstreetReport from "../../components/OverstreetReport";
+import OverstreetReport from "../components/OverstreetReport";
 
 export function Overstreet() {
   const { jsonData, fileName } = useAppContext();

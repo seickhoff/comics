@@ -1,8 +1,8 @@
-import { useAppContext } from "../../hooks/useAppContext";
+import { useAppContext } from "../hooks/useAppContext";
 import { Alert, Container } from "react-bootstrap";
-import { ColumnConfig, ColumnKey } from "../../interfaces/ComicBook";
-import { TableReport } from "../../components/TableReport";
-import ReportConfigWrapper from "../../components/ReportConfigurationWrapper";
+import { ColumnConfig, ColumnKey } from "../interfaces/ComicBook";
+import { TableReport } from "../components/TableReport";
+import ReportConfigWrapper from "../components/ReportConfigurationWrapper";
 
 export function MaintenanceTable() {
   const { columns, setColumns, fileName, filters, setFilters, useOrFiltering, setUseOrFiltering } = useAppContext();

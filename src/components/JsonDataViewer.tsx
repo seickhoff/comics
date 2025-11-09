@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAppContext } from "../hooks/useAppContext";
-import { Card, Button, Collapse, Badge } from "react-bootstrap";
+import { Button, Collapse, Badge } from "react-bootstrap";
 import { normalizeComicBook } from "../utils/normalizeComicBook";
 import { ExportFormat } from "../interfaces/ExportFormat";
 
@@ -26,33 +26,38 @@ export function JsonDataViewer() {
   const comicCount = jsonData.length;
 
   return (
-    <Card className="mt-4">
-      <Card.Body>
-        <div className="d-flex justify-content-between align-items-center mb-2">
-          <Card.Title className="mb-0">JSON Data Preview</Card.Title>
-          <Badge bg="secondary">{comicCount} comics</Badge>
+    <div>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h5 className="mb-1">JSON Data Preview</h5>
+          <p className="text-muted mb-0 small">View the complete export format with all settings and comic data</p>
         </div>
-        <p className="text-muted mb-3">View the complete export format with all settings and comic data</p>
-        <Button variant="outline-primary" onClick={() => setIsOpen(!isOpen)} className="mb-3">
-          {isOpen ? "Hide" : "Show"} JSON Data
+        <Badge bg="secondary" className="fs-6">
+          {comicCount} comics
+        </Badge>
+      </div>
+      <div className="d-flex justify-content-center mb-3">
+        <Button variant="outline-primary" size="lg" onClick={() => setIsOpen(!isOpen)}>
+          {isOpen ? "Hide JSON Data" : "Show JSON Data"}
         </Button>
-        <Collapse in={isOpen}>
-          <div>
-            <pre
-              style={{
-                backgroundColor: "#f5f5f5",
-                padding: "1rem",
-                borderRadius: "0.25rem",
-                maxHeight: "500px",
-                overflow: "auto",
-                fontSize: "0.875rem",
-              }}
-            >
-              <code>{jsonString}</code>
-            </pre>
-          </div>
-        </Collapse>
-      </Card.Body>
-    </Card>
+      </div>
+      <Collapse in={isOpen}>
+        <div>
+          <pre
+            style={{
+              backgroundColor: "#f5f5f5",
+              padding: "1.5rem",
+              borderRadius: "0.5rem",
+              maxHeight: "600px",
+              overflow: "auto",
+              fontSize: "0.875rem",
+              border: "1px solid #dee2e6",
+            }}
+          >
+            <code>{jsonString}</code>
+          </pre>
+        </div>
+      </Collapse>
+    </div>
   );
 }

@@ -11,7 +11,15 @@ interface NavRoute {
 // Define the navRoutes configuration
 const navRoutes: NavRoute[] = [
   { path: "/", label: "Home" },
-  { path: "/file", label: "File" },
+  {
+    label: "File",
+    children: [
+      { path: "/file/load", label: "Load from File" },
+      { path: "/file/import", label: "Import from Clipboard" },
+      { path: "/file/export", label: "Export Collection" },
+      { path: "/file/preview", label: "Preview Data" },
+    ],
+  },
   { path: "/maintenance", label: "Maintenance" },
   { path: "/overstreet", label: "Overstreet" },
 ];
@@ -93,8 +101,8 @@ export function AppNavbar() {
       <Container>
         <Navbar.Brand as={Link} to="/">
           <img
-            src="/vite.svg" // Referring to public/logo.png
-            alt="MyApp Logo"
+            src="/book-svgrepo-com.svg"
+            alt="Comic Book Collection Manager"
             height="40"
             className="d-inline-block align-top"
           />

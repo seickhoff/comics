@@ -22,6 +22,46 @@ export function Home() {
     content?: React.ReactElement;
   }> = [
     {
+      title: "Getting Started",
+      items: [
+        {
+          icon: <FileEarmarkArrowUp className="me-2" size={16} />,
+          text: (
+            <>
+              <strong>Load Your Collection:</strong> Navigate to the <Badge bg="secondary">File</Badge> page to upload
+              an existing JSON file or start fresh
+            </>
+          ),
+        },
+        {
+          icon: <PlusCircle className="me-2" size={16} />,
+          text: (
+            <>
+              <strong>Add Comics:</strong> Use the <Badge bg="success">+ Add</Badge> button to add comics individually
+              or in bulk
+            </>
+          ),
+        },
+        {
+          icon: <Filter className="me-2" size={16} />,
+          text: (
+            <>
+              <strong>Filter & Search:</strong> Use the Report Configuration panel to filter by any field
+            </>
+          ),
+        },
+        {
+          icon: <FileEarmarkArrowDown className="me-2" size={16} />,
+          text: (
+            <>
+              <strong>Save Your Work:</strong> Download your collection as JSON from the{" "}
+              <Badge bg="secondary">File</Badge> page
+            </>
+          ),
+        },
+      ],
+    },
+    {
       title: "Key Features",
       items: [
         {
@@ -184,45 +224,7 @@ export function Home() {
       </div>
 
       <Row className="g-4">
-        {/* Getting Started */}
-        <Col md={12}>
-          <Row>
-            <Col xs={1}></Col>
-            <Col xs={10}>
-              <Card className="shadow-sm">
-                <Card.Header className="bg-dark text-white">
-                  <h5 className="mb-0">Getting Started</h5>
-                </Card.Header>
-                <Card.Body>
-                  <ListGroup variant="flush">
-                    <ListGroup.Item>
-                      <FileEarmarkArrowUp className="me-2 text-primary" size={20} />
-                      <strong>Load Your Collection:</strong> Navigate to the <Badge bg="secondary">File</Badge> page to
-                      upload an existing JSON file or start fresh
-                    </ListGroup.Item>
-                    <ListGroup.Item>
-                      <PlusCircle className="me-2 text-success" size={20} />
-                      <strong>Add Comics:</strong> Use the <Badge bg="success">+ Add</Badge> button to add comics
-                      individually or in bulk
-                    </ListGroup.Item>
-                    <ListGroup.Item>
-                      <Filter className="me-2 text-info" size={20} />
-                      <strong>Filter & Search:</strong> Use the Report Configuration panel to filter by any field
-                    </ListGroup.Item>
-                    <ListGroup.Item>
-                      <FileEarmarkArrowDown className="me-2 text-warning" size={20} />
-                      <strong>Save Your Work:</strong> Download your collection as JSON from the{" "}
-                      <Badge bg="secondary">File</Badge> page
-                    </ListGroup.Item>
-                  </ListGroup>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col xs={1}></Col>
-          </Row>
-        </Col>
-
-        {/* Carousel for remaining cards - two at a time, advancing one at a time */}
+        {/* Carousel for all cards - two at a time, advancing one at a time */}
         <Col md={12}>
           <Row className="align-items-stretch">
             {/* Left arrow in column 1 - entire column is clickable */}

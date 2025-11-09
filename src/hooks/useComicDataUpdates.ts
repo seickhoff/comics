@@ -37,7 +37,7 @@ export function useComicDataUpdates({
   setSelectedComic,
   setIsBatchMode,
 }: UseComicDataUpdatesProps) {
-  const handleSave = (updatedComic: ComicBook) => {
+  const handleSave = (updatedComic: ComicBook, isLastInBulk: boolean = false, appendComments: boolean = false) => {
     if (isBatchMode && selectedKeys.size > 0) {
       // Batch update: apply changes to all selected comics
       const updateFunction = (prev: ComicBook[]) =>
@@ -49,8 +49,15 @@ export function useComicDataUpdates({
             (Object.keys(updatedComic) as (keyof ComicBook)[]).forEach((field) => {
               const newValue = updatedComic[field];
 
+              // Special handling for comments field in append mode
+              if (field === "comments" && appendComments && newValue && !shouldClearField(newValue)) {
+                const existingComment = c.comments || "";
+                const newComment = String(newValue);
+                // Add space before appending only if existing comment is not empty
+                updated.comments = existingComment ? `${existingComment} ${newComment}` : newComment;
+              }
               // Check if user wants to clear this field
-              if (shouldClearField(newValue)) {
+              else if (shouldClearField(newValue)) {
                 if (Array.isArray(newValue)) {
                   (updated as any)[field] = [];
                 } else {

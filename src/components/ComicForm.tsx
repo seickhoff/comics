@@ -12,7 +12,7 @@ type ComicFormProps = {
   mode: "add" | "edit";
   existingComics: ComicBook[];
   initialComic?: ComicBook;
-  onSubmit: (comic: ComicBook, isLastInBulk?: boolean) => void;
+  onSubmit: (comic: ComicBook, isLastInBulk?: boolean, appendComments?: boolean) => void;
   onCancel?: () => void;
   isBatchMode?: boolean;
 };
@@ -22,6 +22,7 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
 
   const [comic, setComic] = useState<Partial<ComicBook>>(initialComic || getEmptyComic());
   const [endingIssue, setEndingIssue] = useState<string>("");
+  const [appendComments, setAppendComments] = useState(false);
 
   const { addToast } = useToast();
 
@@ -65,7 +66,7 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
       // Submit each comic, marking the last one
       result.comics!.forEach((c, index) => {
         const isLast = index === result.comics!.length - 1;
-        onSubmit(c, isLast);
+        onSubmit(c, isLast, false);
       });
 
       // Reset form
@@ -79,7 +80,7 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
       });
     } else {
       // Single comic add or edit
-      onSubmit(comic as ComicBook);
+      onSubmit(comic as ComicBook, false, appendComments);
 
       if (!isEdit) {
         setComic(getEmptyComic());
@@ -339,9 +340,19 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
             placeholder={isBatchMode ? "No change (leave as is)" : "Add any comments here"}
           />
           {isBatchMode && (
-            <Form.Text className="text-muted">
-              Empty = no change. Type a space " " to clear comments on all selected comics.
-            </Form.Text>
+            <>
+              <Form.Check
+                type="checkbox"
+                label="Append to existing comments (instead of replacing)"
+                checked={appendComments}
+                onChange={(e) => setAppendComments(e.target.checked)}
+                className="mt-2"
+              />
+              <Form.Text className="text-muted">
+                Empty = no change. Type a space " " to clear comments on all selected comics.
+                {appendComments && " Append mode adds your text after existing comments."}
+              </Form.Text>
+            </>
           )}
         </Col>
       </Row>

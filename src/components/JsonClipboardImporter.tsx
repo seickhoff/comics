@@ -2,9 +2,8 @@ import { useState } from "react";
 import { useAppContext } from "../hooks/useAppContext";
 import { useToast } from "../context/ToastContext";
 import { Button, Alert, Form } from "react-bootstrap";
-import { normalizeComicBook } from "../utils/normalizeComicBook";
-import { sortComics } from "../utils/comicSorting";
-import { isExportFormat } from "../utils/exportFormat";
+import { loadCollectionData } from "../utils/collectionLoader";
+import { APP_CONFIG } from "../config/constants";
 
 export function JsonClipboardImporter() {
   const { setJsonData, setFileName, setColumns, setFilters, setUseOrFiltering, setTableSortConfig } = useAppContext();
@@ -23,35 +22,30 @@ export function JsonClipboardImporter() {
     try {
       const rawData = JSON.parse(pastedJson);
 
-      // Check if it's the new format or legacy format
-      if (isExportFormat(rawData)) {
-        // New format: restore all app context settings
-        const normalized = rawData.comics.map(normalizeComicBook);
-        const sorted = sortComics(normalized);
-        setJsonData(sorted);
+      const result = loadCollectionData(
+        rawData,
+        {
+          setJsonData,
+          setFileName,
+          setColumns,
+          setFilters,
+          setUseOrFiltering,
+          setTableSortConfig,
+        },
+        APP_CONFIG.DEFAULT_FILENAME
+      );
 
-        // Restore app context settings
-        if (rawData.columns) setColumns(rawData.columns);
-        if (rawData.filters) setFilters(rawData.filters);
-        if (typeof rawData.useOrFiltering === "boolean") setUseOrFiltering(rawData.useOrFiltering);
-        if (rawData.tableSortConfig) setTableSortConfig(rawData.tableSortConfig);
+      if (result.success) {
+        // Clear the textarea and show success
+        setPastedJson("");
+        addToast({
+          title: "Success",
+          body: `Imported ${result.count} comics successfully!`,
+          bg: "success",
+        });
       } else {
-        // Legacy format: just an array of comics
-        const normalized = Array.isArray(rawData) ? rawData.map(normalizeComicBook) : [];
-        const sorted = sortComics(normalized);
-        setJsonData(sorted);
+        setError(result.error || "Failed to import collection");
       }
-
-      // Reset filename to default
-      setFileName("new-collection.json");
-
-      // Clear the textarea and show success
-      setPastedJson("");
-      addToast({
-        title: "Success",
-        body: "Collection imported successfully!",
-        bg: "success",
-      });
     } catch (err) {
       console.error(err);
       setError("Invalid JSON format. Please check your data and try again.");

@@ -1,4 +1,5 @@
 import { ComicBook } from "../interfaces/ComicBook";
+import { normalizeTitle, parseNumber } from "../utils/comicSorting";
 
 interface OverstreetProps {
   comics: ComicBook[];
@@ -10,11 +11,8 @@ function formatCurrency(value: string | number): string {
   return num.toLocaleString("en-US", { style: "currency", currency: "USD" }).replace("$", "");
 }
 
-// Parse issue number
-function parseIssue(issue: string): number | null {
-  const num = Number(issue);
-  return Number.isFinite(num) ? num : null;
-}
+// Parse issue number (alias to parseNumber for clarity in this context)
+const parseIssue = parseNumber;
 
 // JSX-based line with responsive dotted leader and hover background
 function Line({ left, right }: { left: string; right: string }) {
@@ -25,14 +23,6 @@ function Line({ left, right }: { left: string; right: string }) {
       <span className="flex-shrink-0">${formatCurrency(right)}</span>
     </div>
   );
-}
-
-// Normalize "The " in titles
-function normalizeTitle(title: string): string {
-  if (title.startsWith("The ")) {
-    return title.slice(4) + ", The";
-  }
-  return title;
 }
 
 // Group comics by Title → Publisher → Volume

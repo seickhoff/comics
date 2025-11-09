@@ -1,8 +1,9 @@
 import { useAppContext } from "../hooks/useAppContext";
-import { Alert, Container } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { ColumnConfig, ColumnKey } from "../interfaces/ComicBook";
 import { TableReport } from "../components/TableReport";
 import ReportConfigWrapper from "../components/ReportConfigurationWrapper";
+import { EmptyState } from "../components/EmptyState";
 
 export function MaintenanceTable() {
   const { columns, setColumns, fileName, filters, setFilters, useOrFiltering, setUseOrFiltering } = useAppContext();
@@ -18,10 +19,7 @@ export function MaintenanceTable() {
       <h1 className="mb-3">Maintenance</h1>
 
       {!fileName ? (
-        <Alert key="info" variant="info">
-          No data loaded. Please visit the <Alert.Link href="/file">File</Alert.Link> page to load an existing file or
-          start a new collection.
-        </Alert>
+        <EmptyState />
       ) : (
         <>
           <ReportConfigWrapper

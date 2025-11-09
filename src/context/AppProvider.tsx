@@ -2,6 +2,7 @@
 import { useState, ReactNode } from "react";
 import { AppContext, SortConfig } from "./AppContext";
 import { ColumnConfig, ColumnKey, ComicBook } from "../interfaces/ComicBook";
+import { APP_CONFIG } from "../config/constants";
 
 const defaultColumns: ColumnConfig[] = [
   { key: "title", label: "Title", visible: true },
@@ -21,7 +22,7 @@ const defaultColumns: ColumnConfig[] = [
 // AppProvider component that provides the global context
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [columns, setColumns] = useState<ColumnConfig[]>(defaultColumns);
-  const [fileName, setFileName] = useState<string | null>("new-collection.json");
+  const [fileName, setFileName] = useState<string | null>(APP_CONFIG.DEFAULT_FILENAME);
   const [filters, setFilters] = useState<Record<ColumnKey, string>>({} as Record<ColumnKey, string>);
   const [isConfigOpen, setIsConfigOpen] = useState<boolean>(false);
   const [jsonData, setJsonData] = useState<ComicBook[]>([]);

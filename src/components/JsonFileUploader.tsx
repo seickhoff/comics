@@ -2,9 +2,7 @@ import { useState } from "react";
 import { useAppContext } from "../hooks/useAppContext";
 import { useToast } from "../context/ToastContext";
 import { Button, Alert, Spinner } from "react-bootstrap";
-import { normalizeComicBook } from "../utils/normalizeComicBook";
-import { sortComics } from "../utils/comicSorting";
-import { isExportFormat } from "../utils/exportFormat";
+import { loadCollectionData } from "../utils/collectionLoader";
 
 export function JsonFileUploader() {
   const { setJsonData, setLoading, setFileName, setColumns, setFilters, setUseOrFiltering, setTableSortConfig } =
@@ -24,40 +22,30 @@ export function JsonFileUploader() {
       try {
         const rawData = JSON.parse(e.target?.result as string);
 
-        // Check if it's the new format or legacy format
-        if (isExportFormat(rawData)) {
-          // New format: restore all app context settings
-          const normalized = rawData.comics.map(normalizeComicBook);
-          const sorted = sortComics(normalized);
-          setJsonData(sorted);
+        const result = loadCollectionData(
+          rawData,
+          {
+            setJsonData,
+            setFileName,
+            setColumns,
+            setFilters,
+            setUseOrFiltering,
+            setTableSortConfig,
+          },
+          file.name
+        );
 
-          // Restore app context settings
-          if (rawData.columns) setColumns(rawData.columns);
-          if (rawData.filters) setFilters(rawData.filters);
-          if (typeof rawData.useOrFiltering === "boolean") setUseOrFiltering(rawData.useOrFiltering);
-          if (rawData.tableSortConfig) setTableSortConfig(rawData.tableSortConfig);
-
-          // Only set filename after successful load
-          setFileName(file.name);
-
+        if (result.success) {
           addToast({
             title: "Success",
-            body: `Loaded ${sorted.length} comics from ${file.name}`,
+            body: `Loaded ${result.count} comics from ${file.name}`,
             bg: "success",
           });
         } else {
-          // Legacy format: just an array of comics
-          const normalized = Array.isArray(rawData) ? rawData.map(normalizeComicBook) : [];
-          const sorted = sortComics(normalized);
-          setJsonData(sorted);
-
-          // Only set filename after successful load
-          setFileName(file.name);
-
           addToast({
-            title: "Success",
-            body: `Loaded ${sorted.length} comics from ${file.name}`,
-            bg: "success",
+            title: "Error",
+            body: result.error || "Failed to load collection",
+            bg: "danger",
           });
         }
       } catch (error) {

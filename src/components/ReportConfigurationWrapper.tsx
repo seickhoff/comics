@@ -6,6 +6,7 @@ import { useAppContext } from "../hooks/useAppContext";
 import { ComicForm } from "./ComicForm";
 import { ComicBook } from "../interfaces/ComicBook";
 import { normalizeComicBook } from "../utils/normalizeComicBook";
+import { getComicKey } from "../utils/comicKeys";
 
 export default function ReportConfigWrapper(props: ReportConfigurationProps) {
   const {
@@ -56,7 +57,6 @@ export default function ReportConfigWrapper(props: ReportConfigurationProps) {
   };
 
   const confirmDelete = () => {
-    const getComicKey = (c: ComicBook) => `${c.title}||${c.publisher}||${c.volume}||${c.issue}`;
     const filtered = tableData.filter((c) => !selectedKeys.has(getComicKey(c)));
     setTableData(filtered);
     setSelectedKeys(new Set());

@@ -1,6 +1,7 @@
 import { useAppContext } from "../hooks/useAppContext";
-import { Alert, Container } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import OverstreetReport from "../components/OverstreetReport";
+import { EmptyState } from "../components/EmptyState";
 
 export function Overstreet() {
   const { jsonData, fileName } = useAppContext();
@@ -10,10 +11,7 @@ export function Overstreet() {
       <h1 className="mb-3">Overstreet Report</h1>
 
       {!fileName ? (
-        <Alert key="info" variant="info">
-          No data loaded. Please visit the <Alert.Link href="/file">File</Alert.Link> page to load an existing file or
-          start a new collection.
-        </Alert>
+        <EmptyState />
       ) : (
         <>
           <OverstreetReport comics={jsonData} />

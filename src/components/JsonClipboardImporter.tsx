@@ -3,60 +3,14 @@ import { useAppContext } from "../hooks/useAppContext";
 import { useToast } from "../context/ToastContext";
 import { Button, Alert, Form } from "react-bootstrap";
 import { normalizeComicBook } from "../utils/normalizeComicBook";
-import { ComicBook } from "../interfaces/ComicBook";
-import { ExportFormat } from "../interfaces/ExportFormat";
+import { sortComics } from "../utils/comicSorting";
+import { isExportFormat } from "../utils/exportFormat";
 
 export function JsonClipboardImporter() {
   const { setJsonData, setFileName, setColumns, setFilters, setUseOrFiltering, setTableSortConfig } = useAppContext();
   const { addToast } = useToast();
   const [pastedJson, setPastedJson] = useState("");
   const [error, setError] = useState<string | null>(null);
-
-  // Helper functions from JsonFileUploader
-  function parseNumber(str: string): number | null {
-    const num = Number(str);
-    return Number.isFinite(num) ? num : null;
-  }
-
-  function normalizeTitle(title: string): string {
-    if (title.startsWith("The ")) {
-      return title.slice(4) + ", The";
-    }
-    return title;
-  }
-
-  function sortComics(data: ComicBook[]) {
-    return [...data].sort((a, b) => {
-      // 1. Title (normalize for sorting)
-      const t = normalizeTitle(a.title).localeCompare(normalizeTitle(b.title));
-      if (t !== 0) return t;
-
-      // 2. Volume
-      const av = parseNumber(a.volume);
-      const bv = parseNumber(b.volume);
-      if (av !== null && bv !== null) {
-        if (av !== bv) return av - bv;
-      } else {
-        const v = a.volume.localeCompare(b.volume);
-        if (v !== 0) return v;
-      }
-
-      // 3. Issue
-      const ai = parseNumber(a.issue);
-      const bi = parseNumber(b.issue);
-      if (ai !== null && bi !== null) {
-        return ai - bi;
-      }
-      return a.issue.localeCompare(b.issue);
-    });
-  }
-
-  // Type guard to check if data is in new ExportFormat
-  function isExportFormat(data: unknown): data is ExportFormat {
-    return (
-      typeof data === "object" && data !== null && "comics" in data && Array.isArray((data as ExportFormat).comics)
-    );
-  }
 
   const handleImport = () => {
     setError(null);

@@ -1,3 +1,6 @@
+import { useState, useEffect } from "react";
+import { Button } from "react-bootstrap";
+import { ChevronLeft, ChevronRight } from "react-bootstrap-icons";
 import { ComicBook } from "../interfaces/ComicBook";
 import { normalizeTitle, parseNumber } from "../utils/comicSorting";
 
@@ -104,20 +107,191 @@ function buildIssueLines(issues: ComicBook[]): { label: string; value: string }[
 
 export default function OverstreetReport({ comics }: OverstreetProps) {
   const groups = groupByTitlePublisherVolume(comics);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  return (
-    <div className="font-monospace text-sm leading-tight" style={{ maxWidth: "500px", overflowX: "auto" }}>
-      {groups.map((g, idx) => (
-        <div key={idx} className="mb-4">
-          <div className="font-bold">{g.title}</div>
-          <div>
-            ({g.publisher}, v{g.volume})
+  // Detect screen size changes
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Build all entries (title groups with their issue lines)
+  const LINES_PER_PAGE = 32;
+
+  // Flatten all groups into individual lines with group headers
+  type PageItem =
+    | { type: "header"; title: string; publisher: string; volume: string }
+    | { type: "line"; left: string; right: string };
+  const allItems: PageItem[] = [];
+
+  groups.forEach((g) => {
+    allItems.push({ type: "header", title: g.title, publisher: g.publisher, volume: g.volume });
+    const lines = buildIssueLines(g.issues);
+    lines.forEach((line) => allItems.push({ type: "line", left: line.label, right: line.value }));
+  });
+
+  // Calculate visual line count for each item (headers = 3 lines, regular lines = 1 line)
+  const getVisualLineCount = (item: PageItem, isFirstItem: boolean) => {
+    if (item.type === "header") {
+      // Header has title (1 line) + publisher info (1 line) + spacing
+      // First header has no top margin, subsequent headers have 1rem top margin ≈ 1 extra line
+      return isFirstItem ? 2 : 3;
+    }
+    return 1; // Regular issue line
+  };
+
+  // Split into pages based on visual line count
+  const pages: PageItem[][] = [];
+  let currentPageItems: PageItem[] = [];
+  let currentPageLineCount = 0;
+
+  for (let i = 0; i < allItems.length; i++) {
+    const item = allItems[i];
+    const lineCount = getVisualLineCount(item, currentPageItems.length === 0);
+
+    // If adding this item would exceed the page limit, start a new page
+    if (currentPageLineCount > 0 && currentPageLineCount + lineCount > LINES_PER_PAGE) {
+      pages.push(currentPageItems);
+      currentPageItems = [];
+      currentPageLineCount = 0;
+    }
+
+    currentPageItems.push(item);
+    currentPageLineCount += lineCount;
+  }
+
+  // Push the last page
+  if (currentPageItems.length > 0) {
+    pages.push(currentPageItems);
+  }
+
+  // Now organize pages into spreads (overlapping like a real book)
+  // Spread 0: pages 0-1, Spread 1: pages 1-2, Spread 2: pages 2-3, etc.
+  const totalPages = pages.length > 0 ? pages.length - 1 : 0;
+  const leftPageItems = pages[currentPage] || [];
+  const rightPageItems = pages[currentPage + 1] || [];
+
+  const goToPrevious = () => setCurrentPage((p) => Math.max(0, p - 1));
+  const goToNext = () => setCurrentPage((p) => Math.min(totalPages - 1, p + 1));
+
+  const showNavigation = totalPages > 1;
+
+  const renderPage = (items: PageItem[]) => (
+    <div
+      className="font-monospace p-4 bg-white border shadow"
+      style={{
+        flex: "0 0 450px",
+        width: "450px",
+        height: "700px",
+        minHeight: "700px",
+        maxHeight: "700px",
+        fontSize: "0.875rem",
+        lineHeight: "1.25",
+        borderRadius: "4px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        overflow: "hidden",
+      }}
+    >
+      {items.map((item, idx) =>
+        item.type === "header" ? (
+          <div key={idx}>
+            <div
+              style={{ fontWeight: "bold", marginBottom: "0.25rem", fontSize: "1rem", marginTop: idx > 0 ? "1rem" : 0 }}
+            >
+              {item.title}
+            </div>
+            <div style={{ marginBottom: "0.5rem", color: "#666" }}>
+              ({item.publisher}, v{item.volume})
+            </div>
           </div>
-          {buildIssueLines(g.issues).map((r, i) => (
-            <Line key={i} left={r.label} right={r.value} />
-          ))}
+        ) : (
+          <Line key={idx} left={item.left} right={item.right} />
+        )
+      )}
+    </div>
+  );
+
+  // Mobile view: single scrollable column with all content
+  if (isMobile) {
+    return (
+      <div className="font-monospace p-3">
+        {allItems.map((item, idx) =>
+          item.type === "header" ? (
+            <div key={idx}>
+              <div
+                style={{
+                  fontWeight: "bold",
+                  marginBottom: "0.25rem",
+                  fontSize: "1rem",
+                  marginTop: idx > 0 ? "1rem" : 0,
+                }}
+              >
+                {item.title}
+              </div>
+              <div style={{ marginBottom: "0.5rem", color: "#666" }}>
+                ({item.publisher}, v{item.volume})
+              </div>
+            </div>
+          ) : (
+            <Line key={idx} left={item.left} right={item.right} />
+          )
+        )}
+      </div>
+    );
+  }
+
+  // Desktop view: paginated book layout
+  return (
+    <div>
+      {/* Navigation Controls */}
+      {showNavigation && (
+        <div className="d-flex justify-content-center align-items-center mb-3 gap-3">
+          <Button
+            variant="outline-secondary"
+            onClick={goToPrevious}
+            disabled={currentPage === 0}
+            style={{ width: "120px" }}
+          >
+            <ChevronLeft /> Previous
+          </Button>
+          <Button
+            variant="outline-secondary"
+            onClick={goToNext}
+            disabled={currentPage === totalPages - 1}
+            style={{ width: "120px" }}
+          >
+            Next <ChevronRight />
+          </Button>
         </div>
-      ))}
+      )}
+
+      {/* Book Pages Layout - Two columns side by side */}
+      <div
+        className="d-flex gap-4 justify-content-center align-items-start"
+        style={{ minHeight: "70vh", maxWidth: "1000px", margin: "0 auto" }}
+      >
+        {leftPageItems.length > 0 && (
+          <div>
+            <div className="text-center text-muted mb-2" style={{ fontSize: "0.8rem" }}>
+              Page {currentPage + 1}
+            </div>
+            {renderPage(leftPageItems)}
+          </div>
+        )}
+        {rightPageItems.length > 0 && (
+          <div>
+            <div className="text-center text-muted mb-2" style={{ fontSize: "0.8rem" }}>
+              Page {currentPage + 2}
+            </div>
+            {renderPage(rightPageItems)}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

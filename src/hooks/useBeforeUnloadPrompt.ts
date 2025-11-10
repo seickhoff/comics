@@ -9,9 +9,7 @@ export function useBeforeUnloadPrompt(enabled: boolean) {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (!enabled) return;
 
-      // Modern browsers require setting returnValue to trigger the prompt
       e.preventDefault();
-      // e.returnValue = "";
       return "";
     };
 

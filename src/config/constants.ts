@@ -44,3 +44,11 @@ export const COLUMN_ALIGNMENT = {
   CENTER: ["issue", "month", "year", "quantity", "condition"] as const,
   RIGHT: ["value"] as const,
 } as const;
+
+/**
+ * Special marker values for batch operations
+ */
+export const BATCH_MARKERS = {
+  CLEAR_FIELD: "__CLEAR__",
+  CLEAR_TEXT: " ", // Single space to clear text fields
+} as const;

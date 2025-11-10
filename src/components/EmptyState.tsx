@@ -10,12 +10,7 @@ export interface EmptyStateProps {
 /**
  * Reusable empty state component for displaying when no data is loaded
  */
-export function EmptyState({
-  title = "No Data",
-  message = "No data loaded.",
-  variant = "info",
-  showFileLink = true,
-}: EmptyStateProps) {
+export function EmptyState({ message = "No data loaded.", variant = "info", showFileLink = true }: EmptyStateProps) {
   return (
     <Alert variant={variant}>
       {showFileLink ? (

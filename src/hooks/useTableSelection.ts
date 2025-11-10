@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ComicBook } from "../interfaces/ComicBook";
 import { getComicKey } from "../utils/comicKeys";
 
@@ -44,7 +44,7 @@ export function useTableSelection({
     setShowEditModal(true);
   };
 
-  const handleEditSelected = () => {
+  const handleEditSelected = useCallback(() => {
     if (selectedKeys.size === 0) return;
 
     const selectedComics = tableData.filter((c) => selectedKeys.has(getComicKey(c)));
@@ -62,12 +62,12 @@ export function useTableSelection({
       });
 
       if (allMatch) {
-        (mergedComic as any)[field] = firstValue;
+        (mergedComic[field] as typeof firstValue) = firstValue;
       } else {
         if (Array.isArray(firstValue)) {
-          (mergedComic as any)[field] = [];
+          (mergedComic[field] as string[]) = [];
         } else {
-          (mergedComic as any)[field] = "";
+          (mergedComic[field] as string | number | undefined) = "";
         }
       }
     });
@@ -75,13 +75,13 @@ export function useTableSelection({
     setSelectedComic(mergedComic as ComicBook);
     setIsBatchMode(true);
     setShowEditModal(true);
-  };
+  }, [tableData, selectedKeys, setSelectedComic, setIsBatchMode, setShowEditModal]);
 
   // Register the batch edit handler in context so ReportConfigWrapper can call it
   useEffect(() => {
     setHandleBatchEdit(() => handleEditSelected);
     return () => setHandleBatchEdit(null);
-  }, [tableData, selectedKeys, setHandleBatchEdit]);
+  }, [handleEditSelected, setHandleBatchEdit]);
 
   return {
     selectedComic,

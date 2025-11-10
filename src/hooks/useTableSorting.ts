@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ComicBook, ColumnConfig } from "../interfaces/ComicBook";
+import { ComicBook } from "../interfaces/ComicBook";
 import { normalizeTitle } from "../utils/comicSorting";
 
 type SortDirection = "asc" | "desc";

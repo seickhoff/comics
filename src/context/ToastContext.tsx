@@ -1,4 +1,3 @@
-// src/context/ToastContext.tsx
 import { createContext, useContext, useState, ReactNode } from "react";
 import { Toast, ToastContainer } from "react-bootstrap";
 
@@ -60,6 +59,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useToast() {
   const ctx = useContext(ToastContext);
   if (!ctx) throw new Error("useToast must be used within a ToastProvider");

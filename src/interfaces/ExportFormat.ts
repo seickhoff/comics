@@ -1,4 +1,3 @@
-// src/interfaces/ExportFormat.ts
 import { ComicBook, ColumnConfig, ColumnKey } from "./ComicBook";
 import { SortConfig } from "../context/AppContext";
 

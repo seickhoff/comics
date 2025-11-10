@@ -11,7 +11,7 @@ import { useComicDataUpdates } from "../hooks/useComicDataUpdates";
 import { COLUMN_ALIGNMENT } from "../config/constants";
 
 export type TableReportProps = {
-  tableId: string; // unique ID for storing sort state
+  tableId: string;
 };
 
 export const TableReport = ({ tableId }: TableReportProps) => {
@@ -153,8 +153,8 @@ export const TableReport = ({ tableId }: TableReportProps) => {
 
                   // Alignment
                   const style: React.CSSProperties = {};
-                  if (COLUMN_ALIGNMENT.RIGHT.includes(col.key as any)) style.textAlign = "right";
-                  else if (COLUMN_ALIGNMENT.CENTER.includes(col.key as any)) style.textAlign = "center";
+                  if ((COLUMN_ALIGNMENT.RIGHT as readonly string[]).includes(col.key)) style.textAlign = "right";
+                  else if ((COLUMN_ALIGNMENT.CENTER as readonly string[]).includes(col.key)) style.textAlign = "center";
 
                   return (
                     <td key={col.key} style={style}>

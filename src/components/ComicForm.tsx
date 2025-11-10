@@ -1,4 +1,3 @@
-// src/components/ComicForm.tsx
 import { useState, useMemo, useEffect } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import Select from "react-select/creatable";
@@ -7,6 +6,7 @@ import { useToast } from "../context/ToastContext";
 import { generateBulkComics, calculateBulkAddCount } from "../utils/bulkComicGenerator";
 import { useComicFormOptions } from "../hooks/useComicFormOptions";
 import { getEmptyComic } from "../utils/comicDefaults";
+import { BATCH_MARKERS } from "../config/constants";
 
 type ComicFormProps = {
   mode: "add" | "edit";
@@ -294,7 +294,7 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
             isMulti
             isClearable
             options={[
-              ...(isBatchMode ? [{ value: "__CLEAR__", label: "⚠️ Clear All Writers" }] : []),
+              ...(isBatchMode ? [{ value: BATCH_MARKERS.CLEAR_FIELD, label: "⚠️ Clear All Writers" }] : []),
               ...writerOptions.map((w) => ({ value: w, label: w })),
             ]}
             value={(comic.writer || []).map((w) => ({ value: w, label: w }))}
@@ -315,7 +315,7 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
             isMulti
             isClearable
             options={[
-              ...(isBatchMode ? [{ value: "__CLEAR__", label: "⚠️ Clear All Artists" }] : []),
+              ...(isBatchMode ? [{ value: BATCH_MARKERS.CLEAR_FIELD, label: "⚠️ Clear All Artists" }] : []),
               ...artistOptions.map((a) => ({ value: a, label: a })),
             ]}
             value={(comic.artist || []).map((a) => ({ value: a, label: a }))}

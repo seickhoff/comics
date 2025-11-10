@@ -1,6 +1,7 @@
 import { ComicBook } from "../interfaces/ComicBook";
 import { normalizeComicBook } from "../utils/normalizeComicBook";
 import { getComicKey } from "../utils/comicKeys";
+import { BATCH_MARKERS } from "../config/constants";
 
 interface UseComicDataUpdatesProps {
   tableData: ComicBook[];
@@ -14,15 +15,15 @@ interface UseComicDataUpdatesProps {
   setIsBatchMode: (mode: boolean) => void;
 }
 
-const isEmptyValue = (value: any): boolean => {
+const isEmptyValue = (value: unknown): boolean => {
   return value === undefined || value === null || value === "" || (Array.isArray(value) && value.length === 0);
 };
 
-const shouldClearField = (value: any): boolean => {
+const shouldClearField = (value: unknown): boolean => {
   // Check if value is a single space (for text fields)
-  if (value === " ") return true;
+  if (value === BATCH_MARKERS.CLEAR_TEXT) return true;
   // Check if array contains __CLEAR__ marker
-  if (Array.isArray(value) && value.includes("__CLEAR__")) return true;
+  if (Array.isArray(value) && value.includes(BATCH_MARKERS.CLEAR_FIELD)) return true;
   return false;
 };
 
@@ -37,7 +38,11 @@ export function useComicDataUpdates({
   setSelectedComic,
   setIsBatchMode,
 }: UseComicDataUpdatesProps) {
-  const handleSave = (updatedComic: ComicBook, isLastInBulk: boolean = false, appendComments: boolean = false) => {
+  const handleSave = (
+    updatedComic: ComicBook,
+    _isLastInBulk: boolean = false, // eslint-disable-line @typescript-eslint/no-unused-vars
+    appendComments: boolean = false
+  ) => {
     if (isBatchMode && selectedKeys.size > 0) {
       // Batch update: apply changes to all selected comics
       const updateFunction = (prev: ComicBook[]) =>
@@ -59,14 +64,14 @@ export function useComicDataUpdates({
               // Check if user wants to clear this field
               else if (shouldClearField(newValue)) {
                 if (Array.isArray(newValue)) {
-                  (updated as any)[field] = [];
+                  (updated[field] as string[]) = [];
                 } else {
-                  (updated as any)[field] = "";
+                  (updated[field] as string | number | undefined) = "";
                 }
               }
               // Empty strings and empty arrays mean "no change" in batch mode
               else if (!isEmptyValue(newValue)) {
-                (updated as any)[field] = newValue;
+                (updated[field] as typeof newValue) = newValue;
               }
             });
             return normalizeComicBook(updated);

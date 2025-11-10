@@ -1,4 +1,3 @@
-// src/utils/normalizeComicBook.ts
 import { ComicBook, GradeCode } from "../interfaces/ComicBook";
 
 /**
@@ -8,22 +7,22 @@ import { ComicBook, GradeCode } from "../interfaces/ComicBook";
  * @param raw - Raw comic book data (from JSON or user input)
  * @returns Normalized ComicBook object with correct data types
  */
-export function normalizeComicBook(raw: any): ComicBook {
+export function normalizeComicBook(raw: Partial<ComicBook>): ComicBook {
   // Helper to safely convert to number
-  const toNumber = (val: any, defaultValue: number = 0): number => {
+  const toNumber = (val: unknown, defaultValue: number = 0): number => {
     if (val === null || val === undefined || val === "") return defaultValue;
     const num = Number(val);
     return isNaN(num) ? defaultValue : num;
   };
 
   // Helper to safely convert to string
-  const toString = (val: any, defaultValue: string = ""): string => {
+  const toString = (val: unknown, defaultValue: string = ""): string => {
     if (val === null || val === undefined) return defaultValue;
     return String(val);
   };
 
   // Helper to ensure array type
-  const toArray = (val: any): string[] => {
+  const toArray = (val: unknown): string[] => {
     if (Array.isArray(val)) return val.map(String).filter((v) => v.trim() !== "");
     return [];
   };
@@ -43,7 +42,10 @@ export function normalizeComicBook(raw: any): ComicBook {
   }
 
   // Ensure condition is a valid grade code, default to NM
-  const condition = Object.values(GradeCode).includes(raw.condition) ? toString(raw.condition) : GradeCode.NM;
+  const condition =
+    raw.condition && Object.values(GradeCode).includes(raw.condition as GradeCode)
+      ? (raw.condition as GradeCode)
+      : GradeCode.NM;
 
   return {
     title: toString(raw.title),

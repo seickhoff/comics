@@ -1,114 +1,142 @@
-# Comics
+# Comic Book Collection Manager
 
-This is a Vite-based template for building React applications with TypeScript. The template includes configurations for linting, formatting, routing, and development.
+A web-based application for organizing and managing your comic book collection. Track your comics, generate valuation reports, and perform bulk operations with an intuitive interface.
 
 ## Features
 
-- **React** - JavaScript library for building user interfaces.
-- **React Router** - Declarative routing for React.
-- **Bootstrap** - A popular CSS framework for responsive design, styled with react-bootstrap.
-- **TypeScript** - A statically typed superset of JavaScript.
-- **Prettier** - Code formatter.
-- **ESLint** - Linter for maintaining code quality.
-- **Vite** - A fast build tool and development server.
+### Collection Management
 
-## Setup
+- **Add Comics**: Single entry or bulk add consecutive issues with automatic date increment
+- **Edit & Delete**: Modify individual comics or batch-edit multiple selections
+- **Smart Search**: Regex-powered filtering with AND/OR logic across all fields
+- **Multi-Column Sorting**: Intelligent sorting that handles titles with "The" prefix
+- **Auto-Complete**: Field suggestions based on your existing collection
 
-To get started with this project, follow the steps below:
+### Batch Operations
 
-1. Clone this repository to your local machine.
+- Select and edit multiple comics simultaneously
+- Merge common field values, leave mismatched fields unchanged
+- Append or replace comments during batch updates
+- Bulk delete selected items
 
-2. Install dependencies using npm:
+### Reports
 
-`npm install`
+- **Maintenance View**: Full table with filtering, sorting, and inline editing
+- **Overstreet Report**: Professional valuation report grouped by Title → Publisher → Volume
 
-## Available Scripts
+### Data Management
 
-After installing dependencies, you can use the following npm commands:
+- Load collections from JSON files or clipboard
+- Export collections with timestamped filenames
+- Preview raw JSON data
+- Column visibility controls
 
-`npm run dev`:
+## Tech Stack
 
-- Starts the development server with hot-reloading.
-- Visit http://localhost:5173 in your browser to see the app.
+- **React 19** with TypeScript
+- **React Router** for navigation
+- **Bootstrap 5** via react-bootstrap
+- **Vite** for fast development and builds
+- **ESLint** and **Prettier** for code quality
 
-`npm run build`:
+## Getting Started
 
-- Builds the app for production by compiling TypeScript files and optimizing the project.
+### Install Dependencies
 
-`npm run format`:
+```bash
+npm install
+```
 
-- Automatically formats all files in the project using Prettier to ensure consistent code style.
+### Development Server
 
-`npm run lint`:
+```bash
+npm run dev
+```
 
-- Runs ESLint to check for any code quality issues in your files and ensures adherence to coding standards.
+Visit http://localhost:5173 to view the app.
 
-`npm run preview`:
+### Build for Production
 
-- Serves the production build locally, simulating the production environment for previewing the final build.
+```bash
+npm run build
+```
+
+### Other Commands
+
+- `npm run lint` - Check code quality
+- `npm run fix` - Auto-fix linting issues
+- `npm run format` - Format code with Prettier
+- `npm run preview` - Preview production build
+
+## Data Format
+
+Collections are stored as JSON arrays with the following structure:
+
+```json
+[
+  {
+    "title": "The Amazing Spider-Man",
+    "publisher": "Marvel",
+    "volume": "1",
+    "issue": "1",
+    "month": "03",
+    "year": "1963",
+    "quantity": 1,
+    "value": "500000.00",
+    "condition": "VF",
+    "writer": ["Stan Lee"],
+    "artist": ["Steve Ditko"],
+    "comments": "First appearance"
+  }
+]
+```
+
+### Grade Codes
+
+- **MT** - Mint
+- **NM** - Near Mint
+- **VF** - Very Fine
+- **FN** - Fine
+- **VG** - Very Good
+- **GD** - Good
+- **FR** - Fair
+- **PR** - Poor
 
 ## Project Structure
 
-Here’s an overview of the directory structure:
-
 ```
 src/
-├── context/               # Contexts and providers
-├── hooks/                 # Custom hooks
-├── pages/                 # Page components
-├── routes/                # Routing components
-└── ...                    # Other directories (components, assets)
+├── components/       # Reusable UI components
+├── config/           # Constants and configuration
+├── context/          # React contexts and providers
+├── hooks/            # Custom React hooks
+├── interfaces/       # TypeScript interfaces
+├── pages/            # Page components
+├── routes/           # Route definitions
+└── utils/            # Helper functions
 ```
 
-## Context Pattern:
+## Usage Tips
 
-When adding a new set of related routes (e.g., ReportsRoutes), create a new context, provider, and corresponding hook as needed.
+### Bulk Add Comics
 
-Wrap the new routes with the new provider, similar to how DashboardProvider is used in DashboardRoutes.tsx.
+1. Fill in comic details including issue, month, and year
+2. Enter an ending issue number in the "End Issue" field
+3. Submit to create all comics in the range with auto-incrementing dates
 
-Ensure that custom hooks are placed in the /hooks/ directory and are named appropriately (e.g., useReportsContext).
+### Batch Editing
 
-```
-src/
-├── context/               # Folder for all context and provider files
-│   ├── AppContext.tsx     # Global app context (e.g., user, loading state)
-│   ├── AppProvider.tsx
-│   ├── DashboardContext.tsx # Dashboard-specific context
-│   ├── DashboardProvider.tsx
-│   └── ...
-├── hooks/                 # Folder for custom hooks
-│   ├── useAppContext.ts   # Custom hook for accessing AppContext
-│   ├── useDashboardContext.ts # Custom hook for accessing DashboardContext
-│   └── ...
-├── pages/                 # Folder for all the page components
-│   ├── DashboardOverview.tsx  # Dashboard overview page
-│   ├── DashboardView.tsx      # Dashboard detailed view page
-│   └── ...                # Other pages
-├── routes/                # Folder for routing components
-│   ├── DashboardRoutes.tsx  # Define and wrap dashboard-related routes, uses DashboardProvider
-│   └── ...                # Other routing files for features
-├── App.tsx                # Main entry point of the app, uses AppProvider
-└── ...
-```
+1. Select multiple comics using checkboxes
+2. Click "Edit Selected"
+3. Modify any fields - empty fields = no change
+4. Use the append option for comments to add notes without replacing existing text
 
-## Adding New Routes
+### Smart Filtering
 
-The `AppNavbar.tsx` file defines a responsive navigation bar using react-bootstrap components (Navbar, Nav, NavDropdown, and Container) and integrates it with `react-router-dom` for navigation.
+- Use regex patterns for advanced searching (e.g., `Spider.*Man`)
+- Toggle AND/OR logic for combining multiple filters
+- Filter any visible column in real-time
 
-1. Update the navRoutes array in `AppNavbar.tsx`:
+## License
 
-   - Add new routes with path and label.
-   - If the route has sub-routes, nest them under the children key.
-
-2. Create New Page Components:
-
-   - Place new components in the `src/pages/` directory.
-   - Example: `src/pages/NewPage.tsx`.
-
-3. Update Routing:
-
-   - Define new `<Route />` elements for the paths in the routes file, under `src/routes/`.
-
-4. Ensure Navbar Reflects New Routes:
-
-   - If the new route is a dropdown or submenu, ensure it’s added to the `navRoutes` array correctly.
+MIT

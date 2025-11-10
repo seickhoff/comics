@@ -1,4 +1,3 @@
-// src/context/AppContext.tsx
 import { createContext, Dispatch, SetStateAction } from "react";
 import { ColumnConfig, ColumnKey, ComicBook } from "../interfaces/ComicBook";
 

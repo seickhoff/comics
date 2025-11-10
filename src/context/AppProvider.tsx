@@ -1,4 +1,3 @@
-// src/context/AppProvider.tsx
 import { useState, ReactNode } from "react";
 import { AppContext, SortConfig } from "./AppContext";
 import { ColumnConfig, ColumnKey, ComicBook } from "../interfaces/ComicBook";

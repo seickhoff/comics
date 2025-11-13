@@ -85,7 +85,7 @@ export const TableReport = ({ tableId }: TableReportProps) => {
 
   return (
     <>
-      <Table striped bordered hover responsive>
+      <Table striped bordered hover responsive style={{ fontSize: "0.875rem" }}>
         <thead>
           <tr>
             <th

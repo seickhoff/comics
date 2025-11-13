@@ -223,8 +223,8 @@ export function Home() {
         )}
       </div>
 
-      <Row className="g-4">
-        {/* Carousel for all cards - two at a time, advancing one at a time */}
+      {/* Desktop: Carousel with two cards side-by-side */}
+      <Row className="g-4 d-none d-md-block">
         <Col md={12}>
           <Row className="align-items-stretch">
             {/* Left arrow in column 1 - entire column is clickable */}
@@ -312,6 +312,33 @@ export function Home() {
             </Col>
           </Row>
         </Col>
+      </Row>
+
+      {/* Mobile: Stacked cards */}
+      <Row className="g-4 d-md-none">
+        {allCards.map((card, index) => (
+          <Col xs={12} key={index}>
+            <Card className="shadow-sm">
+              <Card.Header className="bg-dark text-white">
+                <h5 className="mb-0">{card.title}</h5>
+              </Card.Header>
+              <Card.Body>
+                {card.content ? (
+                  card.content
+                ) : (
+                  <ListGroup variant="flush">
+                    {card.items?.map((item, itemIndex) => (
+                      <ListGroup.Item key={itemIndex}>
+                        {item.icon}
+                        {item.text}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                )}
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
       </Row>
     </Container>
   );

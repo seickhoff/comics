@@ -17,8 +17,8 @@ export function useTableSorting({ tableId, data, tableSortConfig, setTableSortCo
 
   // Persist sort config to context
   useEffect(() => {
-    setTableSortConfig({ ...tableSortConfig, [tableId]: sortConfig });
-  }, [sortConfig, tableId, tableSortConfig, setTableSortConfig]);
+    setTableSortConfig((prev) => ({ ...prev, [tableId]: sortConfig }));
+  }, [sortConfig, tableId, setTableSortConfig]);
 
   const toggleSort = (key: keyof ComicBook) => {
     setSortConfig((prev) => {

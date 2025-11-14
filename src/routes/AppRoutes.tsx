@@ -6,6 +6,7 @@ import { ExportCollection } from "../pages/ExportCollection";
 import { PreviewData } from "../pages/PreviewData";
 import { Overstreet } from "../pages/Overstreet";
 import { MaintenanceTable } from "../pages/MaintenanceTable";
+import { Summary } from "../pages/Summary";
 
 export function AppRoutes() {
   return (
@@ -18,6 +19,7 @@ export function AppRoutes() {
       <Route path="/file/preview" element={<PreviewData />} />
       <Route path="/maintenance" element={<MaintenanceTable />} />
       <Route path="/overstreet" element={<Overstreet />} />
+      <Route path="/summary" element={<Summary />} />
     </Routes>
   );
 }

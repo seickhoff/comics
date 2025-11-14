@@ -1,0 +1,377 @@
+import { Container, Row, Col, Card, ListGroup, Badge } from "react-bootstrap";
+import { useAppContext } from "../hooks/useAppContext";
+import { ComicBook } from "../interfaces/ComicBook";
+
+export function Summary() {
+  const { jsonData } = useAppContext();
+
+  // Calculate statistics
+  const stats = calculateStatistics(jsonData);
+
+  return (
+    <Container className="mt-4">
+      <h1 className="mb-4">Collection Summary</h1>
+
+      {jsonData.length === 0 ? (
+        <div className="text-center text-muted mt-5">
+          <p className="lead">No comics in collection</p>
+          <p>Load or add comics to see summary statistics</p>
+        </div>
+      ) : (
+        <>
+          {/* Overview Stats */}
+          <Row className="g-4 mb-4">
+            <Col xs={12} md={3}>
+              <Card className="text-center h-100">
+                <Card.Body>
+                  <h2 style={{ fontSize: "2.25rem" }}>{jsonData.length}</h2>
+                  <p className="text-muted mb-0">Total Comics</p>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col xs={12} md={3}>
+              <Card className="text-center h-100">
+                <Card.Body>
+                  <h2 style={{ fontSize: "2.25rem" }}>{stats.totalTitles}</h2>
+                  <p className="text-muted mb-0">Unique Titles</p>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col xs={12} md={3}>
+              <Card className="text-center h-100">
+                <Card.Body>
+                  <h2 style={{ fontSize: "2.25rem" }}>
+                    ${stats.totalValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </h2>
+                  <p className="text-muted mb-0">Total Value</p>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col xs={12} md={3}>
+              <Card className="text-center h-100">
+                <Card.Body>
+                  <h2 style={{ fontSize: "2.25rem" }}>
+                    $
+                    {stats.averageValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </h2>
+                  <p className="text-muted mb-0">Average Value</p>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Most Valuable Comics */}
+          <Row className="g-4 mb-4">
+            <Col xs={12} lg={6}>
+              <Card className="h-100">
+                <Card.Header className="bg-dark text-white">
+                  <h5 className="mb-0">Most Valuable Comics</h5>
+                </Card.Header>
+                <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
+                  <ListGroup variant="flush">
+                    {stats.allValuableComics.map((comic, index) => (
+                      <ListGroup.Item key={index} className="d-flex justify-content-between align-items-start">
+                        <div className="flex-grow-1">
+                          <div>
+                            <Badge bg="secondary" className="me-2">
+                              {index + 1}
+                            </Badge>
+                            <span className="fw-bold">
+                              {comic.title} #{comic.issue}
+                            </span>
+                          </div>
+                          <small className="text-muted ms-4 ps-2">
+                            {comic.publisher} {comic.volume ? `v${comic.volume}` : ""}
+                          </small>
+                        </div>
+                        <Badge bg="secondary" className="ms-2">
+                          $
+                          {Number(comic.value).toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </Badge>
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                </Card.Body>
+              </Card>
+            </Col>
+
+            {/* Titles by Issue Count */}
+            <Col xs={12} lg={6}>
+              <Card className="h-100">
+                <Card.Header className="bg-dark text-white">
+                  <h5 className="mb-0">Titles by Issue Count</h5>
+                </Card.Header>
+                <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
+                  <ListGroup variant="flush">
+                    {stats.allTitlesByCount.map((item, index) => (
+                      <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                        <div>
+                          <div>
+                            <Badge bg="secondary" className="me-2">
+                              {index + 1}
+                            </Badge>
+                            <span className="fw-bold">{item.title}</span>
+                          </div>
+                          <small className="text-muted ms-4 ps-2">
+                            {item.publisher} {item.volume ? `v${item.volume}` : ""}
+                          </small>
+                        </div>
+                        <Badge bg="secondary">{item.count} issues</Badge>
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Writers and Artists */}
+          <Row className="g-4 mb-4">
+            <Col xs={12} lg={6}>
+              <Card className="h-100">
+                <Card.Header className="bg-dark text-white">
+                  <h5 className="mb-0">Writers</h5>
+                </Card.Header>
+                <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
+                  <ListGroup variant="flush">
+                    {stats.allWriters.map((item, index) => (
+                      <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                        <span>
+                          <Badge bg="secondary" className="me-2">
+                            {index + 1}
+                          </Badge>
+                          {item.name}
+                        </span>
+                        <Badge bg="secondary">{item.count} comics</Badge>
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                </Card.Body>
+              </Card>
+            </Col>
+
+            <Col xs={12} lg={6}>
+              <Card className="h-100">
+                <Card.Header className="bg-dark text-white">
+                  <h5 className="mb-0">Artists</h5>
+                </Card.Header>
+                <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
+                  <ListGroup variant="flush">
+                    {stats.allArtists.map((item, index) => (
+                      <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                        <span>
+                          <Badge bg="secondary" className="me-2">
+                            {index + 1}
+                          </Badge>
+                          {item.name}
+                        </span>
+                        <Badge bg="secondary">{item.count} comics</Badge>
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Publishers and Conditions */}
+          <Row className="g-4 mb-4">
+            <Col xs={12} lg={6}>
+              <Card className="h-100">
+                <Card.Header className="bg-dark text-white">
+                  <h5 className="mb-0">Publishers</h5>
+                </Card.Header>
+                <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
+                  <ListGroup variant="flush">
+                    {stats.allPublishers.map((item, index) => (
+                      <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                        <span>
+                          <Badge bg="secondary" className="me-2">
+                            {index + 1}
+                          </Badge>
+                          {item.name}
+                        </span>
+                        <Badge bg="secondary">{item.count} comics</Badge>
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                </Card.Body>
+              </Card>
+            </Col>
+
+            <Col xs={12} lg={6}>
+              <Card className="h-100">
+                <Card.Header className="bg-dark text-white">
+                  <h5 className="mb-0">Comics by Condition</h5>
+                </Card.Header>
+                <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
+                  <ListGroup variant="flush">
+                    {stats.conditionBreakdown.map((item, index) => (
+                      <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                        <span>
+                          <Badge bg="secondary" className="me-2">
+                            {index + 1}
+                          </Badge>
+                          {item.condition || "Unknown"}
+                        </span>
+                        <Badge bg="secondary">{item.count} comics</Badge>
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Publication Years */}
+          <Row className="g-4 mb-4">
+            <Col xs={12}>
+              <Card>
+                <Card.Header className="bg-dark text-white">
+                  <h5 className="mb-0">Comics by Decade</h5>
+                </Card.Header>
+                <Card.Body>
+                  <ListGroup variant="flush">
+                    <Row>
+                      {stats.comicsByDecade.map((item, index) => (
+                        <Col xs={6} md={3} key={index} className="mb-2">
+                          <div className="d-flex justify-content-between align-items-center p-2 border rounded">
+                            <span className="fw-bold">{item.decade}</span>
+                            <Badge bg="secondary">{item.count}</Badge>
+                          </div>
+                        </Col>
+                      ))}
+                    </Row>
+                  </ListGroup>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        </>
+      )}
+    </Container>
+  );
+}
+
+function calculateStatistics(comics: ComicBook[]) {
+  // Total value
+  const totalValue = comics.reduce((sum, comic) => {
+    const value = Number(comic.value) || 0;
+    return sum + value;
+  }, 0);
+
+  const averageValue = comics.length > 0 ? Math.round(totalValue / comics.length) : 0;
+
+  // All valuable comics sorted by value
+  const allValuableComics = [...comics].sort((a, b) => Number(b.value || 0) - Number(a.value || 0));
+
+  // Count unique titles
+  const titleMap = new Map<string, { count: number; publisher: string; volume: string }>();
+  comics.forEach((comic) => {
+    const key = `${comic.title}|${comic.publisher}|${comic.volume || ""}`;
+    const existing = titleMap.get(key);
+    if (existing) {
+      existing.count++;
+    } else {
+      titleMap.set(key, { count: 1, publisher: comic.publisher || "", volume: comic.volume || "" });
+    }
+  });
+
+  const totalTitles = titleMap.size;
+
+  // All titles by count
+  const allTitlesByCount = Array.from(titleMap.entries())
+    .map(([key, data]) => {
+      const [title, publisher, volume] = key.split("|");
+      return { title, publisher, volume, count: data.count };
+    })
+    .sort((a, b) => b.count - a.count);
+
+  // Count writers
+  const writerMap = new Map<string, number>();
+  comics.forEach((comic) => {
+    if (comic.writer && Array.isArray(comic.writer)) {
+      comic.writer.forEach((writer) => {
+        if (writer) {
+          writerMap.set(writer, (writerMap.get(writer) || 0) + 1);
+        }
+      });
+    }
+  });
+
+  const allWriters = Array.from(writerMap.entries())
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
+
+  // Count artists
+  const artistMap = new Map<string, number>();
+  comics.forEach((comic) => {
+    if (comic.artist && Array.isArray(comic.artist)) {
+      comic.artist.forEach((artist) => {
+        if (artist) {
+          artistMap.set(artist, (artistMap.get(artist) || 0) + 1);
+        }
+      });
+    }
+  });
+
+  const allArtists = Array.from(artistMap.entries())
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
+
+  // Count publishers
+  const publisherMap = new Map<string, number>();
+  comics.forEach((comic) => {
+    if (comic.publisher) {
+      publisherMap.set(comic.publisher, (publisherMap.get(comic.publisher) || 0) + 1);
+    }
+  });
+
+  const allPublishers = Array.from(publisherMap.entries())
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
+
+  // Condition breakdown
+  const conditionMap = new Map<string, number>();
+  comics.forEach((comic) => {
+    const condition = comic.condition || "Unknown";
+    conditionMap.set(condition, (conditionMap.get(condition) || 0) + 1);
+  });
+
+  const conditionBreakdown = Array.from(conditionMap.entries())
+    .map(([condition, count]) => ({ condition, count }))
+    .sort((a, b) => b.count - a.count);
+
+  // Comics by decade
+  const decadeMap = new Map<string, number>();
+  comics.forEach((comic) => {
+    if (comic.year) {
+      const year = Number(comic.year);
+      if (!isNaN(year)) {
+        const decade = Math.floor(year / 10) * 10;
+        const decadeLabel = `${decade}s`;
+        decadeMap.set(decadeLabel, (decadeMap.get(decadeLabel) || 0) + 1);
+      }
+    }
+  });
+
+  const comicsByDecade = Array.from(decadeMap.entries())
+    .map(([decade, count]) => ({ decade, count }))
+    .sort((a, b) => a.decade.localeCompare(b.decade));
+
+  return {
+    totalValue,
+    averageValue,
+    totalTitles,
+    allValuableComics,
+    allTitlesByCount,
+    allWriters,
+    allArtists,
+    allPublishers,
+    conditionBreakdown,
+    comicsByDecade,
+  };
+}

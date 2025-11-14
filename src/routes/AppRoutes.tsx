@@ -7,6 +7,7 @@ import { PreviewData } from "../pages/PreviewData";
 import { Overstreet } from "../pages/Overstreet";
 import { MaintenanceTable } from "../pages/MaintenanceTable";
 import { Summary } from "../pages/Summary";
+import { Heatmap } from "../pages/Heatmap";
 
 export function AppRoutes() {
   return (
@@ -20,6 +21,7 @@ export function AppRoutes() {
       <Route path="/maintenance" element={<MaintenanceTable />} />
       <Route path="/overstreet" element={<Overstreet />} />
       <Route path="/summary" element={<Summary />} />
+      <Route path="/heatmap" element={<Heatmap />} />
     </Routes>
   );
 }

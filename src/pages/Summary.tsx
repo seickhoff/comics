@@ -21,40 +21,65 @@ export function Summary() {
         <>
           {/* Overview Stats */}
           <Row className="g-4 mb-4">
-            <Col xs={12} md={3}>
+            <Col xs={6} md={3}>
               <Card className="text-center h-100">
-                <Card.Body>
-                  <h2 style={{ fontSize: "2.25rem" }}>{jsonData.length}</h2>
-                  <p className="text-muted mb-0">Total Comics</p>
+                <Card.Body className="py-2 py-md-3">
+                  <h2 className="d-none d-md-block" style={{ fontSize: "1.406rem" }}>
+                    {jsonData.length}
+                  </h2>
+                  <h2 className="d-md-none" style={{ fontSize: "1.125rem" }}>
+                    {jsonData.length}
+                  </h2>
+                  <p className="text-muted mb-0" style={{ fontSize: "0.75rem" }}>
+                    Total Comics
+                  </p>
                 </Card.Body>
               </Card>
             </Col>
-            <Col xs={12} md={3}>
+            <Col xs={6} md={3}>
               <Card className="text-center h-100">
-                <Card.Body>
-                  <h2 style={{ fontSize: "2.25rem" }}>{stats.totalTitles}</h2>
-                  <p className="text-muted mb-0">Unique Titles</p>
+                <Card.Body className="py-2 py-md-3">
+                  <h2 className="d-none d-md-block" style={{ fontSize: "1.406rem" }}>
+                    {stats.totalTitles}
+                  </h2>
+                  <h2 className="d-md-none" style={{ fontSize: "1.125rem" }}>
+                    {stats.totalTitles}
+                  </h2>
+                  <p className="text-muted mb-0" style={{ fontSize: "0.75rem" }}>
+                    Unique Titles
+                  </p>
                 </Card.Body>
               </Card>
             </Col>
-            <Col xs={12} md={3}>
+            <Col xs={6} md={3}>
               <Card className="text-center h-100">
-                <Card.Body>
-                  <h2 style={{ fontSize: "2.25rem" }}>
+                <Card.Body className="py-2 py-md-3">
+                  <h2 className="d-none d-md-block" style={{ fontSize: "1.406rem" }}>
                     ${stats.totalValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </h2>
-                  <p className="text-muted mb-0">Total Value</p>
+                  <h2 className="d-md-none" style={{ fontSize: "1.125rem" }}>
+                    ${stats.totalValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </h2>
+                  <p className="text-muted mb-0" style={{ fontSize: "0.75rem" }}>
+                    Total Value
+                  </p>
                 </Card.Body>
               </Card>
             </Col>
-            <Col xs={12} md={3}>
+            <Col xs={6} md={3}>
               <Card className="text-center h-100">
-                <Card.Body>
-                  <h2 style={{ fontSize: "2.25rem" }}>
+                <Card.Body className="py-2 py-md-3">
+                  <h2 className="d-none d-md-block" style={{ fontSize: "1.406rem" }}>
                     $
                     {stats.averageValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </h2>
-                  <p className="text-muted mb-0">Average Value</p>
+                  <h2 className="d-md-none" style={{ fontSize: "1.125rem" }}>
+                    $
+                    {stats.averageValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </h2>
+                  <p className="text-muted mb-0" style={{ fontSize: "0.75rem" }}>
+                    Average Value
+                  </p>
                 </Card.Body>
               </Card>
             </Col>
@@ -70,9 +95,14 @@ export function Summary() {
                 <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.allValuableComics.map((comic, index) => (
-                      <ListGroup.Item key={index} className="d-flex justify-content-between align-items-start">
-                        <div className="flex-grow-1">
-                          <div>
+                      <ListGroup.Item
+                        key={index}
+                        className="px-md-3"
+                        style={{ paddingLeft: "0.5rem", paddingRight: "0.5rem" }}
+                      >
+                        {/* Mobile: Number badge + title on row 1, publisher/vol + value on row 2 */}
+                        <div className="d-md-none">
+                          <div className="d-flex align-items-center mb-1">
                             <Badge bg="secondary" className="me-2">
                               {index + 1}
                             </Badge>
@@ -80,17 +110,43 @@ export function Summary() {
                               {comic.title} #{comic.issue}
                             </span>
                           </div>
-                          <small className="text-muted ms-4 ps-2">
-                            {comic.publisher} {comic.volume ? `v${comic.volume}` : ""}
-                          </small>
+                          <div className="d-flex justify-content-between align-items-center">
+                            <small className="text-muted">
+                              {comic.publisher} {comic.volume ? `v${comic.volume}` : ""}
+                            </small>
+                            <Badge bg="light" text="dark" className="border">
+                              $
+                              {Number(comic.value).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </Badge>
+                          </div>
                         </div>
-                        <Badge bg="secondary" className="ms-2">
-                          $
-                          {Number(comic.value).toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
-                        </Badge>
+
+                        {/* Desktop: Original layout */}
+                        <div className="d-none d-md-flex justify-content-between align-items-start">
+                          <div className="flex-grow-1">
+                            <div>
+                              <Badge bg="secondary" className="me-2">
+                                {index + 1}
+                              </Badge>
+                              <span className="fw-bold">
+                                {comic.title} #{comic.issue}
+                              </span>
+                            </div>
+                            <small className="text-muted ms-4 ps-2">
+                              {comic.publisher} {comic.volume ? `v${comic.volume}` : ""}
+                            </small>
+                          </div>
+                          <Badge bg="light" text="dark" className="border ms-2">
+                            $
+                            {Number(comic.value).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                          </Badge>
+                        </div>
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
@@ -107,19 +163,48 @@ export function Summary() {
                 <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.allTitlesByCount.map((item, index) => (
-                      <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
-                        <div>
-                          <div>
+                      <ListGroup.Item
+                        key={index}
+                        className="px-md-3"
+                        style={{ paddingLeft: "0.5rem", paddingRight: "0.5rem" }}
+                      >
+                        {/* Mobile: Number badge + title on row 1, publisher/vol + count on row 2 */}
+                        <div className="d-md-none">
+                          <div className="d-flex align-items-center mb-1">
                             <Badge bg="secondary" className="me-2">
                               {index + 1}
                             </Badge>
                             <span className="fw-bold">{item.title}</span>
                           </div>
-                          <small className="text-muted ms-4 ps-2">
-                            {item.publisher} {item.volume ? `v${item.volume}` : ""}
-                          </small>
+                          <div className="d-flex justify-content-between align-items-center">
+                            <small className="text-muted">
+                              {item.publisher} {item.volume ? `v${item.volume}` : ""}
+                            </small>
+                            <Badge bg="light" text="dark" className="border">
+                              {item.count} issues
+                            </Badge>
+                          </div>
                         </div>
-                        <Badge bg="secondary">{item.count} issues</Badge>
+
+                        {/* Desktop: Original layout */}
+                        <div className="d-none d-md-block">
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                              <div>
+                                <Badge bg="secondary" className="me-2">
+                                  {index + 1}
+                                </Badge>
+                                <span className="fw-bold">{item.title}</span>
+                              </div>
+                              <small className="text-muted ms-4 ps-2">
+                                {item.publisher} {item.volume ? `v${item.volume}` : ""}
+                              </small>
+                            </div>
+                            <Badge bg="light" text="dark" className="border">
+                              {item.count} issues
+                            </Badge>
+                          </div>
+                        </div>
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
@@ -145,7 +230,9 @@ export function Summary() {
                           </Badge>
                           {item.name}
                         </span>
-                        <Badge bg="secondary">{item.count} comics</Badge>
+                        <Badge bg="light" text="dark" className="border">
+                          {item.count} comics
+                        </Badge>
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
@@ -168,7 +255,9 @@ export function Summary() {
                           </Badge>
                           {item.name}
                         </span>
-                        <Badge bg="secondary">{item.count} comics</Badge>
+                        <Badge bg="light" text="dark" className="border">
+                          {item.count} comics
+                        </Badge>
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
@@ -194,7 +283,9 @@ export function Summary() {
                           </Badge>
                           {item.name}
                         </span>
-                        <Badge bg="secondary">{item.count} comics</Badge>
+                        <Badge bg="light" text="dark" className="border">
+                          {item.count} comics
+                        </Badge>
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
@@ -217,7 +308,9 @@ export function Summary() {
                           </Badge>
                           {item.condition || "Unknown"}
                         </span>
-                        <Badge bg="secondary">{item.count} comics</Badge>
+                        <Badge bg="light" text="dark" className="border">
+                          {item.count} comics
+                        </Badge>
                       </ListGroup.Item>
                     ))}
                   </ListGroup>

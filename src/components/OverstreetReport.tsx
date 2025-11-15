@@ -219,7 +219,7 @@ export default function OverstreetReport({ comics }: OverstreetProps) {
   // Mobile view: single scrollable column with all content
   if (isMobile) {
     return (
-      <div className="font-monospace p-3">
+      <div className="font-monospace p-3" style={{ fontSize: "0.75rem" }}>
         {allItems.map((item, idx) =>
           item.type === "header" ? (
             <div key={idx}>
@@ -227,13 +227,13 @@ export default function OverstreetReport({ comics }: OverstreetProps) {
                 style={{
                   fontWeight: "bold",
                   marginBottom: "0.25rem",
-                  fontSize: "1rem",
+                  fontSize: "0.75rem",
                   marginTop: idx > 0 ? "1rem" : 0,
                 }}
               >
                 {item.title}
               </div>
-              <div style={{ marginBottom: "0.5rem", color: "#666" }}>
+              <div style={{ marginBottom: "0.5rem", color: "#666", fontSize: "0.75rem" }}>
                 ({item.publisher}, v{item.volume})
               </div>
             </div>

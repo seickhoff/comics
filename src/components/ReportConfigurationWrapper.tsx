@@ -65,9 +65,9 @@ export default function ReportConfigWrapper(props: ReportConfigurationProps) {
 
   return (
     <div className="mb-3">
-      {/* Header row with icon and Add button */}
+      {/* Header row with icon and Add button - Desktop */}
       <div
-        className="d-flex align-items-center justify-content-between cursor-pointer"
+        className="d-none d-md-flex align-items-center justify-content-between cursor-pointer"
         onClick={() => setIsConfigOpen(!isConfigOpen)}
       >
         <div className="d-flex align-items-center">
@@ -76,25 +76,55 @@ export default function ReportConfigWrapper(props: ReportConfigurationProps) {
         </div>
 
         <div className="d-flex align-items-center gap-2">
-          {selectedKeys.size > 0 && (
+          {selectedKeys.size > 0 ? (
             <>
               <span style={{ fontSize: "0.9rem", marginRight: 5 }}>
                 <strong>{selectedKeys.size}</strong> selected
               </span>
-              <Button variant="primary" size="sm" onClick={handleEditSelected}>
-                Edit Selected
+              <Button variant="outline-primary" size="sm" onClick={handleEditSelected}>
+                Edit
               </Button>
-              <Button variant="danger" size="sm" onClick={handleDeleteSelected}>
-                Delete Selected
+              <Button variant="outline-danger" size="sm" onClick={handleDeleteSelected}>
+                Delete
               </Button>
-              <Button variant="secondary" size="sm" onClick={handleClearSelection}>
+              <Button variant="outline-secondary" size="sm" onClick={handleClearSelection}>
                 Clear
               </Button>
             </>
+          ) : (
+            <Button variant="outline-primary" size="sm" onClick={handleShow} className="d-flex align-items-center">
+              <Plus className="me-1" /> Add
+            </Button>
           )}
-          <Button variant="outline-primary" size="sm" onClick={handleShow} className="d-flex align-items-center">
-            <Plus className="me-1" /> Add
-          </Button>
+        </div>
+      </div>
+
+      {/* Header row - Mobile */}
+      <div className="d-md-none">
+        {/* First row: Report Configuration and Add button (or Edit/Delete if selections exist) */}
+        <div
+          className="d-flex align-items-center justify-content-between cursor-pointer"
+          onClick={() => setIsConfigOpen(!isConfigOpen)}
+        >
+          <div className="d-flex align-items-center">
+            <div className="me-2">{isConfigOpen ? <ChevronDown /> : <ChevronRight />}</div>
+            <strong>Report Configuration</strong>
+          </div>
+
+          {selectedKeys.size === 0 ? (
+            <Button variant="outline-primary" size="sm" onClick={handleShow} className="d-flex align-items-center">
+              <Plus className="me-1" /> Add
+            </Button>
+          ) : (
+            <div className="d-flex align-items-center gap-2">
+              <Button variant="outline-primary" size="sm" onClick={handleEditSelected}>
+                Edit
+              </Button>
+              <Button variant="outline-danger" size="sm" onClick={handleDeleteSelected}>
+                Delete
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 

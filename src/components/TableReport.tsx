@@ -1,5 +1,6 @@
 import { Table, Modal } from "react-bootstrap";
 import { useState, useEffect } from "react";
+import { CheckSquare } from "react-bootstrap-icons";
 import { ComicBook } from "../interfaces/ComicBook";
 import { useAppContext } from "../hooks/useAppContext";
 import { ComicForm } from "./ComicForm";
@@ -83,6 +84,14 @@ export const TableReport = ({ tableId }: TableReportProps) => {
     setIsBatchMode,
   });
 
+  // Determine checkbox color based on selection state
+  const getCheckboxColor = () => {
+    if (sortedData.length === 0) return "#d3d3d3"; // light grey when no data
+    if (selectedKeys.size === 0) return "#d3d3d3"; // light grey when nothing selected
+    if (selectedKeys.size === sortedData.length) return "#000000"; // black when all selected
+    return "#808080"; // gray when 1 or more (but not all) selected
+  };
+
   return (
     <>
       <Table striped bordered hover responsive style={{ fontSize: "0.875rem" }}>
@@ -93,7 +102,7 @@ export const TableReport = ({ tableId }: TableReportProps) => {
               onClick={toggleSelectAll}
               title="Select/deselect all"
             >
-              {sortedData.length > 0 && selectedKeys.size === sortedData.length ? "✓" : ""}
+              <CheckSquare size={16} color={getCheckboxColor()} />
             </th>
             {visibleColumns.map((col) => {
               const activeSort = sortConfig.find((s) => s.key === col.key);
@@ -134,7 +143,9 @@ export const TableReport = ({ tableId }: TableReportProps) => {
                     cursor: "pointer",
                     userSelect: "none",
                     fontWeight: "bold",
-                    fontSize: "1.2em",
+                    fontSize: "1rem",
+                    lineHeight: "1",
+                    verticalAlign: "middle",
                   }}
                   onClick={(e) => toggleSelection(key, e)}
                 >

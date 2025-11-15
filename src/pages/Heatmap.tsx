@@ -41,24 +41,27 @@ export function Heatmap() {
             </p>
           </div>
 
-          {/* Legend */}
-          <Row className="mb-4">
+          {/* Legend - Desktop */}
+          <Row className="mb-4 d-none d-md-block">
             <Col>
               <Card>
                 <Card.Body className="d-flex align-items-center justify-content-center gap-3">
                   <span className="text-muted">Less</span>
-                  <div className="d-flex gap-1">
-                    {[0, 0.2, 0.4, 0.6, 0.8, 1.0].map((intensity, idx) => (
-                      <div
-                        key={idx}
-                        style={{
-                          width: "30px",
-                          height: "20px",
-                          backgroundColor: intensity === 0 ? "#f0f0f0" : `hsl(210, 70%, ${85 - intensity * 55}%)`,
-                          border: "1px solid #ddd",
-                        }}
-                      />
-                    ))}
+                  <div className="d-flex">
+                    {Array.from({ length: 24 }, (_, idx) => {
+                      const intensity = idx / 23;
+                      return (
+                        <div
+                          key={idx}
+                          style={{
+                            width: "20px",
+                            height: "20px",
+                            backgroundColor: intensity === 0 ? "#f0f0f0" : `hsl(210, 70%, ${85 - intensity * 55}%)`,
+                            border: "1px solid #ddd",
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                   <span className="text-muted">More</span>
                   <Badge bg="secondary" className="ms-3">
@@ -69,8 +72,38 @@ export function Heatmap() {
             </Col>
           </Row>
 
-          {/* Heatmap */}
-          <Row>
+          {/* Legend - Mobile */}
+          <Row className="mb-4 d-md-none">
+            <Col>
+              <Card>
+                <Card.Body className="text-center">
+                  <div className="d-flex align-items-center justify-content-center gap-3 mb-2">
+                    <span className="text-muted">Less</span>
+                    <div className="d-flex gap-1">
+                      {[0, 0.2, 0.4, 0.6, 0.8, 1.0].map((intensity, idx) => (
+                        <div
+                          key={idx}
+                          style={{
+                            width: "30px",
+                            height: "20px",
+                            backgroundColor: intensity === 0 ? "#f0f0f0" : `hsl(210, 70%, ${85 - intensity * 55}%)`,
+                            border: "1px solid #ddd",
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-muted">More</span>
+                  </div>
+                  <div>
+                    <Badge bg="secondary">Max: {maxCount} comics/month</Badge>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Heatmap - Desktop */}
+          <Row className="d-none d-md-block">
             <Col>
               <Card>
                 <Card.Body style={{ overflowX: "auto" }}>
@@ -139,8 +172,80 @@ export function Heatmap() {
             </Col>
           </Row>
 
+          {/* Heatmap - Mobile */}
+          <Row className="d-md-none">
+            <Col>
+              <Card>
+                <Card.Body className="p-2">
+                  {/* Month labels header */}
+                  <div className="d-flex mb-1">
+                    <div style={{ width: "35px", flexShrink: 0, fontSize: "0.65rem" }} />
+                    {months.map((month, idx) => (
+                      <div
+                        key={idx}
+                        className="text-center fw-bold"
+                        style={{
+                          flex: 1,
+                          fontSize: "0.5rem",
+                          minWidth: "20px",
+                          padding: "2px 0",
+                        }}
+                      >
+                        {month.substring(0, 1)}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Year rows */}
+                  {years.map((year) => {
+                    const monthData = heatmapData.get(year) || new Map();
+                    return (
+                      <div key={year} className="d-flex mb-1">
+                        {/* Year label */}
+                        <div
+                          className="text-end pe-1 fw-bold"
+                          style={{
+                            width: "35px",
+                            flexShrink: 0,
+                            fontSize: "0.65rem",
+                            lineHeight: "24px",
+                          }}
+                        >
+                          {year}
+                        </div>
+
+                        {/* Month cells */}
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((month) => {
+                          const count = monthData.get(month) || 0;
+                          return (
+                            <div
+                              key={month}
+                              className="d-flex align-items-center justify-content-center"
+                              style={{
+                                flex: 1,
+                                minWidth: "20px",
+                                height: "24px",
+                                backgroundColor: getColor(count),
+                                border: "1px solid #ddd",
+                                fontSize: "0.5rem",
+                              }}
+                            >
+                              {count > 0 && (
+                                <span style={{ color: count / maxCount > 0.5 ? "white" : "#333" }}>{count}</span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
           {/* Summary Statistics */}
-          <Row className="g-4 mt-4 mb-4">
+          <Row className="g-4 mt-1 mb-4">
             <Col xs={12} md={4}>
               <Card className="text-center h-100">
                 <Card.Body>

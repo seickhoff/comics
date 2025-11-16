@@ -3,10 +3,18 @@ import { useAppContext } from "../hooks/useAppContext";
 import { useToast } from "../context/ToastContext";
 import { Button, Alert, Form } from "react-bootstrap";
 import { loadCollectionData } from "../utils/collectionLoader";
-import { APP_CONFIG } from "../config/constants";
 
 export function JsonClipboardImporter() {
-  const { setJsonData, setFileName, setColumns, setFilters, setUseOrFiltering, setTableSortConfig } = useAppContext();
+  const {
+    setJsonData,
+    setFileName,
+    setColumns,
+    setFilters,
+    setUseOrFiltering,
+    setTableSortConfig,
+    setSettings,
+    settings,
+  } = useAppContext();
   const { addToast } = useToast();
   const [pastedJson, setPastedJson] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -31,8 +39,9 @@ export function JsonClipboardImporter() {
           setFilters,
           setUseOrFiltering,
           setTableSortConfig,
+          setSettings,
         },
-        APP_CONFIG.DEFAULT_FILENAME
+        settings.defaultFilename
       );
 
       if (result.success) {

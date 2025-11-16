@@ -24,6 +24,7 @@ const navRoutes: NavRoute[] = [
   { path: "/overstreet", label: "Overstreet" },
   { path: "/summary", label: "Summary" },
   { path: "/heatmap", label: "Heatmap" },
+  { path: "/settings", label: "Settings" },
 ];
 
 export function AppNavbar() {

@@ -4,7 +4,7 @@ import OverstreetReport from "../components/OverstreetReport";
 import { EmptyState } from "../components/EmptyState";
 
 export function Overstreet() {
-  const { jsonData, fileName } = useAppContext();
+  const { jsonData, fileName, settings } = useAppContext();
 
   return (
     <Container className="mt-4">
@@ -14,7 +14,7 @@ export function Overstreet() {
         <EmptyState />
       ) : (
         <>
-          <OverstreetReport comics={jsonData} />
+          <OverstreetReport comics={jsonData} settings={settings} />
         </>
       )}
     </Container>

@@ -1,5 +1,5 @@
 import { createContext, Dispatch, SetStateAction } from "react";
-import { ColumnConfig, ColumnKey, ComicBook } from "../interfaces/ComicBook";
+import { ColumnConfig, ColumnKey, ComicBook, GradeCode } from "../interfaces/ComicBook";
 
 // Type for User
 export type User = { id: string; name: string } | null;
@@ -12,6 +12,28 @@ export type SortConfig = {
   key: keyof ComicBook;
   direction: SortDirection;
 }[];
+
+// Type for application settings (editable constants)
+export type AppSettings = {
+  defaultFilename: string;
+  defaultQuantity: number;
+  defaultCondition: GradeCode;
+  defaultVolume: string;
+  toastDuration: number;
+  maxTitleLength: number;
+  maxCommentLength: number;
+  minYear: number;
+  maxYear: number;
+  minIssue: number;
+  overstreetMaxCharsDesktop: number;
+  overstreetMaxCharsMobile: number;
+  overstreetLinesPerPage: number;
+  summaryMaxListHeight: string;
+  heatmapColorHue: number;
+  heatmapColorSaturation: string;
+  heatmapColorLightnessMin: number;
+  heatmapColorLightnessMax: number;
+};
 
 // Type for the state
 export type AppState = {
@@ -50,6 +72,10 @@ export type AppState = {
   // Batch edit handler - set by TableReport, called by ReportConfigWrapper
   handleBatchEdit: (() => void) | null;
   setHandleBatchEdit: (handler: (() => void) | null) => void;
+
+  // Application settings
+  settings: AppSettings;
+  setSettings: Dispatch<SetStateAction<AppSettings>>;
 };
 
 // Context declaration

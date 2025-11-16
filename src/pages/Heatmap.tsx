@@ -5,7 +5,7 @@ import { ComicBook } from "../interfaces/ComicBook";
 import { HEATMAP_CONFIG } from "../config/constants";
 
 export function Heatmap() {
-  const { jsonData, setFilters } = useAppContext();
+  const { jsonData, setFilters, settings } = useAppContext();
   const navigate = useNavigate();
 
   const heatmapData = calculateHeatmapData(jsonData);
@@ -64,11 +64,11 @@ export function Heatmap() {
   const getColor = (count: number) => {
     if (count === 0) return HEATMAP_CONFIG.COLORS.EMPTY;
     const intensity = Math.min(count / maxCount, 1);
-    // Blue gradient from light to dark
+    // Gradient from light to dark using settings
     const lightness =
-      HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX -
-      intensity * (HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - HEATMAP_CONFIG.COLORS.LIGHTNESS_MIN);
-    return `hsl(${HEATMAP_CONFIG.COLORS.HUE}, ${HEATMAP_CONFIG.COLORS.SATURATION}, ${lightness}%)`;
+      settings.heatmapColorLightnessMax -
+      intensity * (settings.heatmapColorLightnessMax - settings.heatmapColorLightnessMin);
+    return `hsl(${settings.heatmapColorHue}, ${settings.heatmapColorSaturation}, ${lightness}%)`;
   };
 
   return (
@@ -344,7 +344,7 @@ export function Heatmap() {
                             backgroundColor:
                               intensity === 0
                                 ? HEATMAP_CONFIG.COLORS.EMPTY
-                                : `hsl(${HEATMAP_CONFIG.COLORS.HUE}, ${HEATMAP_CONFIG.COLORS.SATURATION}, ${HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - intensity * (HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - HEATMAP_CONFIG.COLORS.LIGHTNESS_MIN)}%)`,
+                                : `hsl(${settings.heatmapColorHue}, ${settings.heatmapColorSaturation}, ${settings.heatmapColorLightnessMax - intensity * (settings.heatmapColorLightnessMax - settings.heatmapColorLightnessMin)}%)`,
                             border: "1px solid #ddd",
                           }}
                         />
@@ -377,7 +377,7 @@ export function Heatmap() {
                               backgroundColor:
                                 intensity === 0
                                   ? HEATMAP_CONFIG.COLORS.EMPTY
-                                  : `hsl(${HEATMAP_CONFIG.COLORS.HUE}, ${HEATMAP_CONFIG.COLORS.SATURATION}, ${HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - intensity * (HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - HEATMAP_CONFIG.COLORS.LIGHTNESS_MIN)}%)`,
+                                  : `hsl(${settings.heatmapColorHue}, ${settings.heatmapColorSaturation}, ${settings.heatmapColorLightnessMax - intensity * (settings.heatmapColorLightnessMax - settings.heatmapColorLightnessMin)}%)`,
                               border: "1px solid #ddd",
                             }}
                           />

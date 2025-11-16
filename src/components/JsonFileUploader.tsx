@@ -5,8 +5,16 @@ import { Button, Alert, Spinner } from "react-bootstrap";
 import { loadCollectionData } from "../utils/collectionLoader";
 
 export function JsonFileUploader() {
-  const { setJsonData, setLoading, setFileName, setColumns, setFilters, setUseOrFiltering, setTableSortConfig } =
-    useAppContext();
+  const {
+    setJsonData,
+    setLoading,
+    setFileName,
+    setColumns,
+    setFilters,
+    setUseOrFiltering,
+    setTableSortConfig,
+    setSettings,
+  } = useAppContext();
   const { addToast } = useToast();
   const [loading, setLocalLoading] = useState(false);
 
@@ -31,6 +39,7 @@ export function JsonFileUploader() {
             setFilters,
             setUseOrFiltering,
             setTableSortConfig,
+            setSettings,
           },
           file.name
         );

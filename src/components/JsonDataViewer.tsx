@@ -5,7 +5,7 @@ import { normalizeComicBook } from "../utils/normalizeComicBook";
 import { ExportFormat } from "../interfaces/ExportFormat";
 
 export function JsonDataViewer() {
-  const { jsonData, fileName, columns, filters, useOrFiltering, tableSortConfig } = useAppContext();
+  const { jsonData, fileName, columns, filters, useOrFiltering, tableSortConfig, settings } = useAppContext();
   const [isOpen, setIsOpen] = useState(false);
 
   if (!fileName) return null;
@@ -19,6 +19,7 @@ export function JsonDataViewer() {
     filters,
     useOrFiltering,
     tableSortConfig,
+    settings,
     comics: jsonData.map(normalizeComicBook),
   };
 

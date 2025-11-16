@@ -1,5 +1,5 @@
 import { ComicBook, ColumnConfig, ColumnKey } from "./ComicBook";
-import { SortConfig } from "../context/AppContext";
+import { AppSettings, SortConfig } from "../context/AppContext";
 
 export interface ExportFormat {
   // Metadata
@@ -12,6 +12,7 @@ export interface ExportFormat {
   filters: Record<ColumnKey, string>;
   useOrFiltering: boolean;
   tableSortConfig: Record<string, SortConfig>;
+  settings?: AppSettings; // Optional for backward compatibility
 
   // Comic Data
   comics: ComicBook[];

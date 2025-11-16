@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
 import { ChevronLeft, ChevronRight } from "react-bootstrap-icons";
 import { ComicBook } from "../interfaces/ComicBook";
+import { AppSettings } from "../context/AppContext";
 import { normalizeTitle, parseNumber } from "../utils/comicSorting";
 import { OVERSTREET_CONFIG } from "../config/constants";
 
 interface OverstreetProps {
   comics: ComicBook[];
+  settings: AppSettings;
 }
 
 // Format currency without $
@@ -20,12 +22,22 @@ const parseIssue = parseNumber;
 
 // JSX-based line with responsive dotted leader and hover background
 // Supports multi-line display when content is too long
-function Line({ left, right, isMobile }: { left: string; right: string; isMobile?: boolean }) {
+function Line({
+  left,
+  right,
+  isMobile,
+  settings,
+}: {
+  left: string;
+  right: string;
+  isMobile?: boolean;
+  settings: AppSettings;
+}) {
   // Calculate the formatted value string (including $ and formatting)
   const formattedValue = `$${formatCurrency(right)}`;
 
   // Total available width
-  const totalWidth = isMobile ? OVERSTREET_CONFIG.MAX_CHARS_MOBILE : OVERSTREET_CONFIG.MAX_CHARS_DESKTOP;
+  const totalWidth = isMobile ? settings.overstreetMaxCharsMobile : settings.overstreetMaxCharsDesktop;
 
   // Calculate the column position where $ should start (right-aligned with buffer)
   // The $ should start at position: totalWidth - valueLength
@@ -195,7 +207,7 @@ function buildIssueLines(issues: ComicBook[]): { label: string; value: string }[
   return merged;
 }
 
-export default function OverstreetReport({ comics }: OverstreetProps) {
+export default function OverstreetReport({ comics, settings }: OverstreetProps) {
   const groups = groupByTitlePublisherVolume(comics);
   const [currentPage, setCurrentPage] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -211,7 +223,7 @@ export default function OverstreetReport({ comics }: OverstreetProps) {
   }, []);
 
   // Build all entries (title groups with their issue lines)
-  const LINES_PER_PAGE = OVERSTREET_CONFIG.LINES_PER_PAGE;
+  const LINES_PER_PAGE = settings.overstreetLinesPerPage;
 
   // Flatten all groups into individual lines with group headers
   type PageItem =
@@ -237,7 +249,7 @@ export default function OverstreetReport({ comics }: OverstreetProps) {
     const formattedValue = `$${formatCurrency(item.right)}`;
 
     // Total available width
-    const totalWidth = OVERSTREET_CONFIG.MAX_CHARS_DESKTOP;
+    const totalWidth = settings.overstreetMaxCharsDesktop;
 
     // Calculate the column position where $ should start
     const dollarStartColumn = totalWidth - formattedValue.length;
@@ -361,7 +373,7 @@ export default function OverstreetReport({ comics }: OverstreetProps) {
             </div>
           </div>
         ) : (
-          <Line key={idx} left={item.left} right={item.right} isMobile={false} />
+          <Line key={idx} left={item.left} right={item.right} isMobile={false} settings={settings} />
         )
       )}
     </div>
@@ -395,7 +407,7 @@ export default function OverstreetReport({ comics }: OverstreetProps) {
               </div>
             </div>
           ) : (
-            <Line key={idx} left={item.left} right={item.right} isMobile={true} />
+            <Line key={idx} left={item.left} right={item.right} isMobile={true} settings={settings} />
           )
         )}
       </div>

@@ -5,7 +5,7 @@ import { ComicBook } from "../interfaces/ComicBook";
 import { SUMMARY_CONFIG } from "../config/constants";
 
 export function Summary() {
-  const { jsonData, setFilters } = useAppContext();
+  const { jsonData, setFilters, settings } = useAppContext();
   const navigate = useNavigate();
 
   // Calculate statistics
@@ -187,7 +187,7 @@ export function Summary() {
                 <Card.Header className="bg-dark text-white">
                   <h5 className="mb-0">Most Valuable Comics</h5>
                 </Card.Header>
-                <Card.Body style={{ maxHeight: SUMMARY_CONFIG.MAX_LIST_HEIGHT, overflowY: "auto" }}>
+                <Card.Body style={{ maxHeight: settings.summaryMaxListHeight, overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.allValuableComics.map((comic, index) => (
                       <ListGroup.Item
@@ -256,7 +256,7 @@ export function Summary() {
                 <Card.Header className="bg-dark text-white">
                   <h5 className="mb-0">Titles by Issue Count</h5>
                 </Card.Header>
-                <Card.Body style={{ maxHeight: SUMMARY_CONFIG.MAX_LIST_HEIGHT, overflowY: "auto" }}>
+                <Card.Body style={{ maxHeight: settings.summaryMaxListHeight, overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.allTitlesByCount.map((item, index) => (
                       <ListGroup.Item
@@ -317,7 +317,7 @@ export function Summary() {
                 <Card.Header className="bg-dark text-white">
                   <h5 className="mb-0">Writers</h5>
                 </Card.Header>
-                <Card.Body style={{ maxHeight: SUMMARY_CONFIG.MAX_LIST_HEIGHT, overflowY: "auto" }}>
+                <Card.Body style={{ maxHeight: settings.summaryMaxListHeight, overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.allWriters.map((item, index) => (
                       <ListGroup.Item
@@ -347,7 +347,7 @@ export function Summary() {
                 <Card.Header className="bg-dark text-white">
                   <h5 className="mb-0">Artists</h5>
                 </Card.Header>
-                <Card.Body style={{ maxHeight: SUMMARY_CONFIG.MAX_LIST_HEIGHT, overflowY: "auto" }}>
+                <Card.Body style={{ maxHeight: settings.summaryMaxListHeight, overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.allArtists.map((item, index) => (
                       <ListGroup.Item
@@ -380,7 +380,7 @@ export function Summary() {
                 <Card.Header className="bg-dark text-white">
                   <h5 className="mb-0">Publishers</h5>
                 </Card.Header>
-                <Card.Body style={{ maxHeight: SUMMARY_CONFIG.MAX_LIST_HEIGHT, overflowY: "auto" }}>
+                <Card.Body style={{ maxHeight: settings.summaryMaxListHeight, overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.allPublishers.map((item, index) => (
                       <ListGroup.Item
@@ -410,7 +410,7 @@ export function Summary() {
                 <Card.Header className="bg-dark text-white">
                   <h5 className="mb-0">Comics by Condition</h5>
                 </Card.Header>
-                <Card.Body style={{ maxHeight: SUMMARY_CONFIG.MAX_LIST_HEIGHT, overflowY: "auto" }}>
+                <Card.Body style={{ maxHeight: settings.summaryMaxListHeight, overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.conditionBreakdown.map((item, index) => (
                       <ListGroup.Item
@@ -445,7 +445,7 @@ export function Summary() {
                   <Card.Header className="bg-dark text-white">
                     <h5 className="mb-0">Duplicate Comics</h5>
                   </Card.Header>
-                  <Card.Body style={{ maxHeight: SUMMARY_CONFIG.MAX_LIST_HEIGHT, overflowY: "auto" }}>
+                  <Card.Body style={{ maxHeight: settings.summaryMaxListHeight, overflowY: "auto" }}>
                     <ListGroup variant="flush">
                       {stats.allDuplicates.map((item, index) => (
                         <ListGroup.Item

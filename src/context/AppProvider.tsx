@@ -1,7 +1,7 @@
 import { useState, ReactNode } from "react";
-import { AppContext, SortConfig } from "./AppContext";
+import { AppContext, AppSettings, SortConfig } from "./AppContext";
 import { ColumnConfig, ColumnKey, ComicBook } from "../interfaces/ComicBook";
-import { APP_CONFIG } from "../config/constants";
+import { APP_CONFIG, OVERSTREET_CONFIG, SUMMARY_CONFIG, HEATMAP_CONFIG } from "../config/constants";
 
 const defaultColumns: ColumnConfig[] = [
   { key: "title", label: "Title", visible: true },
@@ -18,6 +18,28 @@ const defaultColumns: ColumnConfig[] = [
   { key: "comments", label: "Comments", visible: true },
 ];
 
+// Default settings from constants
+const getDefaultSettings = (): AppSettings => ({
+  defaultFilename: APP_CONFIG.DEFAULT_FILENAME,
+  defaultQuantity: APP_CONFIG.DEFAULTS.QUANTITY,
+  defaultCondition: APP_CONFIG.DEFAULTS.CONDITION,
+  defaultVolume: APP_CONFIG.DEFAULTS.VOLUME,
+  toastDuration: APP_CONFIG.UI.TOAST_DURATION,
+  maxTitleLength: APP_CONFIG.UI.MAX_TITLE_LENGTH,
+  maxCommentLength: APP_CONFIG.UI.MAX_COMMENT_LENGTH,
+  minYear: APP_CONFIG.VALIDATION.MIN_YEAR,
+  maxYear: new Date().getFullYear() + 2,
+  minIssue: APP_CONFIG.VALIDATION.MIN_ISSUE,
+  overstreetMaxCharsDesktop: OVERSTREET_CONFIG.MAX_CHARS_DESKTOP,
+  overstreetMaxCharsMobile: OVERSTREET_CONFIG.MAX_CHARS_MOBILE,
+  overstreetLinesPerPage: OVERSTREET_CONFIG.LINES_PER_PAGE,
+  summaryMaxListHeight: SUMMARY_CONFIG.MAX_LIST_HEIGHT,
+  heatmapColorHue: HEATMAP_CONFIG.COLORS.HUE,
+  heatmapColorSaturation: HEATMAP_CONFIG.COLORS.SATURATION,
+  heatmapColorLightnessMin: HEATMAP_CONFIG.COLORS.LIGHTNESS_MIN,
+  heatmapColorLightnessMax: HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX,
+});
+
 // AppProvider component that provides the global context
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [columns, setColumns] = useState<ColumnConfig[]>(defaultColumns);
@@ -31,6 +53,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [tableSortConfig, setTableSortConfig] = useState<Record<string, SortConfig>>({});
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [handleBatchEdit, setHandleBatchEdit] = useState<(() => void) | null>(null);
+  const [settings, setSettings] = useState<AppSettings>(getDefaultSettings());
 
   return (
     <AppContext.Provider
@@ -57,6 +80,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setSelectedKeys,
         handleBatchEdit,
         setHandleBatchEdit,
+        settings,
+        setSettings,
       }}
     >
       {children}

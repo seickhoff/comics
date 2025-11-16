@@ -6,7 +6,8 @@ import { normalizeComicBook } from "../utils/normalizeComicBook";
 import { ExportFormat } from "../interfaces/ExportFormat";
 
 export function JsonFileDownloader() {
-  const { jsonData, fileName, setFileName, columns, filters, useOrFiltering, tableSortConfig } = useAppContext();
+  const { jsonData, fileName, setFileName, columns, filters, useOrFiltering, tableSortConfig, settings } =
+    useAppContext();
   const { addToast } = useToast();
   const [copySuccess, setCopySuccess] = useState(false);
 
@@ -25,6 +26,7 @@ export function JsonFileDownloader() {
       filters,
       useOrFiltering,
       tableSortConfig,
+      settings,
       comics: normalized,
     };
 

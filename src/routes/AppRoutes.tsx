@@ -8,6 +8,7 @@ import { Overstreet } from "../pages/Overstreet";
 import { MaintenanceTable } from "../pages/MaintenanceTable";
 import { Summary } from "../pages/Summary";
 import { Heatmap } from "../pages/Heatmap";
+import { Settings } from "../pages/Settings";
 
 export function AppRoutes() {
   return (
@@ -22,6 +23,7 @@ export function AppRoutes() {
       <Route path="/overstreet" element={<Overstreet />} />
       <Route path="/summary" element={<Summary />} />
       <Route path="/heatmap" element={<Heatmap />} />
+      <Route path="/settings" element={<Settings />} />
     </Routes>
   );
 }

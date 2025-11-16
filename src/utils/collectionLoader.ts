@@ -1,5 +1,5 @@
 import { ComicBook, ColumnConfig, ColumnKey } from "../interfaces/ComicBook";
-import { SortConfig } from "../context/AppContext";
+import { AppSettings, SortConfig } from "../context/AppContext";
 import { normalizeComicBook } from "./normalizeComicBook";
 import { sortComics } from "./comicSorting";
 import { isExportFormat } from "./exportFormat";
@@ -11,6 +11,7 @@ export interface CollectionLoaderSetters {
   setFilters?: (filters: Record<ColumnKey, string>) => void;
   setUseOrFiltering?: (val: boolean) => void;
   setTableSortConfig?: (config: Record<string, SortConfig>) => void;
+  setSettings?: (settings: AppSettings) => void;
 }
 
 export interface LoadCollectionResult {
@@ -48,6 +49,9 @@ export function loadCollectionData(
       }
       if (rawData.tableSortConfig && setters.setTableSortConfig) {
         setters.setTableSortConfig(rawData.tableSortConfig);
+      }
+      if (rawData.settings && setters.setSettings) {
+        setters.setSettings(rawData.settings);
       }
 
       // Set filename if provided

@@ -1,8 +1,0 @@
-1. use the existing constants as default values
-2. have a page to edit the constants, mobile and desktop friendly
-3. make the constants object be part of appcontext
-4. extend the JSON file structure to include the constants data and can be saved and read, new uses defaults
-
-5. reset sorting
-6. above maintenance table - summary of issue count, total price, avg price
-7. summary page - duplicates list desc by count, clickable wor, also click to see all in list

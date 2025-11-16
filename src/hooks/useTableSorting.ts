@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ComicBook } from "../interfaces/ComicBook";
 import { normalizeTitle } from "../utils/comicSorting";
 
@@ -16,11 +16,42 @@ interface UseTableSortingProps {
 
 export function useTableSorting({ tableId, data, tableSortConfig, setTableSortConfig }: UseTableSortingProps) {
   const [sortConfig, setSortConfig] = useState<SortConfig>(tableSortConfig[tableId] || []);
+  const lastTableIdRef = useRef(tableId);
+  const lastContextConfigRef = useRef<string>(JSON.stringify(tableSortConfig[tableId] || []));
 
-  // Persist sort config to context
+  // When tableId changes (viewport switch), load the config for the new tableId
   useEffect(() => {
-    setTableSortConfig((prev) => ({ ...prev, [tableId]: sortConfig }));
-  }, [sortConfig, tableId, setTableSortConfig]);
+    if (lastTableIdRef.current !== tableId) {
+      lastTableIdRef.current = tableId;
+      const newConfig = tableSortConfig[tableId] || [];
+      setSortConfig(newConfig);
+      lastContextConfigRef.current = JSON.stringify(newConfig);
+    }
+  }, [tableId, tableSortConfig]);
+
+  // Sync local state when context changes externally (e.g., from reset button)
+  useEffect(() => {
+    const currentConfig = tableSortConfig[tableId];
+    const currentConfigStr = JSON.stringify(currentConfig || []);
+
+    // Only update if context changed AND it's different from what we last saw
+    if (currentConfigStr !== lastContextConfigRef.current) {
+      lastContextConfigRef.current = currentConfigStr;
+      setSortConfig(currentConfig || []);
+    }
+  }, [tableSortConfig, tableId]);
+
+  // Persist sort config to context when user changes it
+  useEffect(() => {
+    const currentConfig = tableSortConfig[tableId];
+    const sortConfigStr = JSON.stringify(sortConfig);
+    const currentConfigStr = JSON.stringify(currentConfig || []);
+
+    if (sortConfigStr !== currentConfigStr) {
+      lastContextConfigRef.current = sortConfigStr;
+      setTableSortConfig((prev) => ({ ...prev, [tableId]: sortConfig }));
+    }
+  }, [sortConfig, tableId, tableSortConfig, setTableSortConfig]);
 
   const toggleSort = (key: keyof ComicBook) => {
     setSortConfig((prev) => {

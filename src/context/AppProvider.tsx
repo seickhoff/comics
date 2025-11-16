@@ -18,6 +18,25 @@ const defaultColumns: ColumnConfig[] = [
   { key: "comments", label: "Comments", visible: true },
 ];
 
+// Default mobile columns (fewer visible by default)
+const defaultMobileColumns: ColumnConfig[] = [
+  { key: "title", label: "Title", visible: true },
+  { key: "publisher", label: "Publisher", visible: false },
+  { key: "volume", label: "Volume", visible: false },
+  { key: "issue", label: "Issue", visible: true },
+  { key: "month", label: "Month", visible: true },
+  { key: "year", label: "Year", visible: true },
+  { key: "quantity", label: "Quantity", visible: false },
+  { key: "value", label: "Value", visible: false },
+  { key: "condition", label: "Condition", visible: false },
+  { key: "writer", label: "Writer", visible: false },
+  { key: "artist", label: "Artist", visible: false },
+  { key: "comments", label: "Comments", visible: false },
+];
+
+// Default desktop columns (all visible)
+const defaultDesktopColumns: ColumnConfig[] = [...defaultColumns];
+
 // Default settings from constants
 const getDefaultSettings = (): AppSettings => ({
   defaultFilename: APP_CONFIG.DEFAULT_FILENAME,
@@ -42,7 +61,12 @@ const getDefaultSettings = (): AppSettings => ({
 
 // AppProvider component that provides the global context
 export const AppProvider = ({ children }: { children: ReactNode }) => {
+  // Detect initial viewport
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
+
   const [columns, setColumns] = useState<ColumnConfig[]>(defaultColumns);
+  const [mobileColumns, setMobileColumns] = useState<ColumnConfig[]>(defaultMobileColumns);
+  const [desktopColumns, setDesktopColumns] = useState<ColumnConfig[]>(defaultDesktopColumns);
   const [fileName, setFileName] = useState<string | null>(APP_CONFIG.DEFAULT_FILENAME);
   const [filters, setFilters] = useState<Record<ColumnKey, string>>({} as Record<ColumnKey, string>);
   const [isConfigOpen, setIsConfigOpen] = useState<boolean>(false);
@@ -51,6 +75,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [useOrFiltering, setUseOrFiltering] = useState(false);
   const [user, setUser] = useState<null | { id: string; name: string }>(null);
   const [tableSortConfig, setTableSortConfig] = useState<Record<string, SortConfig>>({});
+  const [mobileTableSortConfig, setMobileTableSortConfig] = useState<Record<string, SortConfig>>({});
+  const [desktopTableSortConfig, setDesktopTableSortConfig] = useState<Record<string, SortConfig>>({});
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [handleBatchEdit, setHandleBatchEdit] = useState<(() => void) | null>(null);
   const [settings, setSettings] = useState<AppSettings>(getDefaultSettings());
@@ -76,12 +102,22 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         user,
         tableSortConfig,
         setTableSortConfig,
+        mobileTableSortConfig,
+        setMobileTableSortConfig,
+        desktopTableSortConfig,
+        setDesktopTableSortConfig,
         selectedKeys,
         setSelectedKeys,
         handleBatchEdit,
         setHandleBatchEdit,
         settings,
         setSettings,
+        mobileColumns,
+        setMobileColumns,
+        desktopColumns,
+        setDesktopColumns,
+        isMobileView,
+        setIsMobileView,
       }}
     >
       {children}

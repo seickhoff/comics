@@ -6,7 +6,22 @@ import ReportConfigWrapper from "../components/ReportConfigurationWrapper";
 import { EmptyState } from "../components/EmptyState";
 
 export function MaintenanceTable() {
-  const { columns, setColumns, fileName, filters, setFilters, useOrFiltering, setUseOrFiltering } = useAppContext();
+  const {
+    isMobileView,
+    mobileColumns,
+    setMobileColumns,
+    desktopColumns,
+    setDesktopColumns,
+    fileName,
+    filters,
+    setFilters,
+    useOrFiltering,
+    setUseOrFiltering,
+  } = useAppContext();
+
+  // Use viewport-specific columns
+  const columns = isMobileView ? mobileColumns : desktopColumns;
+  const setColumns = isMobileView ? setMobileColumns : setDesktopColumns;
 
   const toggleColumnVisibility = (key: ColumnKey) => {
     setColumns((cols: ColumnConfig[]) =>

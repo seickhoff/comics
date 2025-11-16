@@ -126,6 +126,18 @@ export default function ReportConfigWrapper(props: ReportConfigurationProps) {
             </div>
           )}
         </div>
+
+        {/* Second row: Clear Selection button when applicable */}
+        {selectedKeys.size > 0 && (
+          <div className="d-flex align-items-center justify-content-end gap-2 mt-2">
+            <span style={{ fontSize: "0.85rem" }}>
+              <strong>{selectedKeys.size}</strong> selected
+            </span>
+            <Button variant="outline-secondary" size="sm" onClick={handleClearSelection}>
+              Clear
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Collapsible body */}

@@ -5,7 +5,19 @@ import { normalizeComicBook } from "../utils/normalizeComicBook";
 import { ExportFormat } from "../interfaces/ExportFormat";
 
 export function JsonDataViewer() {
-  const { jsonData, fileName, columns, filters, useOrFiltering, tableSortConfig, settings } = useAppContext();
+  const {
+    jsonData,
+    fileName,
+    columns,
+    mobileColumns,
+    desktopColumns,
+    filters,
+    useOrFiltering,
+    tableSortConfig,
+    mobileTableSortConfig,
+    desktopTableSortConfig,
+    settings,
+  } = useAppContext();
   const [isOpen, setIsOpen] = useState(false);
 
   if (!fileName) return null;
@@ -16,9 +28,13 @@ export function JsonDataViewer() {
     version: "2.0",
     exportDate: new Date().toISOString(),
     columns,
+    mobileColumns,
+    desktopColumns,
     filters,
     useOrFiltering,
     tableSortConfig,
+    mobileTableSortConfig,
+    desktopTableSortConfig,
     settings,
     comics: jsonData.map(normalizeComicBook),
   };

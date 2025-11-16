@@ -6,8 +6,20 @@ import { normalizeComicBook } from "../utils/normalizeComicBook";
 import { ExportFormat } from "../interfaces/ExportFormat";
 
 export function JsonFileDownloader() {
-  const { jsonData, fileName, setFileName, columns, filters, useOrFiltering, tableSortConfig, settings } =
-    useAppContext();
+  const {
+    jsonData,
+    fileName,
+    setFileName,
+    columns,
+    mobileColumns,
+    desktopColumns,
+    filters,
+    useOrFiltering,
+    tableSortConfig,
+    mobileTableSortConfig,
+    desktopTableSortConfig,
+    settings,
+  } = useAppContext();
   const { addToast } = useToast();
   const [copySuccess, setCopySuccess] = useState(false);
 
@@ -23,9 +35,13 @@ export function JsonFileDownloader() {
       version: "2.0",
       exportDate: new Date().toISOString(),
       columns,
+      mobileColumns,
+      desktopColumns,
       filters,
       useOrFiltering,
       tableSortConfig,
+      mobileTableSortConfig,
+      desktopTableSortConfig,
       settings,
       comics: normalized,
     };

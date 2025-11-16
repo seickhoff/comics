@@ -49,6 +49,14 @@ export type AppState = {
   columns: ColumnConfig[];
   setColumns: Dispatch<SetStateAction<ColumnConfig[]>>;
 
+  // Viewport-specific columns
+  mobileColumns: ColumnConfig[];
+  setMobileColumns: Dispatch<SetStateAction<ColumnConfig[]>>;
+  desktopColumns: ColumnConfig[];
+  setDesktopColumns: Dispatch<SetStateAction<ColumnConfig[]>>;
+  isMobileView: boolean;
+  setIsMobileView: (value: boolean) => void;
+
   filters: Record<ColumnKey, string>;
   setFilters: Dispatch<SetStateAction<Record<ColumnKey, string>>>;
 
@@ -64,6 +72,12 @@ export type AppState = {
   // --- NEW: sorting configuration per table ---
   tableSortConfig: Record<string, SortConfig>; // keyed by table ID
   setTableSortConfig: Dispatch<SetStateAction<Record<string, SortConfig>>>;
+
+  // Viewport-specific sort configs
+  mobileTableSortConfig: Record<string, SortConfig>;
+  setMobileTableSortConfig: Dispatch<SetStateAction<Record<string, SortConfig>>>;
+  desktopTableSortConfig: Record<string, SortConfig>;
+  setDesktopTableSortConfig: Dispatch<SetStateAction<Record<string, SortConfig>>>;
 
   // --- NEW: selected rows for batch editing ---
   selectedKeys: Set<string>;

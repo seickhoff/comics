@@ -8,9 +8,13 @@ export interface CollectionLoaderSetters {
   setJsonData: (data: ComicBook[]) => void;
   setFileName?: (name: string) => void;
   setColumns?: (cols: ColumnConfig[]) => void;
+  setMobileColumns?: (cols: ColumnConfig[]) => void;
+  setDesktopColumns?: (cols: ColumnConfig[]) => void;
   setFilters?: (filters: Record<ColumnKey, string>) => void;
   setUseOrFiltering?: (val: boolean) => void;
   setTableSortConfig?: (config: Record<string, SortConfig>) => void;
+  setMobileTableSortConfig?: (config: Record<string, SortConfig>) => void;
+  setDesktopTableSortConfig?: (config: Record<string, SortConfig>) => void;
   setSettings?: (settings: AppSettings) => void;
 }
 
@@ -41,6 +45,12 @@ export function loadCollectionData(
       if (rawData.columns && setters.setColumns) {
         setters.setColumns(rawData.columns);
       }
+      if (rawData.mobileColumns && setters.setMobileColumns) {
+        setters.setMobileColumns(rawData.mobileColumns);
+      }
+      if (rawData.desktopColumns && setters.setDesktopColumns) {
+        setters.setDesktopColumns(rawData.desktopColumns);
+      }
       if (rawData.filters && setters.setFilters) {
         setters.setFilters(rawData.filters);
       }
@@ -49,6 +59,12 @@ export function loadCollectionData(
       }
       if (rawData.tableSortConfig && setters.setTableSortConfig) {
         setters.setTableSortConfig(rawData.tableSortConfig);
+      }
+      if (rawData.mobileTableSortConfig && setters.setMobileTableSortConfig) {
+        setters.setMobileTableSortConfig(rawData.mobileTableSortConfig);
+      }
+      if (rawData.desktopTableSortConfig && setters.setDesktopTableSortConfig) {
+        setters.setDesktopTableSortConfig(rawData.desktopTableSortConfig);
       }
       if (rawData.settings && setters.setSettings) {
         setters.setSettings(rawData.settings);

@@ -10,9 +10,13 @@ export function JsonFileUploader() {
     setLoading,
     setFileName,
     setColumns,
+    setMobileColumns,
+    setDesktopColumns,
     setFilters,
     setUseOrFiltering,
     setTableSortConfig,
+    setMobileTableSortConfig,
+    setDesktopTableSortConfig,
     setSettings,
   } = useAppContext();
   const { addToast } = useToast();
@@ -36,9 +40,13 @@ export function JsonFileUploader() {
             setJsonData,
             setFileName,
             setColumns,
+            setMobileColumns,
+            setDesktopColumns,
             setFilters,
             setUseOrFiltering,
             setTableSortConfig,
+            setMobileTableSortConfig,
+            setDesktopTableSortConfig,
             setSettings,
           },
           file.name

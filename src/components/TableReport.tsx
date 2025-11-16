@@ -1,4 +1,4 @@
-import { Table, Modal } from "react-bootstrap";
+import { Table, Modal, Button } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { CheckSquare } from "react-bootstrap-icons";
 import { ComicBook } from "../interfaces/ComicBook";
@@ -17,18 +17,26 @@ export type TableReportProps = {
 
 export const TableReport = ({ tableId }: TableReportProps) => {
   const {
-    columns,
+    isMobileView,
+    mobileColumns,
+    desktopColumns,
     jsonData,
     setJsonData,
     filters,
     useOrFiltering,
-    tableSortConfig,
-    setTableSortConfig,
+    mobileTableSortConfig,
+    setMobileTableSortConfig,
+    desktopTableSortConfig,
+    setDesktopTableSortConfig,
     selectedKeys,
     setSelectedKeys,
     setHandleBatchEdit,
   } = useAppContext();
 
+  // Use viewport-specific columns and sort config
+  const columns = isMobileView ? mobileColumns : desktopColumns;
+  const tableSortConfig = isMobileView ? mobileTableSortConfig : desktopTableSortConfig;
+  const setTableSortConfig = isMobileView ? setMobileTableSortConfig : setDesktopTableSortConfig;
   const visibleColumns = columns.filter((col) => col.visible);
 
   // Local state
@@ -47,8 +55,11 @@ export const TableReport = ({ tableId }: TableReportProps) => {
     useOrFiltering,
   });
 
+  // Add a key based on viewport to force re-initialization when switching
+  const sortingKey = `${tableId}-${isMobileView ? "mobile" : "desktop"}`;
+
   const { sortConfig, toggleSort, sortedData } = useTableSorting({
-    tableId,
+    tableId: sortingKey,
     data: filteredData,
     tableSortConfig,
     setTableSortConfig,
@@ -97,46 +108,71 @@ export const TableReport = ({ tableId }: TableReportProps) => {
   const totalPrice = sortedData.reduce((sum, comic) => sum + Number(comic.value || 0), 0);
   const avgPrice = issueCount > 0 ? totalPrice / issueCount : 0;
 
+  // Reset sort handler
+  const handleResetSort = () => {
+    if (isMobileView) {
+      setMobileTableSortConfig((prev) => ({ ...prev, [sortingKey]: [] }));
+    } else {
+      setDesktopTableSortConfig((prev) => ({ ...prev, [sortingKey]: [] }));
+    }
+  };
+
+  // Check if there are active sorts
+  const hasActiveSorts = sortConfig.length > 0;
+
   return (
     <>
       {/* Summary Badges */}
       {issueCount > 0 && (
-        <div className="mb-3 d-flex flex-wrap gap-2 justify-content-center justify-content-md-start">
-          <span
-            className="badge bg-secondary"
-            style={{
-              fontSize: "0.75rem",
-              padding: "0.35rem 0.5rem",
-            }}
-          >
-            Issues: {issueCount}
-          </span>
-          <span
-            className="badge bg-secondary"
-            style={{
-              fontSize: "0.75rem",
-              padding: "0.35rem 0.5rem",
-            }}
-          >
-            Total: ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </span>
-          <span
-            className="badge bg-secondary"
-            style={{
-              fontSize: "0.75rem",
-              padding: "0.35rem 0.5rem",
-            }}
-          >
-            Avg: ${avgPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </span>
+        <div className="mb-3 d-flex flex-wrap gap-2 justify-content-center justify-content-md-between align-items-center">
+          <div className="d-flex flex-wrap gap-2">
+            <span
+              className="badge bg-secondary"
+              style={{
+                fontSize: "0.75rem",
+                padding: "0.35rem 0.5rem",
+              }}
+            >
+              Issues: {issueCount}
+            </span>
+            <span
+              className="badge bg-secondary"
+              style={{
+                fontSize: "0.75rem",
+                padding: "0.35rem 0.5rem",
+              }}
+            >
+              Total: ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </span>
+            <span
+              className="badge bg-secondary"
+              style={{
+                fontSize: "0.75rem",
+                padding: "0.35rem 0.5rem",
+              }}
+            >
+              Avg: ${avgPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </span>
+          </div>
+          {hasActiveSorts && (
+            <Button variant="outline-secondary" size="sm" onClick={handleResetSort}>
+              Reset Sort
+            </Button>
+          )}
         </div>
       )}
 
-      <Table striped bordered hover responsive style={{ fontSize: "0.875rem" }}>
+      <Table striped bordered hover responsive style={{ fontSize: isMobileView ? "0.75rem" : "0.875rem" }}>
         <thead>
           <tr>
             <th
-              style={{ width: 40, textAlign: "center", cursor: "pointer", userSelect: "none" }}
+              style={{
+                width: 30,
+                textAlign: "center",
+                cursor: "pointer",
+                userSelect: "none",
+                padding: isMobileView ? "0.25rem 0.15rem" : "0.5rem 0.25rem",
+              }}
               onClick={toggleSelectAll}
               title="Select/deselect all"
             >
@@ -149,12 +185,17 @@ export const TableReport = ({ tableId }: TableReportProps) => {
                 <th
                   key={col.key}
                   onClick={() => toggleSort(col.key)}
-                  style={{ cursor: "pointer", whiteSpace: "nowrap" }}
+                  style={{
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                    padding: isMobileView ? "0.25rem 0.35rem" : undefined,
+                  }}
                 >
                   {col.label}
                   {activeSort && (
-                    <span style={{ marginLeft: 5 }}>
-                      {activeSort.direction === "asc" ? "↑" : "↓"} {sortPriority}
+                    <span style={{ marginLeft: 3, fontSize: "0.75rem" }}>
+                      {activeSort.direction === "asc" ? "↑" : "↓"}
+                      <sup style={{ fontSize: "0.7em" }}>{sortPriority}</sup>
                     </span>
                   )}
                 </th>
@@ -184,6 +225,7 @@ export const TableReport = ({ tableId }: TableReportProps) => {
                     fontSize: "1rem",
                     lineHeight: "1",
                     verticalAlign: "middle",
+                    padding: isMobileView ? "0.25rem 0.15rem" : "0.5rem 0.25rem",
                   }}
                   onClick={(e) => toggleSelection(key, e)}
                 >
@@ -201,7 +243,9 @@ export const TableReport = ({ tableId }: TableReportProps) => {
                   const display = Array.isArray(value) ? value.join(", ") : value;
 
                   // Alignment
-                  const style: React.CSSProperties = {};
+                  const style: React.CSSProperties = {
+                    padding: isMobileView ? "0.25rem 0.35rem" : undefined,
+                  };
                   if ((COLUMN_ALIGNMENT.RIGHT as readonly string[]).includes(col.key)) style.textAlign = "right";
                   else if ((COLUMN_ALIGNMENT.CENTER as readonly string[]).includes(col.key)) style.textAlign = "center";
 

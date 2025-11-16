@@ -9,6 +9,8 @@ import {
   Trash,
   Filter,
   SortDown,
+  BarChart,
+  Grid3x3Gap,
 } from "react-bootstrap-icons";
 
 export function Home() {
@@ -37,7 +39,7 @@ export function Home() {
           icon: <PlusCircle className="me-2" size={16} />,
           text: (
             <>
-              <strong>Add Comics:</strong> Use the <Badge bg="success">+ Add</Badge> button to add comics individually
+              <strong>Add Comics:</strong> Use the <Badge bg="secondary">+ Add</Badge> button to add comics individually
               or in bulk
             </>
           ),
@@ -93,10 +95,40 @@ export function Home() {
             </>
           ),
         },
+      ],
+    },
+    {
+      title: "Key Features (cont.)",
+      items: [
+        {
+          icon: <BarChart className="me-2" size={16} />,
+          text: (
+            <>
+              <strong>Summary View:</strong> Click any statistic (writers, publishers, titles, etc.) to filter your
+              collection instantly
+            </>
+          ),
+        },
+        {
+          icon: <Grid3x3Gap className="me-2" size={16} />,
+          text: (
+            <>
+              <strong>Heatmap View:</strong> Visualize your collection by publication date and click any month to see
+              those comics
+            </>
+          ),
+        },
         {
           text: (
             <>
               <strong>Auto-complete:</strong> All fields offer suggestions based on your existing collection
+            </>
+          ),
+        },
+        {
+          text: (
+            <>
+              <strong>Multi-select Fields:</strong> Writers and artists support multiple values with auto-suggestions
             </>
           ),
         },
@@ -125,7 +157,7 @@ export function Home() {
           icon: <Trash className="me-2" size={16} />,
           text: (
             <>
-              <strong>Batch Delete:</strong> Select multiple comics and use "Delete Selected" to remove them
+              <strong>Batch Delete:</strong> Select multiple comics and use "Delete" to remove them
             </>
           ),
         },
@@ -155,7 +187,7 @@ export function Home() {
           </p>
           <ol>
             <li>
-              Click the <Badge bg="success">+ Add</Badge> button
+              Click the <Badge bg="secondary">+ Add</Badge> button
             </li>
             <li>Fill in the comic details (Title, Publisher, Volume, etc.)</li>
             <li>
@@ -170,7 +202,7 @@ export function Home() {
             <li>A blue banner will show how many comics will be created</li>
             <li>Click "Add Comic" to create all issues at once</li>
           </ol>
-          <div className="alert alert-info mb-0">
+          <div className="alert alert-secondary mb-0">
             <strong>Note:</strong> The month and year will automatically increment for each issue. When the month
             exceeds 12, it rolls over to January of the next year.
           </div>
@@ -185,7 +217,7 @@ export function Home() {
           <ol>
             <li>Click the checkboxes next to the comics you want to edit</li>
             <li>
-              Click <Badge bg="primary">Edit Selected</Badge>
+              Click <Badge bg="secondary">Edit</Badge>
             </li>
             <li>Fields showing the same value across all selected comics will be pre-filled</li>
             <li>Fields with different values will be empty</li>
@@ -195,9 +227,56 @@ export function Home() {
               multi-select fields
             </li>
           </ol>
-          <div className="alert alert-warning mb-0">
+          <div className="alert alert-secondary mb-0">
             <strong>Tip:</strong> This is perfect for updating condition, value, or adding writers/artists to multiple
             issues at once.
+          </div>
+        </>
+      ),
+    },
+    {
+      title: "Summary Page",
+      content: (
+        <>
+          <p className="mb-2">
+            Navigate to <Badge bg="secondary">Summary</Badge> to explore your collection statistics:
+          </p>
+          <ul>
+            <li>View your most valuable comics ranked by price</li>
+            <li>See which titles you have the most issues of</li>
+            <li>Browse top writers, artists, and publishers in your collection</li>
+            <li>View comics grouped by condition and decade</li>
+          </ul>
+          <div className="alert alert-secondary mb-0">
+            <strong>
+              <BarChart className="me-1" size={16} />
+              Interactive Filtering:
+            </strong>{" "}
+            Click any item (writer, publisher, title, decade, etc.) to instantly filter the Maintenance page to show
+            only those comics. Perfect for quick exploration!
+          </div>
+        </>
+      ),
+    },
+    {
+      title: "Heatmap Page",
+      content: (
+        <>
+          <p className="mb-2">
+            Navigate to <Badge bg="secondary">Heatmap</Badge> to visualize your collection by publication date:
+          </p>
+          <ul>
+            <li>Interactive grid showing comics by month and year</li>
+            <li>Color intensity indicates volume (darker = more comics)</li>
+            <li>See your busiest collection months at a glance</li>
+            <li>Identify gaps or missing periods in your collection</li>
+          </ul>
+          <div className="alert alert-secondary mb-0">
+            <strong>
+              <Grid3x3Gap className="me-1" size={16} />
+              Interactive Filtering:
+            </strong>{" "}
+            Click any cell to view all comics from that specific month and year. Great for tracking publication runs!
           </div>
         </>
       ),
@@ -217,7 +296,7 @@ export function Home() {
         <h1 className="display-4">Comic Book Collection Manager</h1>
         <p className="lead text-muted">Organize, track, and manage your comic book collection with ease</p>
         {jsonData.length > 0 && (
-          <Badge bg="success" className="fs-6">
+          <Badge bg="secondary" className="fs-6">
             {jsonData.length} comic{jsonData.length !== 1 ? "s" : ""} in collection
           </Badge>
         )}

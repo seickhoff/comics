@@ -1,15 +1,34 @@
 import { Container, Row, Col, Card, Badge } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../hooks/useAppContext";
 import { ComicBook } from "../interfaces/ComicBook";
 
 export function Heatmap() {
-  const { jsonData } = useAppContext();
+  const { jsonData, setFilters } = useAppContext();
+  const navigate = useNavigate();
 
   const heatmapData = calculateHeatmapData(jsonData);
 
   // Get unique years sorted
   const years = Array.from(heatmapData.keys()).sort((a, b) => a - b);
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  // Handle click on heatmap cell to navigate to maintenance page with filters
+  const handleCellClick = (year: number, month: number, count: number) => {
+    if (count === 0) return; // Don't navigate if no comics
+
+    // Pad month to 2 digits (e.g., "01", "02", etc.)
+    const paddedMonth = month.toString().padStart(2, "0");
+
+    // Reset filters and set only year and month
+    setFilters({
+      year: `^${year}$`, // Exact match for year
+      month: `^${paddedMonth}$`, // Exact match for month (padded)
+    } as Record<string, string>);
+
+    // Navigate to maintenance page
+    navigate("/maintenance");
+  };
 
   // Calculate max count for color intensity
   const maxCount = Math.max(...Array.from(heatmapData.values()).flatMap((monthData) => Array.from(monthData.values())));
@@ -156,6 +175,7 @@ export function Heatmap() {
                                     ? `${months[month - 1]} ${year}: ${count} comic${count !== 1 ? "s" : ""}`
                                     : ""
                                 }
+                                onClick={() => handleCellClick(year, month, count)}
                               >
                                 {count > 0 && (
                                   <span style={{ color: count / maxCount > 0.5 ? "white" : "#333" }}>{count}</span>
@@ -228,7 +248,9 @@ export function Heatmap() {
                                 backgroundColor: getColor(count),
                                 border: "1px solid #ddd",
                                 fontSize: "0.5rem",
+                                cursor: count > 0 ? "pointer" : "default",
                               }}
+                              onClick={() => handleCellClick(year, month, count)}
                             >
                               {count > 0 && (
                                 <span style={{ color: count / maxCount > 0.5 ? "white" : "#333" }}>{count}</span>

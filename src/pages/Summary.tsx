@@ -1,12 +1,88 @@
 import { Container, Row, Col, Card, ListGroup, Badge } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../hooks/useAppContext";
 import { ComicBook } from "../interfaces/ComicBook";
 
 export function Summary() {
-  const { jsonData } = useAppContext();
+  const { jsonData, setFilters } = useAppContext();
+  const navigate = useNavigate();
 
   // Calculate statistics
   const stats = calculateStatistics(jsonData);
+
+  // Handle clicks on comic items (title, publisher, volume, issue)
+  const handleComicClick = (comic: ComicBook) => {
+    const escapedTitle = comic.title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const escapedPublisher = comic.publisher?.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") || "";
+    const escapedVolume = comic.volume?.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") || "";
+    const escapedIssue = comic.issue?.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") || "";
+
+    // Reset filters and set only the comic-specific filters
+    setFilters({
+      title: `^${escapedTitle}$`,
+      publisher: escapedPublisher ? `^${escapedPublisher}$` : "",
+      volume: escapedVolume ? `^${escapedVolume}$` : "",
+      issue: escapedIssue ? `^${escapedIssue}$` : "",
+    } as Record<string, string>);
+
+    navigate("/maintenance");
+  };
+
+  // Handle clicks on title items (title, publisher, volume - no specific issue)
+  const handleTitleClick = (title: string, publisher: string, volume: string) => {
+    const escapedTitle = title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const escapedPublisher = publisher?.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") || "";
+    const escapedVolume = volume?.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") || "";
+
+    // Reset filters and set only title, publisher, and volume
+    setFilters({
+      title: `^${escapedTitle}$`,
+      publisher: escapedPublisher ? `^${escapedPublisher}$` : "",
+      volume: escapedVolume ? `^${escapedVolume}$` : "",
+    } as Record<string, string>);
+
+    navigate("/maintenance");
+  };
+
+  // Handle clicks on summary items to filter and navigate to maintenance
+  const handleItemClick = (filterType: string, filterValue: string | number, exactMatch = true) => {
+    let regexPattern: string;
+
+    if (filterType === "decade") {
+      // For decades like "1990s", match years 1990-1999
+      const decade = String(filterValue).replace("s", "");
+      regexPattern = `^${decade.slice(0, 3)}\\d$`; // Matches years in the decade (e.g., ^197\d$ for 1970s)
+    } else if (exactMatch) {
+      // Exact match with proper escaping for special regex characters
+      const escapedValue = String(filterValue).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      regexPattern = `^${escapedValue}$`;
+    } else {
+      // Partial match (for cases where we want to match part of a field)
+      const escapedValue = String(filterValue).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      regexPattern = escapedValue;
+    }
+
+    // Map filter types to column keys
+    const filterMap: Record<string, string> = {
+      title: "title",
+      publisher: "publisher",
+      volume: "volume",
+      writer: "writer",
+      artist: "artist",
+      condition: "condition",
+      decade: "year",
+    };
+
+    const columnKey = filterMap[filterType];
+    if (!columnKey) return;
+
+    // Reset filters and set only the selected filter
+    setFilters({
+      [columnKey]: regexPattern,
+    } as Record<string, string>);
+
+    navigate("/maintenance");
+  };
 
   return (
     <Container className="mt-4">
@@ -98,7 +174,8 @@ export function Summary() {
                       <ListGroup.Item
                         key={index}
                         className="px-md-3"
-                        style={{ paddingLeft: "0.5rem", paddingRight: "0.5rem" }}
+                        style={{ paddingLeft: "0.5rem", paddingRight: "0.5rem", cursor: "pointer" }}
+                        onClick={() => handleComicClick(comic)}
                       >
                         {/* Mobile: Number badge + title on row 1, publisher/vol + value on row 2 */}
                         <div className="d-md-none">
@@ -166,7 +243,8 @@ export function Summary() {
                       <ListGroup.Item
                         key={index}
                         className="px-md-3"
-                        style={{ paddingLeft: "0.5rem", paddingRight: "0.5rem" }}
+                        style={{ paddingLeft: "0.5rem", paddingRight: "0.5rem", cursor: "pointer" }}
+                        onClick={() => handleTitleClick(item.title, item.publisher, item.volume)}
                       >
                         {/* Mobile: Number badge + title on row 1, publisher/vol + count on row 2 */}
                         <div className="d-md-none">
@@ -223,7 +301,12 @@ export function Summary() {
                 <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.allWriters.map((item, index) => (
-                      <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                      <ListGroup.Item
+                        key={index}
+                        className="d-flex justify-content-between align-items-center"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => handleItemClick("writer", item.name)}
+                      >
                         <span>
                           <Badge bg="secondary" className="me-2">
                             {index + 1}
@@ -248,7 +331,12 @@ export function Summary() {
                 <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.allArtists.map((item, index) => (
-                      <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                      <ListGroup.Item
+                        key={index}
+                        className="d-flex justify-content-between align-items-center"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => handleItemClick("artist", item.name)}
+                      >
                         <span>
                           <Badge bg="secondary" className="me-2">
                             {index + 1}
@@ -276,7 +364,12 @@ export function Summary() {
                 <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.allPublishers.map((item, index) => (
-                      <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                      <ListGroup.Item
+                        key={index}
+                        className="d-flex justify-content-between align-items-center"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => handleItemClick("publisher", item.name)}
+                      >
                         <span>
                           <Badge bg="secondary" className="me-2">
                             {index + 1}
@@ -301,7 +394,12 @@ export function Summary() {
                 <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.conditionBreakdown.map((item, index) => (
-                      <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                      <ListGroup.Item
+                        key={index}
+                        className="d-flex justify-content-between align-items-center"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => handleItemClick("condition", item.condition || "Unknown")}
+                      >
                         <span>
                           <Badge bg="secondary" className="me-2">
                             {index + 1}
@@ -331,7 +429,11 @@ export function Summary() {
                     <Row>
                       {stats.comicsByDecade.map((item, index) => (
                         <Col xs={6} md={3} key={index} className="mb-2">
-                          <div className="d-flex justify-content-between align-items-center p-2 border rounded">
+                          <div
+                            className="d-flex justify-content-between align-items-center p-2 border rounded"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => handleItemClick("decade", item.decade)}
+                          >
                             <span className="fw-bold">{item.decade}</span>
                             <Badge bg="secondary">{item.count}</Badge>
                           </div>

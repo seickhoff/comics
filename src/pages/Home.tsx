@@ -57,7 +57,7 @@ export function Home() {
           text: (
             <>
               <strong>Save Your Work:</strong> Download your collection as JSON from the{" "}
-              <Badge bg="secondary">File</Badge> page
+              <Badge bg="secondary">File</Badge> page (includes sort and filter preferences)
             </>
           ),
         },

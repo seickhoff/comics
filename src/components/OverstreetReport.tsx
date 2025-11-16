@@ -3,6 +3,7 @@ import { Button } from "react-bootstrap";
 import { ChevronLeft, ChevronRight } from "react-bootstrap-icons";
 import { ComicBook } from "../interfaces/ComicBook";
 import { normalizeTitle, parseNumber } from "../utils/comicSorting";
+import { OVERSTREET_CONFIG } from "../config/constants";
 
 interface OverstreetProps {
   comics: ComicBook[];
@@ -18,12 +19,101 @@ function formatCurrency(value: string | number): string {
 const parseIssue = parseNumber;
 
 // JSX-based line with responsive dotted leader and hover background
-function Line({ left, right }: { left: string; right: string }) {
+// Supports multi-line display when content is too long
+function Line({ left, right, isMobile }: { left: string; right: string; isMobile?: boolean }) {
+  // Calculate the formatted value string (including $ and formatting)
+  const formattedValue = `$${formatCurrency(right)}`;
+
+  // Total available width
+  const totalWidth = isMobile ? OVERSTREET_CONFIG.MAX_CHARS_MOBILE : OVERSTREET_CONFIG.MAX_CHARS_DESKTOP;
+
+  // Calculate the column position where $ should start (right-aligned with buffer)
+  // The $ should start at position: totalWidth - valueLength
+  const dollarStartColumn = totalWidth - formattedValue.length;
+
+  // Maximum characters for last line (must leave room for dots + value)
+  // Reserve at least 3 chars for dots/spacing before the $
+  const maxCharsLastLine = dollarStartColumn - 3;
+
+  // Maximum characters for intermediate lines - they can go up to the $ column
+  const maxCharsIntermediateLine = dollarStartColumn - 1;
+
+  // Check if we can fit on a single line
+  if (left.length <= maxCharsLastLine) {
+    // Single line display
+    return (
+      <div className="d-flex align-items-center font-monospace text-nowrap w-100 px-1 py-0.5 line-hover">
+        <span className="flex-shrink-0">{left}</span>
+        <span className="flex-grow-1 mx-2" style={{ borderBottom: "1px dotted gray", height: "0.6em" }}></span>
+        <span className="flex-shrink-0">{formattedValue}</span>
+      </div>
+    );
+  }
+
+  // Multi-line display: split at commas to find good break points
+  const parts = left.split(", ");
+  const lines: string[] = [];
+  let currentLine = "";
+  let currentLength = 0;
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    const addLength = currentLine === "" ? part.length : part.length + 2; // +2 for ", "
+
+    // Check if this is the last part
+    const isLastPart = i === parts.length - 1;
+
+    // Determine max length based on whether we have content and if this is the last part
+    let maxChars;
+    if (isLastPart && currentLine !== "") {
+      // Last part on a line with existing content - use last line limit
+      maxChars = maxCharsLastLine;
+    } else {
+      // Not the last part, or first part on a line - use intermediate limit
+      maxChars = maxCharsIntermediateLine;
+    }
+
+    if (currentLength + addLength <= maxChars) {
+      // Add to current line
+      currentLine += (currentLine === "" ? "" : ", ") + part;
+      currentLength += addLength;
+    } else {
+      // Current line is full, save it and start a new line
+      if (currentLine !== "") {
+        lines.push(currentLine);
+      }
+      currentLine = part;
+      currentLength = part.length;
+    }
+  }
+
+  // Don't forget the last line
+  if (currentLine !== "") {
+    lines.push(currentLine);
+  }
+
   return (
-    <div className="d-flex align-items-center font-monospace text-nowrap w-100 px-1 py-0.5 line-hover">
-      <span className="flex-shrink-0">{left}</span>
-      <span className="flex-grow-1 mx-2" style={{ borderBottom: "1px dotted gray", height: "0.6em" }}></span>
-      <span className="flex-shrink-0">${formatCurrency(right)}</span>
+    <div className="font-monospace w-100 px-1 py-0.5 line-hover">
+      {lines.map((line, index) => {
+        const isLastLine = index === lines.length - 1;
+        if (isLastLine) {
+          // Last line: with dots and price
+          return (
+            <div key={index} className="d-flex align-items-center text-nowrap">
+              <span className="flex-shrink-0">{line}</span>
+              <span className="flex-grow-1 mx-2" style={{ borderBottom: "1px dotted gray", height: "0.6em" }}></span>
+              <span className="flex-shrink-0">{formattedValue}</span>
+            </div>
+          );
+        } else {
+          // Intermediate lines: just text with trailing comma
+          return (
+            <div key={index} className="text-nowrap">
+              {line},
+            </div>
+          );
+        }
+      })}
     </div>
   );
 }
@@ -121,7 +211,7 @@ export default function OverstreetReport({ comics }: OverstreetProps) {
   }, []);
 
   // Build all entries (title groups with their issue lines)
-  const LINES_PER_PAGE = 32;
+  const LINES_PER_PAGE = OVERSTREET_CONFIG.LINES_PER_PAGE;
 
   // Flatten all groups into individual lines with group headers
   type PageItem =
@@ -135,14 +225,70 @@ export default function OverstreetReport({ comics }: OverstreetProps) {
     lines.forEach((line) => allItems.push({ type: "line", left: line.label, right: line.value }));
   });
 
-  // Calculate visual line count for each item (headers = 3 lines, regular lines = 1 line)
+  // Calculate visual line count for each item (headers = 2-3 lines, regular lines = 1+ lines)
   const getVisualLineCount = (item: PageItem, isFirstItem: boolean) => {
     if (item.type === "header") {
       // Header has title (1 line) + publisher info (1 line) + spacing
       // First header has no top margin, subsequent headers have 1rem top margin ≈ 1 extra line
       return isFirstItem ? 2 : 3;
     }
-    return 1; // Regular issue line
+    // Regular issue line - calculate how many lines it will take
+    // Calculate the formatted value string (including $ and formatting)
+    const formattedValue = `$${formatCurrency(item.right)}`;
+
+    // Total available width
+    const totalWidth = OVERSTREET_CONFIG.MAX_CHARS_DESKTOP;
+
+    // Calculate the column position where $ should start
+    const dollarStartColumn = totalWidth - formattedValue.length;
+
+    // Maximum characters for last line (must leave room for dots + value)
+    const maxCharsLastLine = dollarStartColumn - 3;
+
+    // Maximum characters for intermediate lines - they can go up to the $ column
+    const maxCharsIntermediateLine = dollarStartColumn - 1;
+
+    if (item.left.length <= maxCharsLastLine) {
+      return 1; // Single line
+    }
+
+    // Multi-line: simulate the line-breaking algorithm to count lines
+    const parts = item.left.split(", ");
+    let lineCount = 0;
+    let currentLength = 0;
+
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      const addLength = currentLength === 0 ? part.length : part.length + 2; // +2 for ", "
+
+      // Check if this is the last part
+      const isLastPart = i === parts.length - 1;
+
+      // Determine max length based on whether we have content and if this is the last part
+      let maxChars;
+      if (isLastPart && currentLength !== 0) {
+        // Last part on a line with existing content - use last line limit
+        maxChars = maxCharsLastLine;
+      } else {
+        // Not the last part, or first part on a line - use intermediate limit
+        maxChars = maxCharsIntermediateLine;
+      }
+
+      if (currentLength + addLength <= maxChars) {
+        currentLength += addLength;
+      } else {
+        // Start a new line
+        lineCount++;
+        currentLength = part.length;
+      }
+    }
+
+    // Count the last line
+    if (currentLength > 0) {
+      lineCount++;
+    }
+
+    return lineCount;
   };
 
   // Split into pages based on visual line count
@@ -185,12 +331,12 @@ export default function OverstreetReport({ comics }: OverstreetProps) {
     <div
       className="font-monospace p-4 bg-white border shadow"
       style={{
-        flex: "0 0 450px",
-        width: "450px",
-        height: "700px",
-        minHeight: "700px",
-        maxHeight: "700px",
-        fontSize: "0.875rem",
+        flex: `0 0 ${OVERSTREET_CONFIG.PAGE.WIDTH}`,
+        width: OVERSTREET_CONFIG.PAGE.WIDTH,
+        height: OVERSTREET_CONFIG.PAGE.HEIGHT,
+        minHeight: OVERSTREET_CONFIG.PAGE.HEIGHT,
+        maxHeight: OVERSTREET_CONFIG.PAGE.HEIGHT,
+        fontSize: OVERSTREET_CONFIG.FONT_SIZE.DESKTOP_BASE,
         lineHeight: "1.25",
         borderRadius: "4px",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
@@ -201,16 +347,21 @@ export default function OverstreetReport({ comics }: OverstreetProps) {
         item.type === "header" ? (
           <div key={idx}>
             <div
-              style={{ fontWeight: "bold", marginBottom: "0.25rem", fontSize: "1rem", marginTop: idx > 0 ? "1rem" : 0 }}
+              style={{
+                fontWeight: "bold",
+                marginBottom: OVERSTREET_CONFIG.SPACING.HEADER_TITLE_MARGIN_BOTTOM,
+                fontSize: OVERSTREET_CONFIG.FONT_SIZE.DESKTOP_HEADER,
+                marginTop: idx > 0 ? OVERSTREET_CONFIG.SPACING.HEADER_MARGIN_TOP : 0,
+              }}
             >
               {item.title}
             </div>
-            <div style={{ marginBottom: "0.5rem", color: "#666" }}>
+            <div style={{ marginBottom: OVERSTREET_CONFIG.SPACING.HEADER_MARGIN_BOTTOM, color: "#666" }}>
               ({item.publisher}, v{item.volume})
             </div>
           </div>
         ) : (
-          <Line key={idx} left={item.left} right={item.right} />
+          <Line key={idx} left={item.left} right={item.right} isMobile={false} />
         )
       )}
     </div>
@@ -219,26 +370,32 @@ export default function OverstreetReport({ comics }: OverstreetProps) {
   // Mobile view: single scrollable column with all content
   if (isMobile) {
     return (
-      <div className="font-monospace p-3" style={{ fontSize: "0.75rem" }}>
+      <div className="font-monospace p-3" style={{ fontSize: OVERSTREET_CONFIG.FONT_SIZE.MOBILE_BASE }}>
         {allItems.map((item, idx) =>
           item.type === "header" ? (
             <div key={idx}>
               <div
                 style={{
                   fontWeight: "bold",
-                  marginBottom: "0.25rem",
-                  fontSize: "0.75rem",
-                  marginTop: idx > 0 ? "1rem" : 0,
+                  marginBottom: OVERSTREET_CONFIG.SPACING.HEADER_TITLE_MARGIN_BOTTOM,
+                  fontSize: OVERSTREET_CONFIG.FONT_SIZE.MOBILE_HEADER,
+                  marginTop: idx > 0 ? OVERSTREET_CONFIG.SPACING.HEADER_MARGIN_TOP : 0,
                 }}
               >
                 {item.title}
               </div>
-              <div style={{ marginBottom: "0.5rem", color: "#666", fontSize: "0.75rem" }}>
+              <div
+                style={{
+                  marginBottom: OVERSTREET_CONFIG.SPACING.HEADER_MARGIN_BOTTOM,
+                  color: "#666",
+                  fontSize: OVERSTREET_CONFIG.FONT_SIZE.MOBILE_HEADER,
+                }}
+              >
                 ({item.publisher}, v{item.volume})
               </div>
             </div>
           ) : (
-            <Line key={idx} left={item.left} right={item.right} />
+            <Line key={idx} left={item.left} right={item.right} isMobile={true} />
           )
         )}
       </div>
@@ -277,7 +434,10 @@ export default function OverstreetReport({ comics }: OverstreetProps) {
       >
         {leftPageItems.length > 0 && (
           <div>
-            <div className="text-center text-muted mb-2" style={{ fontSize: "0.8rem" }}>
+            <div
+              className="text-center text-muted mb-2"
+              style={{ fontSize: OVERSTREET_CONFIG.FONT_SIZE.DESKTOP_PAGE_NUMBER }}
+            >
               Page {currentPage + 1}
             </div>
             {renderPage(leftPageItems)}
@@ -285,7 +445,10 @@ export default function OverstreetReport({ comics }: OverstreetProps) {
         )}
         {rightPageItems.length > 0 && (
           <div>
-            <div className="text-center text-muted mb-2" style={{ fontSize: "0.8rem" }}>
+            <div
+              className="text-center text-muted mb-2"
+              style={{ fontSize: OVERSTREET_CONFIG.FONT_SIZE.DESKTOP_PAGE_NUMBER }}
+            >
               Page {currentPage + 2}
             </div>
             {renderPage(rightPageItems)}

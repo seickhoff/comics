@@ -9,7 +9,9 @@ interface UseTableSortingProps {
   tableId: string;
   data: ComicBook[];
   tableSortConfig: Record<string, SortConfig>;
-  setTableSortConfig: (config: Record<string, SortConfig>) => void;
+  setTableSortConfig: (
+    config: Record<string, SortConfig> | ((prev: Record<string, SortConfig>) => Record<string, SortConfig>)
+  ) => void;
 }
 
 export function useTableSorting({ tableId, data, tableSortConfig, setTableSortConfig }: UseTableSortingProps) {

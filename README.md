@@ -40,6 +40,7 @@ A web-based application for organizing and managing your comic book collection. 
 - Export collections with timestamped filenames
 - Preview raw JSON data
 - Column visibility controls
+- Sort preferences and filters are automatically saved with your collection
 
 ## Tech Stack
 

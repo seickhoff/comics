@@ -2,6 +2,7 @@ import { Container, Row, Col, Card, ListGroup, Badge } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../hooks/useAppContext";
 import { ComicBook } from "../interfaces/ComicBook";
+import { SUMMARY_CONFIG } from "../config/constants";
 
 export function Summary() {
   const { jsonData, setFilters } = useAppContext();
@@ -100,13 +101,13 @@ export function Summary() {
             <Col xs={6} md={3}>
               <Card className="text-center h-100">
                 <Card.Body className="py-2 py-md-3">
-                  <h2 className="d-none d-md-block" style={{ fontSize: "1.406rem" }}>
+                  <h2 className="d-none d-md-block" style={{ fontSize: SUMMARY_CONFIG.FONT_SIZE.DESKTOP_STAT_VALUE }}>
                     {jsonData.length}
                   </h2>
-                  <h2 className="d-md-none" style={{ fontSize: "1.125rem" }}>
+                  <h2 className="d-md-none" style={{ fontSize: SUMMARY_CONFIG.FONT_SIZE.MOBILE_STAT_VALUE }}>
                     {jsonData.length}
                   </h2>
-                  <p className="text-muted mb-0" style={{ fontSize: "0.75rem" }}>
+                  <p className="text-muted mb-0" style={{ fontSize: SUMMARY_CONFIG.FONT_SIZE.STAT_LABEL }}>
                     Total Comics
                   </p>
                 </Card.Body>
@@ -115,13 +116,13 @@ export function Summary() {
             <Col xs={6} md={3}>
               <Card className="text-center h-100">
                 <Card.Body className="py-2 py-md-3">
-                  <h2 className="d-none d-md-block" style={{ fontSize: "1.406rem" }}>
+                  <h2 className="d-none d-md-block" style={{ fontSize: SUMMARY_CONFIG.FONT_SIZE.DESKTOP_STAT_VALUE }}>
                     {stats.totalTitles}
                   </h2>
-                  <h2 className="d-md-none" style={{ fontSize: "1.125rem" }}>
+                  <h2 className="d-md-none" style={{ fontSize: SUMMARY_CONFIG.FONT_SIZE.MOBILE_STAT_VALUE }}>
                     {stats.totalTitles}
                   </h2>
-                  <p className="text-muted mb-0" style={{ fontSize: "0.75rem" }}>
+                  <p className="text-muted mb-0" style={{ fontSize: SUMMARY_CONFIG.FONT_SIZE.STAT_LABEL }}>
                     Unique Titles
                   </p>
                 </Card.Body>
@@ -130,13 +131,13 @@ export function Summary() {
             <Col xs={6} md={3}>
               <Card className="text-center h-100">
                 <Card.Body className="py-2 py-md-3">
-                  <h2 className="d-none d-md-block" style={{ fontSize: "1.406rem" }}>
+                  <h2 className="d-none d-md-block" style={{ fontSize: SUMMARY_CONFIG.FONT_SIZE.DESKTOP_STAT_VALUE }}>
                     ${stats.totalValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </h2>
-                  <h2 className="d-md-none" style={{ fontSize: "1.125rem" }}>
+                  <h2 className="d-md-none" style={{ fontSize: SUMMARY_CONFIG.FONT_SIZE.MOBILE_STAT_VALUE }}>
                     ${stats.totalValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </h2>
-                  <p className="text-muted mb-0" style={{ fontSize: "0.75rem" }}>
+                  <p className="text-muted mb-0" style={{ fontSize: SUMMARY_CONFIG.FONT_SIZE.STAT_LABEL }}>
                     Total Value
                   </p>
                 </Card.Body>
@@ -145,15 +146,15 @@ export function Summary() {
             <Col xs={6} md={3}>
               <Card className="text-center h-100">
                 <Card.Body className="py-2 py-md-3">
-                  <h2 className="d-none d-md-block" style={{ fontSize: "1.406rem" }}>
+                  <h2 className="d-none d-md-block" style={{ fontSize: SUMMARY_CONFIG.FONT_SIZE.DESKTOP_STAT_VALUE }}>
                     $
                     {stats.averageValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </h2>
-                  <h2 className="d-md-none" style={{ fontSize: "1.125rem" }}>
+                  <h2 className="d-md-none" style={{ fontSize: SUMMARY_CONFIG.FONT_SIZE.MOBILE_STAT_VALUE }}>
                     $
                     {stats.averageValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </h2>
-                  <p className="text-muted mb-0" style={{ fontSize: "0.75rem" }}>
+                  <p className="text-muted mb-0" style={{ fontSize: SUMMARY_CONFIG.FONT_SIZE.STAT_LABEL }}>
                     Average Value
                   </p>
                 </Card.Body>
@@ -168,7 +169,7 @@ export function Summary() {
                 <Card.Header className="bg-dark text-white">
                   <h5 className="mb-0">Most Valuable Comics</h5>
                 </Card.Header>
-                <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
+                <Card.Body style={{ maxHeight: SUMMARY_CONFIG.MAX_LIST_HEIGHT, overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.allValuableComics.map((comic, index) => (
                       <ListGroup.Item
@@ -237,7 +238,7 @@ export function Summary() {
                 <Card.Header className="bg-dark text-white">
                   <h5 className="mb-0">Titles by Issue Count</h5>
                 </Card.Header>
-                <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
+                <Card.Body style={{ maxHeight: SUMMARY_CONFIG.MAX_LIST_HEIGHT, overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.allTitlesByCount.map((item, index) => (
                       <ListGroup.Item
@@ -298,7 +299,7 @@ export function Summary() {
                 <Card.Header className="bg-dark text-white">
                   <h5 className="mb-0">Writers</h5>
                 </Card.Header>
-                <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
+                <Card.Body style={{ maxHeight: SUMMARY_CONFIG.MAX_LIST_HEIGHT, overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.allWriters.map((item, index) => (
                       <ListGroup.Item
@@ -328,7 +329,7 @@ export function Summary() {
                 <Card.Header className="bg-dark text-white">
                   <h5 className="mb-0">Artists</h5>
                 </Card.Header>
-                <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
+                <Card.Body style={{ maxHeight: SUMMARY_CONFIG.MAX_LIST_HEIGHT, overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.allArtists.map((item, index) => (
                       <ListGroup.Item
@@ -361,7 +362,7 @@ export function Summary() {
                 <Card.Header className="bg-dark text-white">
                   <h5 className="mb-0">Publishers</h5>
                 </Card.Header>
-                <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
+                <Card.Body style={{ maxHeight: SUMMARY_CONFIG.MAX_LIST_HEIGHT, overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.allPublishers.map((item, index) => (
                       <ListGroup.Item
@@ -391,7 +392,7 @@ export function Summary() {
                 <Card.Header className="bg-dark text-white">
                   <h5 className="mb-0">Comics by Condition</h5>
                 </Card.Header>
-                <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
+                <Card.Body style={{ maxHeight: SUMMARY_CONFIG.MAX_LIST_HEIGHT, overflowY: "auto" }}>
                   <ListGroup variant="flush">
                     {stats.conditionBreakdown.map((item, index) => (
                       <ListGroup.Item

@@ -2,6 +2,7 @@ import { Container, Row, Col, Card, Badge } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../hooks/useAppContext";
 import { ComicBook } from "../interfaces/ComicBook";
+import { HEATMAP_CONFIG } from "../config/constants";
 
 export function Heatmap() {
   const { jsonData, setFilters } = useAppContext();
@@ -35,11 +36,13 @@ export function Heatmap() {
 
   // Get color based on count (0 = light, maxCount = dark)
   const getColor = (count: number) => {
-    if (count === 0) return "#f0f0f0";
+    if (count === 0) return HEATMAP_CONFIG.COLORS.EMPTY;
     const intensity = Math.min(count / maxCount, 1);
     // Blue gradient from light to dark
-    const lightness = 85 - intensity * 55; // 85% to 30%
-    return `hsl(210, 70%, ${lightness}%)`;
+    const lightness =
+      HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX -
+      intensity * (HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - HEATMAP_CONFIG.COLORS.LIGHTNESS_MIN);
+    return `hsl(${HEATMAP_CONFIG.COLORS.HUE}, ${HEATMAP_CONFIG.COLORS.SATURATION}, ${lightness}%)`;
   };
 
   return (
@@ -67,15 +70,18 @@ export function Heatmap() {
                 <Card.Body className="d-flex align-items-center justify-content-center gap-3">
                   <span className="text-muted">Less</span>
                   <div className="d-flex">
-                    {Array.from({ length: 24 }, (_, idx) => {
-                      const intensity = idx / 23;
+                    {Array.from({ length: HEATMAP_CONFIG.LEGEND.DESKTOP_GRADIENT_BOXES }, (_, idx) => {
+                      const intensity = idx / (HEATMAP_CONFIG.LEGEND.DESKTOP_GRADIENT_BOXES - 1);
                       return (
                         <div
                           key={idx}
                           style={{
-                            width: "20px",
-                            height: "20px",
-                            backgroundColor: intensity === 0 ? "#f0f0f0" : `hsl(210, 70%, ${85 - intensity * 55}%)`,
+                            width: HEATMAP_CONFIG.LEGEND.BOX_WIDTH_DESKTOP,
+                            height: HEATMAP_CONFIG.LEGEND.BOX_HEIGHT,
+                            backgroundColor:
+                              intensity === 0
+                                ? HEATMAP_CONFIG.COLORS.EMPTY
+                                : `hsl(${HEATMAP_CONFIG.COLORS.HUE}, ${HEATMAP_CONFIG.COLORS.SATURATION}, ${HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - intensity * (HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - HEATMAP_CONFIG.COLORS.LIGHTNESS_MIN)}%)`,
                             border: "1px solid #ddd",
                           }}
                         />
@@ -99,17 +105,23 @@ export function Heatmap() {
                   <div className="d-flex align-items-center justify-content-center gap-3 mb-2">
                     <span className="text-muted">Less</span>
                     <div className="d-flex gap-1">
-                      {[0, 0.2, 0.4, 0.6, 0.8, 1.0].map((intensity, idx) => (
-                        <div
-                          key={idx}
-                          style={{
-                            width: "30px",
-                            height: "20px",
-                            backgroundColor: intensity === 0 ? "#f0f0f0" : `hsl(210, 70%, ${85 - intensity * 55}%)`,
-                            border: "1px solid #ddd",
-                          }}
-                        />
-                      ))}
+                      {Array.from({ length: HEATMAP_CONFIG.LEGEND.MOBILE_GRADIENT_BOXES }, (_, idx) => {
+                        const intensity = idx / (HEATMAP_CONFIG.LEGEND.MOBILE_GRADIENT_BOXES - 1);
+                        return (
+                          <div
+                            key={idx}
+                            style={{
+                              width: HEATMAP_CONFIG.LEGEND.BOX_WIDTH_MOBILE,
+                              height: HEATMAP_CONFIG.LEGEND.BOX_HEIGHT,
+                              backgroundColor:
+                                intensity === 0
+                                  ? HEATMAP_CONFIG.COLORS.EMPTY
+                                  : `hsl(${HEATMAP_CONFIG.COLORS.HUE}, ${HEATMAP_CONFIG.COLORS.SATURATION}, ${HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - intensity * (HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - HEATMAP_CONFIG.COLORS.LIGHTNESS_MIN)}%)`,
+                              border: "1px solid #ddd",
+                            }}
+                          />
+                        );
+                      })}
                     </div>
                     <span className="text-muted">More</span>
                   </div>
@@ -129,12 +141,16 @@ export function Heatmap() {
                   <div style={{ minWidth: "800px" }}>
                     {/* Month labels header */}
                     <div className="d-flex mb-2">
-                      <div style={{ width: "60px", flexShrink: 0 }} />
+                      <div style={{ width: HEATMAP_CONFIG.DESKTOP.YEAR_LABEL_WIDTH, flexShrink: 0 }} />
                       {months.map((month, idx) => (
                         <div
                           key={idx}
                           className="text-center fw-bold"
-                          style={{ flex: 1, fontSize: "0.875rem", minWidth: "40px" }}
+                          style={{
+                            flex: 1,
+                            fontSize: HEATMAP_CONFIG.DESKTOP.FONT_SIZE_BASE,
+                            minWidth: HEATMAP_CONFIG.DESKTOP.MONTH_LABEL_WIDTH,
+                          }}
                         >
                           {month}
                         </div>
@@ -149,7 +165,12 @@ export function Heatmap() {
                           {/* Year label */}
                           <div
                             className="text-end pe-2 fw-bold"
-                            style={{ width: "60px", flexShrink: 0, fontSize: "0.875rem", lineHeight: "40px" }}
+                            style={{
+                              width: HEATMAP_CONFIG.DESKTOP.YEAR_LABEL_WIDTH,
+                              flexShrink: 0,
+                              fontSize: HEATMAP_CONFIG.DESKTOP.FONT_SIZE_BASE,
+                              lineHeight: HEATMAP_CONFIG.DESKTOP.CELL_HEIGHT,
+                            }}
                           >
                             {year}
                           </div>
@@ -163,12 +184,12 @@ export function Heatmap() {
                                 className="d-flex align-items-center justify-content-center position-relative"
                                 style={{
                                   flex: 1,
-                                  minWidth: "40px",
-                                  height: "40px",
+                                  minWidth: HEATMAP_CONFIG.DESKTOP.CELL_WIDTH,
+                                  height: HEATMAP_CONFIG.DESKTOP.CELL_HEIGHT,
                                   backgroundColor: getColor(count),
                                   border: "1px solid #ddd",
                                   cursor: count > 0 ? "pointer" : "default",
-                                  fontSize: "0.75rem",
+                                  fontSize: HEATMAP_CONFIG.DESKTOP.FONT_SIZE_CELL,
                                 }}
                                 title={
                                   count > 0
@@ -199,15 +220,21 @@ export function Heatmap() {
                 <Card.Body className="p-2">
                   {/* Month labels header */}
                   <div className="d-flex mb-1">
-                    <div style={{ width: "35px", flexShrink: 0, fontSize: "0.65rem" }} />
+                    <div
+                      style={{
+                        width: HEATMAP_CONFIG.MOBILE.YEAR_LABEL_WIDTH,
+                        flexShrink: 0,
+                        fontSize: HEATMAP_CONFIG.MOBILE.FONT_SIZE_BASE,
+                      }}
+                    />
                     {months.map((month, idx) => (
                       <div
                         key={idx}
                         className="text-center fw-bold"
                         style={{
                           flex: 1,
-                          fontSize: "0.5rem",
-                          minWidth: "20px",
+                          fontSize: HEATMAP_CONFIG.MOBILE.FONT_SIZE_CELL,
+                          minWidth: HEATMAP_CONFIG.MOBILE.MONTH_LABEL_WIDTH,
                           padding: "2px 0",
                         }}
                       >
@@ -225,10 +252,10 @@ export function Heatmap() {
                         <div
                           className="text-end pe-1 fw-bold"
                           style={{
-                            width: "35px",
+                            width: HEATMAP_CONFIG.MOBILE.YEAR_LABEL_WIDTH,
                             flexShrink: 0,
-                            fontSize: "0.65rem",
-                            lineHeight: "24px",
+                            fontSize: HEATMAP_CONFIG.MOBILE.FONT_SIZE_BASE,
+                            lineHeight: HEATMAP_CONFIG.MOBILE.CELL_HEIGHT,
                           }}
                         >
                           {year}
@@ -243,11 +270,11 @@ export function Heatmap() {
                               className="d-flex align-items-center justify-content-center"
                               style={{
                                 flex: 1,
-                                minWidth: "20px",
-                                height: "24px",
+                                minWidth: HEATMAP_CONFIG.MOBILE.CELL_WIDTH,
+                                height: HEATMAP_CONFIG.MOBILE.CELL_HEIGHT,
                                 backgroundColor: getColor(count),
                                 border: "1px solid #ddd",
-                                fontSize: "0.5rem",
+                                fontSize: HEATMAP_CONFIG.MOBILE.FONT_SIZE_CELL,
                                 cursor: count > 0 ? "pointer" : "default",
                               }}
                               onClick={() => handleCellClick(year, month, count)}

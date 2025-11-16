@@ -1,3 +1,14 @@
+/* Card title styling - 50% black for all card headers */
+.card-title {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* Card header titles - applies to all pages */
+.card-header strong,
+.card-header h5 {
+  color: rgba(0, 0, 0, 0.5);
+}
+
 /* Hover highlight for OverstreetReport lines */
 .line-hover:hover {
   background-color: #f0f0f0; /* light gray */

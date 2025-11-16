@@ -184,7 +184,7 @@ export function Summary() {
           <Row className="g-4 mb-4">
             <Col xs={12} lg={6}>
               <Card className="h-100">
-                <Card.Header className="bg-dark text-white">
+                <Card.Header>
                   <h5 className="mb-0">Most Valuable Comics</h5>
                 </Card.Header>
                 <Card.Body style={{ maxHeight: settings.summaryMaxListHeight, overflowY: "auto" }}>
@@ -253,7 +253,7 @@ export function Summary() {
             {/* Titles by Issue Count */}
             <Col xs={12} lg={6}>
               <Card className="h-100">
-                <Card.Header className="bg-dark text-white">
+                <Card.Header>
                   <h5 className="mb-0">Titles by Issue Count</h5>
                 </Card.Header>
                 <Card.Body style={{ maxHeight: settings.summaryMaxListHeight, overflowY: "auto" }}>
@@ -314,7 +314,7 @@ export function Summary() {
           <Row className="g-4 mb-4">
             <Col xs={12} lg={6}>
               <Card className="h-100">
-                <Card.Header className="bg-dark text-white">
+                <Card.Header>
                   <h5 className="mb-0">Writers</h5>
                 </Card.Header>
                 <Card.Body style={{ maxHeight: settings.summaryMaxListHeight, overflowY: "auto" }}>
@@ -344,7 +344,7 @@ export function Summary() {
 
             <Col xs={12} lg={6}>
               <Card className="h-100">
-                <Card.Header className="bg-dark text-white">
+                <Card.Header>
                   <h5 className="mb-0">Artists</h5>
                 </Card.Header>
                 <Card.Body style={{ maxHeight: settings.summaryMaxListHeight, overflowY: "auto" }}>
@@ -377,7 +377,7 @@ export function Summary() {
           <Row className="g-4 mb-4">
             <Col xs={12} lg={6}>
               <Card className="h-100">
-                <Card.Header className="bg-dark text-white">
+                <Card.Header>
                   <h5 className="mb-0">Publishers</h5>
                 </Card.Header>
                 <Card.Body style={{ maxHeight: settings.summaryMaxListHeight, overflowY: "auto" }}>
@@ -407,7 +407,7 @@ export function Summary() {
 
             <Col xs={12} lg={6}>
               <Card className="h-100">
-                <Card.Header className="bg-dark text-white">
+                <Card.Header>
                   <h5 className="mb-0">Comics by Condition</h5>
                 </Card.Header>
                 <Card.Body style={{ maxHeight: settings.summaryMaxListHeight, overflowY: "auto" }}>
@@ -442,7 +442,7 @@ export function Summary() {
             {stats.allDuplicates.length > 0 && (
               <Col xs={12} lg={6}>
                 <Card className="h-100">
-                  <Card.Header className="bg-dark text-white">
+                  <Card.Header>
                     <h5 className="mb-0">Duplicate Comics</h5>
                   </Card.Header>
                   <Card.Body style={{ maxHeight: settings.summaryMaxListHeight, overflowY: "auto" }}>
@@ -504,7 +504,7 @@ export function Summary() {
             {/* Comics by Decade */}
             <Col xs={12} lg={6}>
               <Card className="h-100">
-                <Card.Header className="bg-dark text-white">
+                <Card.Header>
                   <h5 className="mb-0">Comics by Decade</h5>
                 </Card.Header>
                 <Card.Body>

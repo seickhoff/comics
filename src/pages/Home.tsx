@@ -331,7 +331,7 @@ export function Home() {
                       className="shadow-sm"
                       style={{ minHeight: "450px", display: "flex", flexDirection: "column" }}
                     >
-                      <Card.Header className="bg-dark text-white">
+                      <Card.Header>
                         <h5 className="mb-0">{card.title}</h5>
                       </Card.Header>
                       <Card.Body style={{ flex: 1, overflow: "auto" }}>
@@ -398,7 +398,7 @@ export function Home() {
         {allCards.map((card, index) => (
           <Col xs={12} key={index}>
             <Card className="shadow-sm">
-              <Card.Header className="bg-dark text-white">
+              <Card.Header>
                 <h5 className="mb-0">{card.title}</h5>
               </Card.Header>
               <Card.Body>

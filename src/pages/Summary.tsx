@@ -45,6 +45,24 @@ export function Summary() {
     navigate("/maintenance");
   };
 
+  // Handle clicks on duplicate items (title, publisher, volume, issue - show all duplicates)
+  const handleDuplicateClick = (title: string, publisher: string, volume: string, issue: string) => {
+    const escapedTitle = title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const escapedPublisher = publisher?.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") || "";
+    const escapedVolume = volume?.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") || "";
+    const escapedIssue = issue?.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") || "";
+
+    // Reset filters and set all fields to show the duplicate comics
+    setFilters({
+      title: `^${escapedTitle}$`,
+      publisher: escapedPublisher ? `^${escapedPublisher}$` : "",
+      volume: escapedVolume ? `^${escapedVolume}$` : "",
+      issue: escapedIssue ? `^${escapedIssue}$` : "",
+    } as Record<string, string>);
+
+    navigate("/maintenance");
+  };
+
   // Handle clicks on summary items to filter and navigate to maintenance
   const handleItemClick = (filterType: string, filterValue: string | number, exactMatch = true) => {
     let regexPattern: string;
@@ -418,10 +436,74 @@ export function Summary() {
             </Col>
           </Row>
 
-          {/* Publication Years */}
+          {/* Duplicates and Comics by Decade */}
           <Row className="g-4 mb-4">
-            <Col xs={12}>
-              <Card>
+            {/* Duplicates */}
+            {stats.allDuplicates.length > 0 && (
+              <Col xs={12} lg={6}>
+                <Card className="h-100">
+                  <Card.Header className="bg-dark text-white">
+                    <h5 className="mb-0">Duplicate Comics</h5>
+                  </Card.Header>
+                  <Card.Body style={{ maxHeight: SUMMARY_CONFIG.MAX_LIST_HEIGHT, overflowY: "auto" }}>
+                    <ListGroup variant="flush">
+                      {stats.allDuplicates.map((item, index) => (
+                        <ListGroup.Item
+                          key={index}
+                          className="px-md-3"
+                          style={{ paddingLeft: "0.5rem", paddingRight: "0.5rem", cursor: "pointer" }}
+                          onClick={() => handleDuplicateClick(item.title, item.publisher, item.volume, item.issue)}
+                        >
+                          {/* Mobile: Number badge + title/issue on row 1, publisher/vol + count on row 2 */}
+                          <div className="d-md-none">
+                            <div className="d-flex align-items-center mb-1">
+                              <Badge bg="secondary" className="me-2">
+                                {index + 1}
+                              </Badge>
+                              <span className="fw-bold">
+                                {item.title} #{item.issue}
+                              </span>
+                            </div>
+                            <div className="d-flex justify-content-between align-items-center">
+                              <small className="text-muted">
+                                {item.publisher} {item.volume ? `v${item.volume}` : ""}
+                              </small>
+                              <Badge bg="light" text="dark" className="border">
+                                {item.count} copies
+                              </Badge>
+                            </div>
+                          </div>
+
+                          {/* Desktop: Original layout */}
+                          <div className="d-none d-md-flex justify-content-between align-items-start">
+                            <div className="flex-grow-1">
+                              <div>
+                                <Badge bg="secondary" className="me-2">
+                                  {index + 1}
+                                </Badge>
+                                <span className="fw-bold">
+                                  {item.title} #{item.issue}
+                                </span>
+                              </div>
+                              <small className="text-muted ms-4 ps-2">
+                                {item.publisher} {item.volume ? `v${item.volume}` : ""}
+                              </small>
+                            </div>
+                            <Badge bg="light" text="dark" className="border ms-2">
+                              {item.count} copies
+                            </Badge>
+                          </div>
+                        </ListGroup.Item>
+                      ))}
+                    </ListGroup>
+                  </Card.Body>
+                </Card>
+              </Col>
+            )}
+
+            {/* Comics by Decade */}
+            <Col xs={12} lg={6}>
+              <Card className="h-100">
                 <Card.Header className="bg-dark text-white">
                   <h5 className="mb-0">Comics by Decade</h5>
                 </Card.Header>
@@ -429,7 +511,7 @@ export function Summary() {
                   <ListGroup variant="flush">
                     <Row>
                       {stats.comicsByDecade.map((item, index) => (
-                        <Col xs={6} md={3} key={index} className="mb-2">
+                        <Col xs={6} md={6} key={index} className="mb-2">
                           <div
                             className="d-flex justify-content-between align-items-center p-2 border rounded"
                             style={{ cursor: "pointer" }}
@@ -558,6 +640,18 @@ function calculateStatistics(comics: ComicBook[]) {
     .map(([decade, count]) => ({ decade, count }))
     .sort((a, b) => a.decade.localeCompare(b.decade));
 
+  // Find duplicates - comics where quantity > 1
+  const allDuplicates = comics
+    .filter((comic) => Number(comic.quantity) > 1)
+    .map((comic) => ({
+      title: comic.title,
+      publisher: comic.publisher || "",
+      volume: comic.volume || "",
+      issue: comic.issue || "",
+      count: Number(comic.quantity),
+    }))
+    .sort((a, b) => b.count - a.count);
+
   return {
     totalValue,
     averageValue,
@@ -569,5 +663,6 @@ function calculateStatistics(comics: ComicBook[]) {
     allPublishers,
     conditionBreakdown,
     comicsByDecade,
+    allDuplicates,
   };
 }

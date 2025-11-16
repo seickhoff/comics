@@ -1,4 +1,4 @@
-import { Container, Row, Col, Card, Badge } from "react-bootstrap";
+import { Container, Row, Col, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../hooks/useAppContext";
 import { ComicBook } from "../interfaces/ComicBook";
@@ -31,6 +31,32 @@ export function Heatmap() {
     navigate("/maintenance");
   };
 
+  // Handle click on year label to filter by year
+  const handleYearClick = (year: number) => {
+    // Reset filters and set only year
+    setFilters({
+      year: `^${year}$`, // Exact match for year
+    } as Record<string, string>);
+
+    // Navigate to maintenance page
+    navigate("/maintenance");
+  };
+
+  // Handle click on month label to filter by month across all years
+  const handleMonthClick = (monthIndex: number) => {
+    // monthIndex is 0-based (0 = Jan, 11 = Dec)
+    // Convert to 1-based and pad (1 = "01", 12 = "12")
+    const paddedMonth = (monthIndex + 1).toString().padStart(2, "0");
+
+    // Reset filters and set only month
+    setFilters({
+      month: `^${paddedMonth}$`, // Exact match for month (padded)
+    } as Record<string, string>);
+
+    // Navigate to maintenance page
+    navigate("/maintenance");
+  };
+
   // Calculate max count for color intensity
   const maxCount = Math.max(...Array.from(heatmapData.values()).flatMap((monthData) => Array.from(monthData.values())));
 
@@ -47,7 +73,12 @@ export function Heatmap() {
 
   return (
     <Container className="mt-4">
-      <h1 className="mb-4">Collection Heatmap</h1>
+      <h1 className="mb-2">Collection Heatmap</h1>
+
+      {/* Description - Desktop only, directly under header */}
+      <p className="text-muted mb-4 d-none d-md-block">
+        Visualize your collection by publication date. Darker colors indicate more comics published in that month/year.
+      </p>
 
       {jsonData.length === 0 ? (
         <div className="text-center text-muted mt-5">
@@ -56,82 +87,72 @@ export function Heatmap() {
         </div>
       ) : (
         <>
-          <div className="mb-4">
-            <p className="text-muted">
-              Visualize your collection by publication date. Darker colors indicate more comics published in that
-              month/year.
-            </p>
+          {/* Summary Statistics - Compact */}
+          {/* Desktop: horizontal badges centered */}
+          <div className="mb-3 d-none d-md-flex flex-wrap gap-2 justify-content-center">
+            <span
+              className="badge bg-light text-dark border"
+              style={{ fontSize: "0.875rem", padding: "0.5rem 0.75rem" }}
+            >
+              Years: {years.length}
+              {years.length > 0 && (
+                <span className="ms-2 opacity-75">
+                  ({years[0]} - {years[years.length - 1]})
+                </span>
+              )}
+            </span>
+            <span
+              className="badge bg-light text-dark border"
+              style={{ fontSize: "0.875rem", padding: "0.5rem 0.75rem" }}
+            >
+              Most Active Month: {getBusiestMonth(heatmapData)?.month || "N/A"}
+              {getBusiestMonth(heatmapData) && (
+                <span className="ms-2 opacity-75">({getBusiestMonth(heatmapData)?.count} comics)</span>
+              )}
+            </span>
+            <span
+              className="badge bg-light text-dark border"
+              style={{ fontSize: "0.875rem", padding: "0.5rem 0.75rem" }}
+            >
+              Most Active Year: {getBusiestYear(heatmapData)?.year || "N/A"}
+              {getBusiestYear(heatmapData) && (
+                <span className="ms-2 opacity-75">({getBusiestYear(heatmapData)?.count} comics)</span>
+              )}
+            </span>
           </div>
 
-          {/* Legend - Desktop */}
-          <Row className="mb-4 d-none d-md-block">
-            <Col>
-              <Card>
-                <Card.Body className="d-flex align-items-center justify-content-center gap-3">
-                  <span className="text-muted">Less</span>
-                  <div className="d-flex">
-                    {Array.from({ length: HEATMAP_CONFIG.LEGEND.DESKTOP_GRADIENT_BOXES }, (_, idx) => {
-                      const intensity = idx / (HEATMAP_CONFIG.LEGEND.DESKTOP_GRADIENT_BOXES - 1);
-                      return (
-                        <div
-                          key={idx}
-                          style={{
-                            width: HEATMAP_CONFIG.LEGEND.BOX_WIDTH_DESKTOP,
-                            height: HEATMAP_CONFIG.LEGEND.BOX_HEIGHT,
-                            backgroundColor:
-                              intensity === 0
-                                ? HEATMAP_CONFIG.COLORS.EMPTY
-                                : `hsl(${HEATMAP_CONFIG.COLORS.HUE}, ${HEATMAP_CONFIG.COLORS.SATURATION}, ${HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - intensity * (HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - HEATMAP_CONFIG.COLORS.LIGHTNESS_MIN)}%)`,
-                            border: "1px solid #ddd",
-                          }}
-                        />
-                      );
-                    })}
-                  </div>
-                  <span className="text-muted">More</span>
-                  <Badge bg="secondary" className="ms-3">
-                    Max: {maxCount} comics/month
-                  </Badge>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-
-          {/* Legend - Mobile */}
-          <Row className="mb-4 d-md-none">
-            <Col>
-              <Card>
-                <Card.Body className="text-center">
-                  <div className="d-flex align-items-center justify-content-center gap-3 mb-2">
-                    <span className="text-muted">Less</span>
-                    <div className="d-flex gap-1">
-                      {Array.from({ length: HEATMAP_CONFIG.LEGEND.MOBILE_GRADIENT_BOXES }, (_, idx) => {
-                        const intensity = idx / (HEATMAP_CONFIG.LEGEND.MOBILE_GRADIENT_BOXES - 1);
-                        return (
-                          <div
-                            key={idx}
-                            style={{
-                              width: HEATMAP_CONFIG.LEGEND.BOX_WIDTH_MOBILE,
-                              height: HEATMAP_CONFIG.LEGEND.BOX_HEIGHT,
-                              backgroundColor:
-                                intensity === 0
-                                  ? HEATMAP_CONFIG.COLORS.EMPTY
-                                  : `hsl(${HEATMAP_CONFIG.COLORS.HUE}, ${HEATMAP_CONFIG.COLORS.SATURATION}, ${HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - intensity * (HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - HEATMAP_CONFIG.COLORS.LIGHTNESS_MIN)}%)`,
-                              border: "1px solid #ddd",
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
-                    <span className="text-muted">More</span>
-                  </div>
-                  <div>
-                    <Badge bg="secondary">Max: {maxCount} comics/month</Badge>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
+          {/* Mobile: full-width badges stacked */}
+          <div className="mb-3 d-md-none d-flex flex-column gap-2">
+            <span
+              className="badge bg-light text-dark border w-100"
+              style={{ fontSize: "0.875rem", padding: "0.5rem 0.75rem" }}
+            >
+              Years: {years.length}
+              {years.length > 0 && (
+                <span className="ms-2 opacity-75">
+                  ({years[0]} - {years[years.length - 1]})
+                </span>
+              )}
+            </span>
+            <span
+              className="badge bg-light text-dark border w-100"
+              style={{ fontSize: "0.875rem", padding: "0.5rem 0.75rem" }}
+            >
+              Most Active Month: {getBusiestMonth(heatmapData)?.month || "N/A"}
+              {getBusiestMonth(heatmapData) && (
+                <span className="ms-2 opacity-75">({getBusiestMonth(heatmapData)?.count} comics)</span>
+              )}
+            </span>
+            <span
+              className="badge bg-light text-dark border w-100"
+              style={{ fontSize: "0.875rem", padding: "0.5rem 0.75rem" }}
+            >
+              Most Active Year: {getBusiestYear(heatmapData)?.year || "N/A"}
+              {getBusiestYear(heatmapData) && (
+                <span className="ms-2 opacity-75">({getBusiestYear(heatmapData)?.count} comics)</span>
+              )}
+            </span>
+          </div>
 
           {/* Heatmap - Desktop */}
           <Row className="d-none d-md-block">
@@ -150,7 +171,10 @@ export function Heatmap() {
                             flex: 1,
                             fontSize: HEATMAP_CONFIG.DESKTOP.FONT_SIZE_BASE,
                             minWidth: HEATMAP_CONFIG.DESKTOP.MONTH_LABEL_WIDTH,
+                            cursor: "pointer",
                           }}
+                          title={`View all comics from ${month}`}
+                          onClick={() => handleMonthClick(idx)}
                         >
                           {month}
                         </div>
@@ -170,7 +194,10 @@ export function Heatmap() {
                               flexShrink: 0,
                               fontSize: HEATMAP_CONFIG.DESKTOP.FONT_SIZE_BASE,
                               lineHeight: HEATMAP_CONFIG.DESKTOP.CELL_HEIGHT,
+                              cursor: "pointer",
                             }}
+                            title={`View all comics from ${year}`}
+                            onClick={() => handleYearClick(year)}
                           >
                             {year}
                           </div>
@@ -236,7 +263,10 @@ export function Heatmap() {
                           fontSize: HEATMAP_CONFIG.MOBILE.FONT_SIZE_CELL,
                           minWidth: HEATMAP_CONFIG.MOBILE.MONTH_LABEL_WIDTH,
                           padding: "2px 0",
+                          cursor: "pointer",
                         }}
+                        title={`View all comics from ${month}`}
+                        onClick={() => handleMonthClick(idx)}
                       >
                         {month.substring(0, 1)}
                       </div>
@@ -256,7 +286,10 @@ export function Heatmap() {
                             flexShrink: 0,
                             fontSize: HEATMAP_CONFIG.MOBILE.FONT_SIZE_BASE,
                             lineHeight: HEATMAP_CONFIG.MOBILE.CELL_HEIGHT,
+                            cursor: "pointer",
                           }}
+                          title={`View all comics from ${year}`}
+                          onClick={() => handleYearClick(year)}
                         >
                           {year}
                         </div>
@@ -293,42 +326,69 @@ export function Heatmap() {
             </Col>
           </Row>
 
-          {/* Summary Statistics */}
-          <Row className="g-4 mt-1 mb-4">
-            <Col xs={12} md={4}>
-              <Card className="text-center h-100">
-                <Card.Body>
-                  <h3>{years.length}</h3>
-                  <p className="text-muted mb-0">Years Covered</p>
-                  {years.length > 0 && (
-                    <small className="text-muted">
-                      {years[0]} - {years[years.length - 1]}
-                    </small>
-                  )}
+          {/* Legend - Desktop */}
+          <Row className="mt-4 mb-4 d-none d-md-block">
+            <Col>
+              <Card>
+                <Card.Body className="d-flex align-items-center justify-content-center gap-3">
+                  <span className="text-muted">Less</span>
+                  <div className="d-flex">
+                    {Array.from({ length: HEATMAP_CONFIG.LEGEND.DESKTOP_GRADIENT_BOXES }, (_, idx) => {
+                      const intensity = idx / (HEATMAP_CONFIG.LEGEND.DESKTOP_GRADIENT_BOXES - 1);
+                      return (
+                        <div
+                          key={idx}
+                          style={{
+                            width: HEATMAP_CONFIG.LEGEND.BOX_WIDTH_DESKTOP,
+                            height: HEATMAP_CONFIG.LEGEND.BOX_HEIGHT,
+                            backgroundColor:
+                              intensity === 0
+                                ? HEATMAP_CONFIG.COLORS.EMPTY
+                                : `hsl(${HEATMAP_CONFIG.COLORS.HUE}, ${HEATMAP_CONFIG.COLORS.SATURATION}, ${HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - intensity * (HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - HEATMAP_CONFIG.COLORS.LIGHTNESS_MIN)}%)`,
+                            border: "1px solid #ddd",
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                  <span className="text-muted">More</span>
+                  <span className="badge bg-light text-dark border ms-3">Max: {maxCount} comics/month</span>
                 </Card.Body>
               </Card>
             </Col>
+          </Row>
 
-            <Col xs={12} md={4}>
-              <Card className="text-center h-100">
-                <Card.Body>
-                  <h3>{getBusiestMonth(heatmapData)?.month || "N/A"}</h3>
-                  <p className="text-muted mb-0">Most Active Month</p>
-                  {getBusiestMonth(heatmapData) && (
-                    <small className="text-muted">{getBusiestMonth(heatmapData)?.count} comics</small>
-                  )}
-                </Card.Body>
-              </Card>
-            </Col>
-
-            <Col xs={12} md={4}>
-              <Card className="text-center h-100">
-                <Card.Body>
-                  <h3>{getBusiestYear(heatmapData)?.year || "N/A"}</h3>
-                  <p className="text-muted mb-0">Most Active Year</p>
-                  {getBusiestYear(heatmapData) && (
-                    <small className="text-muted">{getBusiestYear(heatmapData)?.count} comics</small>
-                  )}
+          {/* Legend - Mobile */}
+          <Row className="mt-4 mb-4 d-md-none">
+            <Col>
+              <Card>
+                <Card.Body className="text-center">
+                  <div className="d-flex align-items-center justify-content-center gap-3 mb-2">
+                    <span className="text-muted">Less</span>
+                    <div className="d-flex gap-1">
+                      {Array.from({ length: HEATMAP_CONFIG.LEGEND.MOBILE_GRADIENT_BOXES }, (_, idx) => {
+                        const intensity = idx / (HEATMAP_CONFIG.LEGEND.MOBILE_GRADIENT_BOXES - 1);
+                        return (
+                          <div
+                            key={idx}
+                            style={{
+                              width: HEATMAP_CONFIG.LEGEND.BOX_WIDTH_MOBILE,
+                              height: HEATMAP_CONFIG.LEGEND.BOX_HEIGHT,
+                              backgroundColor:
+                                intensity === 0
+                                  ? HEATMAP_CONFIG.COLORS.EMPTY
+                                  : `hsl(${HEATMAP_CONFIG.COLORS.HUE}, ${HEATMAP_CONFIG.COLORS.SATURATION}, ${HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - intensity * (HEATMAP_CONFIG.COLORS.LIGHTNESS_MAX - HEATMAP_CONFIG.COLORS.LIGHTNESS_MIN)}%)`,
+                              border: "1px solid #ddd",
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                    <span className="text-muted">More</span>
+                  </div>
+                  <div>
+                    <span className="badge bg-light text-dark border">Max: {maxCount} comics/month</span>
+                  </div>
                 </Card.Body>
               </Card>
             </Col>

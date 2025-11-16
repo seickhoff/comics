@@ -92,8 +92,46 @@ export const TableReport = ({ tableId }: TableReportProps) => {
     return "#808080"; // gray when 1 or more (but not all) selected
   };
 
+  // Calculate summary statistics for visible/filtered data
+  const issueCount = sortedData.length;
+  const totalPrice = sortedData.reduce((sum, comic) => sum + Number(comic.value || 0), 0);
+  const avgPrice = issueCount > 0 ? totalPrice / issueCount : 0;
+
   return (
     <>
+      {/* Summary Badges */}
+      {issueCount > 0 && (
+        <div className="mb-3 d-flex flex-wrap gap-2 justify-content-center justify-content-md-start">
+          <span
+            className="badge bg-secondary"
+            style={{
+              fontSize: "0.75rem",
+              padding: "0.35rem 0.5rem",
+            }}
+          >
+            Issues: {issueCount}
+          </span>
+          <span
+            className="badge bg-secondary"
+            style={{
+              fontSize: "0.75rem",
+              padding: "0.35rem 0.5rem",
+            }}
+          >
+            Total: ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+          <span
+            className="badge bg-secondary"
+            style={{
+              fontSize: "0.75rem",
+              padding: "0.35rem 0.5rem",
+            }}
+          >
+            Avg: ${avgPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+        </div>
+      )}
+
       <Table striped bordered hover responsive style={{ fontSize: "0.875rem" }}>
         <thead>
           <tr>

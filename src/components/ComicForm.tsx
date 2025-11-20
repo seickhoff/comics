@@ -39,6 +39,7 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
     valueOptions,
     monthOptions,
     yearOptions,
+    typeOptions,
     writerOptions,
     artistOptions,
   } = useComicFormOptions(existingComics);
@@ -184,6 +185,22 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
           />
           <datalist id="issue-options">
             {issueOptions.map((opt) => (
+              <option key={opt} value={opt} />
+            ))}
+          </datalist>
+        </Col>
+
+        {/* Type */}
+        <Col lg={2}>
+          <Form.Label>Type</Form.Label>
+          <Form.Control
+            list="type-options"
+            value={comic.type || ""}
+            onChange={(e) => handleChange("type", e.target.value)}
+            placeholder={isBatchMode ? "No change" : ""}
+          />
+          <datalist id="type-options">
+            {typeOptions.map((opt) => (
               <option key={opt} value={opt} />
             ))}
           </datalist>

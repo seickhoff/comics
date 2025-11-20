@@ -1,4 +1,5 @@
 import { ComicBook, GradeCode } from "../interfaces/ComicBook";
+import { generateUUID } from "./uuid";
 
 /**
  * Normalizes raw comic book data to match the ComicBook interface types.
@@ -48,6 +49,7 @@ export function normalizeComicBook(raw: Partial<ComicBook>): ComicBook {
       : GradeCode.NM;
 
   return {
+    uuid: raw.uuid || generateUUID(), // Generate UUID if not present (for legacy data)
     title: toString(raw.title),
     publisher: toString(raw.publisher),
     volume: toString(raw.volume),
@@ -57,6 +59,7 @@ export function normalizeComicBook(raw: Partial<ComicBook>): ComicBook {
     quantity: toNumber(raw.quantity, 1),
     value,
     condition,
+    type: raw.type !== null && raw.type !== undefined && raw.type !== "" ? toString(raw.type) : undefined,
     writer: toArray(raw.writer),
     artist: toArray(raw.artist),
     comments:

@@ -23,6 +23,7 @@ export const TableReport = ({ tableId }: TableReportProps) => {
     jsonData,
     setJsonData,
     filters,
+    setFilters,
     useOrFiltering,
     mobileTableSortConfig,
     setMobileTableSortConfig,
@@ -117,8 +118,13 @@ export const TableReport = ({ tableId }: TableReportProps) => {
     }
   };
 
-  // Check if there are active sorts
-  const hasActiveSorts = sortConfig.length > 0;
+  // Reset filters handler
+  const handleResetFilters = () => {
+    setFilters({} as Record<import("../interfaces/ComicBook").ColumnKey, string>);
+  };
+
+  // Check if there are active filters
+  const hasActiveFilters = Object.values(filters).some((value) => value?.trim());
 
   return (
     <>
@@ -154,11 +160,14 @@ export const TableReport = ({ tableId }: TableReportProps) => {
               Avg: ${avgPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
-          {hasActiveSorts && (
+          <div className="d-flex gap-2">
+            <Button variant="outline-secondary" size="sm" onClick={handleResetFilters} disabled={!hasActiveFilters}>
+              Reset Filters
+            </Button>
             <Button variant="outline-secondary" size="sm" onClick={handleResetSort}>
               Reset Sort
             </Button>
-          )}
+          </div>
         </div>
       )}
 

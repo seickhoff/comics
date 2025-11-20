@@ -1,4 +1,5 @@
 import { ComicBook } from "../interfaces/ComicBook";
+import { generateUUID } from "./uuid";
 
 export interface BulkComicGeneratorResult {
   success: boolean;
@@ -49,6 +50,7 @@ export function generateBulkComics(
   while (currentIssue <= end) {
     comics.push({
       ...baseComic,
+      uuid: generateUUID(),
       issue: String(currentIssue),
       month: String(currentMonth).padStart(2, "0"),
       year: String(currentYear),

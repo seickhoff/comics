@@ -3,9 +3,10 @@ import { ComicBook } from "../interfaces/ComicBook";
 /**
  * Generate a unique key for a comic book
  * Used for selection management and data operations
+ * Uses the comic's UUID for stable, unique identification
  */
 export function getComicKey(comic: ComicBook): string {
-  return `${comic.title}||${comic.publisher}||${comic.volume}||${comic.issue}`;
+  return comic.uuid;
 }
 
 /**

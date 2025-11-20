@@ -54,7 +54,10 @@ function Line({
   if (left.length <= maxCharsLastLine) {
     // Single line display
     return (
-      <div className="d-flex align-items-center font-monospace text-nowrap w-100 px-1 py-0.5 line-hover">
+      <div
+        className="d-flex align-items-center font-monospace text-nowrap w-100 px-1 line-hover"
+        style={{ height: "1.25em" }}
+      >
         <span className="flex-shrink-0">{left}</span>
         <span className="flex-grow-1 mx-2" style={{ borderBottom: "1px dotted gray", height: "0.6em" }}></span>
         <span className="flex-shrink-0">{formattedValue}</span>
@@ -105,13 +108,13 @@ function Line({
   }
 
   return (
-    <div className="font-monospace w-100 px-1 py-0.5 line-hover">
+    <div className="font-monospace w-100 px-1 line-hover">
       {lines.map((line, index) => {
         const isLastLine = index === lines.length - 1;
         if (isLastLine) {
           // Last line: with dots and price
           return (
-            <div key={index} className="d-flex align-items-center text-nowrap">
+            <div key={index} className="d-flex align-items-center text-nowrap" style={{ height: "1.25em" }}>
               <span className="flex-shrink-0">{line}</span>
               <span className="flex-grow-1 mx-2" style={{ borderBottom: "1px dotted gray", height: "0.6em" }}></span>
               <span className="flex-shrink-0">{formattedValue}</span>
@@ -120,7 +123,7 @@ function Line({
         } else {
           // Intermediate lines: just text with trailing comma
           return (
-            <div key={index} className="text-nowrap">
+            <div key={index} className="text-nowrap" style={{ height: "1.25em" }}>
               {line},
             </div>
           );
@@ -158,6 +161,11 @@ function groupByTitlePublisherVolume(comics: ComicBook[]) {
   return groups;
 }
 
+// Format issue label - display "No Number" for blank/empty issues
+function formatIssueLabel(issue: string): string {
+  return issue && issue.trim() !== "" ? issue : "No Number";
+}
+
 // Build issue lines
 function buildIssueLines(issues: ComicBook[]): { label: string; value: string }[] {
   const numeric = issues.filter((i) => parseIssue(i.issue) !== null);
@@ -175,7 +183,10 @@ function buildIssueLines(issues: ComicBook[]): { label: string; value: string }[
       prev = comic;
     } else {
       if (runStart && prev) {
-        const label = runStart.issue === prev.issue ? runStart.issue : `${runStart.issue}-${prev.issue}`;
+        const label =
+          runStart.issue === prev.issue
+            ? formatIssueLabel(runStart.issue)
+            : `${formatIssueLabel(runStart.issue)}-${formatIssueLabel(prev.issue)}`;
         runs.push({ label, value: runStart.value });
       }
       runStart = comic;
@@ -184,7 +195,10 @@ function buildIssueLines(issues: ComicBook[]): { label: string; value: string }[
   }
 
   if (runStart && prev) {
-    const label = runStart.issue === prev.issue ? runStart.issue : `${runStart.issue}-${prev.issue}`;
+    const label =
+      runStart.issue === prev.issue
+        ? formatIssueLabel(runStart.issue)
+        : `${formatIssueLabel(runStart.issue)}-${formatIssueLabel(prev.issue)}`;
     runs.push({ label, value: runStart.value });
   }
 
@@ -201,7 +215,7 @@ function buildIssueLines(issues: ComicBook[]): { label: string; value: string }[
 
   // Append non-numeric
   for (const comic of nonNumeric) {
-    merged.push({ label: comic.issue, value: comic.value });
+    merged.push({ label: formatIssueLabel(comic.issue), value: comic.value });
   }
 
   return merged;
@@ -241,7 +255,8 @@ export default function OverstreetReport({ comics, settings }: OverstreetProps) 
   const getVisualLineCount = (item: PageItem, isFirstItem: boolean) => {
     if (item.type === "header") {
       // Header has title (1 line) + publisher info (1 line) + spacing
-      // First header has no top margin, subsequent headers have 1rem top margin ≈ 1 extra line
+      // First header has no top margin
+      // Subsequent headers have 1rem top margin which equals roughly 1 line at 0.875rem font with 1.25 line-height
       return isFirstItem ? 2 : 3;
     }
     // Regular issue line - calculate how many lines it will take
@@ -313,10 +328,37 @@ export default function OverstreetReport({ comics, settings }: OverstreetProps) 
     const lineCount = getVisualLineCount(item, currentPageItems.length === 0);
 
     // If adding this item would exceed the page limit, start a new page
-    if (currentPageLineCount > 0 && currentPageLineCount + lineCount > LINES_PER_PAGE) {
+    // Allow slight overage (up to 1 line) since our estimates aren't perfect
+    if (currentPageLineCount > 0 && currentPageLineCount + lineCount > LINES_PER_PAGE + 1) {
+      // Special case: if this is a header, check if we can fit at least one issue line after it
+      // If not, move the header to the next page to avoid orphaning
+      if (item.type === "header") {
+        const nextItem = allItems[i + 1];
+        if (nextItem && nextItem.type === "line") {
+          const nextLineCount = getVisualLineCount(nextItem, false);
+          const headerAsFirstCount = getVisualLineCount(item, true);
+          // If header + at least one line would fit on a new page, move to new page
+          // Otherwise, try to fit the header on current page (orphan prevention)
+          if (headerAsFirstCount + nextLineCount <= LINES_PER_PAGE + 1) {
+            pages.push(currentPageItems);
+            currentPageItems = [];
+            currentPageLineCount = 0;
+            currentPageItems.push(item);
+            currentPageLineCount = headerAsFirstCount;
+            continue;
+          }
+        }
+      }
+
+      // Regular page break
       pages.push(currentPageItems);
       currentPageItems = [];
       currentPageLineCount = 0;
+      // Recalculate line count for the item as it's now the first on the new page
+      const newLineCount = getVisualLineCount(item, true);
+      currentPageItems.push(item);
+      currentPageLineCount = newLineCount;
+      continue;
     }
 
     currentPageItems.push(item);
@@ -361,14 +403,22 @@ export default function OverstreetReport({ comics, settings }: OverstreetProps) 
             <div
               style={{
                 fontWeight: "bold",
-                marginBottom: OVERSTREET_CONFIG.SPACING.HEADER_TITLE_MARGIN_BOTTOM,
                 fontSize: OVERSTREET_CONFIG.FONT_SIZE.DESKTOP_HEADER,
                 marginTop: idx > 0 ? OVERSTREET_CONFIG.SPACING.HEADER_MARGIN_TOP : 0,
+                height: "1.25em",
+                lineHeight: "1.25",
               }}
             >
               {item.title}
             </div>
-            <div style={{ marginBottom: OVERSTREET_CONFIG.SPACING.HEADER_MARGIN_BOTTOM, color: "#666" }}>
+            <div
+              style={{
+                marginBottom: OVERSTREET_CONFIG.SPACING.HEADER_MARGIN_BOTTOM,
+                color: "#666",
+                height: "1.25em",
+                lineHeight: "1.25",
+              }}
+            >
               ({item.publisher}, v{item.volume})
             </div>
           </div>
@@ -389,9 +439,10 @@ export default function OverstreetReport({ comics, settings }: OverstreetProps) 
               <div
                 style={{
                   fontWeight: "bold",
-                  marginBottom: OVERSTREET_CONFIG.SPACING.HEADER_TITLE_MARGIN_BOTTOM,
                   fontSize: OVERSTREET_CONFIG.FONT_SIZE.MOBILE_HEADER,
                   marginTop: idx > 0 ? OVERSTREET_CONFIG.SPACING.HEADER_MARGIN_TOP : 0,
+                  height: "1.25em",
+                  lineHeight: "1.25",
                 }}
               >
                 {item.title}
@@ -401,6 +452,8 @@ export default function OverstreetReport({ comics, settings }: OverstreetProps) 
                   marginBottom: OVERSTREET_CONFIG.SPACING.HEADER_MARGIN_BOTTOM,
                   color: "#666",
                   fontSize: OVERSTREET_CONFIG.FONT_SIZE.MOBILE_HEADER,
+                  height: "1.25em",
+                  lineHeight: "1.25",
                 }}
               >
                 ({item.publisher}, v{item.volume})

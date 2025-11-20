@@ -1,5 +1,6 @@
 import { ComicBook } from "../interfaces/ComicBook";
 import { APP_CONFIG } from "../config/constants";
+import { generateUUID } from "./uuid";
 
 /**
  * Returns the default empty comic book state
@@ -7,6 +8,7 @@ import { APP_CONFIG } from "../config/constants";
  */
 export function getEmptyComic(): Partial<ComicBook> {
   return {
+    uuid: generateUUID(),
     title: "",
     publisher: "",
     volume: "",
@@ -18,6 +20,7 @@ export function getEmptyComic(): Partial<ComicBook> {
     year: "",
     quantity: APP_CONFIG.DEFAULTS.QUANTITY,
     condition: APP_CONFIG.DEFAULTS.CONDITION,
+    type: "",
     comments: "",
   };
 }

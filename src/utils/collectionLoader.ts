@@ -4,6 +4,21 @@ import { normalizeComicBook } from "./normalizeComicBook";
 import { sortComics } from "./comicSorting";
 import { isExportFormat } from "./exportFormat";
 
+/**
+ * Merges saved column configuration with current default columns
+ * Ensures new columns added to the app are included in loaded collections
+ * Maintains the order from defaultColumns for consistency
+ */
+function mergeColumns(savedColumns: ColumnConfig[], defaultColumns: ColumnConfig[]): ColumnConfig[] {
+  const savedMap = new Map(savedColumns.map((col) => [col.key, col]));
+
+  // Use default column order, but preserve visibility settings from saved config
+  return defaultColumns.map((defaultCol) => {
+    const savedCol = savedMap.get(defaultCol.key);
+    return savedCol || defaultCol;
+  });
+}
+
 export interface CollectionLoaderSetters {
   setJsonData: (data: ComicBook[]) => void;
   setFileName?: (name: string) => void;
@@ -16,6 +31,9 @@ export interface CollectionLoaderSetters {
   setMobileTableSortConfig?: (config: Record<string, SortConfig>) => void;
   setDesktopTableSortConfig?: (config: Record<string, SortConfig>) => void;
   setSettings?: (settings: AppSettings) => void;
+  defaultColumns?: ColumnConfig[];
+  defaultMobileColumns?: ColumnConfig[];
+  defaultDesktopColumns?: ColumnConfig[];
 }
 
 export interface LoadCollectionResult {
@@ -42,14 +60,15 @@ export function loadCollectionData(
       setters.setJsonData(sorted);
 
       // Restore app context settings if setters provided
-      if (rawData.columns && setters.setColumns) {
-        setters.setColumns(rawData.columns);
+      // Merge saved columns with defaults to include any new columns added to the app
+      if (rawData.columns && setters.setColumns && setters.defaultColumns) {
+        setters.setColumns(mergeColumns(rawData.columns, setters.defaultColumns));
       }
-      if (rawData.mobileColumns && setters.setMobileColumns) {
-        setters.setMobileColumns(rawData.mobileColumns);
+      if (rawData.mobileColumns && setters.setMobileColumns && setters.defaultMobileColumns) {
+        setters.setMobileColumns(mergeColumns(rawData.mobileColumns, setters.defaultMobileColumns));
       }
-      if (rawData.desktopColumns && setters.setDesktopColumns) {
-        setters.setDesktopColumns(rawData.desktopColumns);
+      if (rawData.desktopColumns && setters.setDesktopColumns && setters.defaultDesktopColumns) {
+        setters.setDesktopColumns(mergeColumns(rawData.desktopColumns, setters.defaultDesktopColumns));
       }
       if (rawData.filters && setters.setFilters) {
         setters.setFilters(rawData.filters);

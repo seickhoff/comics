@@ -3,6 +3,7 @@ import { useAppContext } from "../hooks/useAppContext";
 import { useToast } from "../context/ToastContext";
 import { Button, Alert, Spinner } from "react-bootstrap";
 import { loadCollectionData } from "../utils/collectionLoader";
+import { defaultColumns, defaultMobileColumns, defaultDesktopColumns } from "../context/AppProvider";
 
 export function JsonFileUploader() {
   const {
@@ -48,6 +49,9 @@ export function JsonFileUploader() {
             setMobileTableSortConfig,
             setDesktopTableSortConfig,
             setSettings,
+            defaultColumns,
+            defaultMobileColumns,
+            defaultDesktopColumns,
           },
           file.name
         );

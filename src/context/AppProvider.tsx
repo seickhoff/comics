@@ -3,11 +3,12 @@ import { AppContext, AppSettings, SortConfig } from "./AppContext";
 import { ColumnConfig, ColumnKey, ComicBook } from "../interfaces/ComicBook";
 import { APP_CONFIG, OVERSTREET_CONFIG, SUMMARY_CONFIG, HEATMAP_CONFIG } from "../config/constants";
 
-const defaultColumns: ColumnConfig[] = [
+export const defaultColumns: ColumnConfig[] = [
   { key: "title", label: "Title", visible: true },
   { key: "publisher", label: "Publisher", visible: true },
   { key: "volume", label: "Volume", visible: true },
   { key: "issue", label: "Issue", visible: true },
+  { key: "type", label: "Type", visible: true },
   { key: "month", label: "Month", visible: true },
   { key: "year", label: "Year", visible: true },
   { key: "quantity", label: "Quantity", visible: true },
@@ -19,11 +20,12 @@ const defaultColumns: ColumnConfig[] = [
 ];
 
 // Default mobile columns (fewer visible by default)
-const defaultMobileColumns: ColumnConfig[] = [
+export const defaultMobileColumns: ColumnConfig[] = [
   { key: "title", label: "Title", visible: true },
   { key: "publisher", label: "Publisher", visible: false },
   { key: "volume", label: "Volume", visible: false },
   { key: "issue", label: "Issue", visible: true },
+  { key: "type", label: "Type", visible: false },
   { key: "month", label: "Month", visible: true },
   { key: "year", label: "Year", visible: true },
   { key: "quantity", label: "Quantity", visible: false },
@@ -35,7 +37,7 @@ const defaultMobileColumns: ColumnConfig[] = [
 ];
 
 // Default desktop columns (all visible)
-const defaultDesktopColumns: ColumnConfig[] = [...defaultColumns];
+export const defaultDesktopColumns: ColumnConfig[] = [...defaultColumns];
 
 // Default settings from constants
 const getDefaultSettings = (): AppSettings => ({

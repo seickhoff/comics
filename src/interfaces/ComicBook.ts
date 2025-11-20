@@ -1,4 +1,5 @@
 export interface ComicBook {
+  uuid: string;
   title: string;
   publisher: string;
   volume: string;
@@ -8,6 +9,7 @@ export interface ComicBook {
   quantity: number;
   value: string;
   condition: string;
+  type?: string;
   writer?: string[];
   artist?: string[];
   comments?: string;
@@ -45,6 +47,7 @@ export type ColumnKey =
   | "quantity"
   | "value"
   | "condition"
+  | "type"
   | "writer"
   | "artist"
   | "comments";

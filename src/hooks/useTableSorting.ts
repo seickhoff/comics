@@ -72,9 +72,13 @@ export function useTableSorting({ tableId, data, tableSortConfig, setTableSortCo
         bValue = normalizeTitle(String(bValue));
       }
 
+      // Check if both values are actually numeric (not empty strings)
+      const aStr = String(aValue).trim();
+      const bStr = String(bValue).trim();
       const aNum = Number(aValue);
       const bNum = Number(bValue);
-      const bothNumeric = !isNaN(aNum) && !isNaN(bNum);
+      // Only treat as numeric if the string is not empty and converts to a valid number
+      const bothNumeric = aStr !== "" && bStr !== "" && !isNaN(aNum) && !isNaN(bNum);
 
       let cmp = 0;
       if (bothNumeric) cmp = aNum - bNum;

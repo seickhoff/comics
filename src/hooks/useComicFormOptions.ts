@@ -26,6 +26,7 @@ export function useComicFormOptions(existingComics: ComicBook[]) {
   const valueOptions = useMemo(() => getUniqueValues(existingComics, "value"), [existingComics]);
   const monthOptions = useMemo(() => getUniqueValues(existingComics, "month"), [existingComics]);
   const yearOptions = useMemo(() => getUniqueValues(existingComics, "year"), [existingComics]);
+  const typeOptions = useMemo(() => getUniqueValues(existingComics, "type"), [existingComics]);
   const writerOptions = useMemo(() => getUniqueValues(existingComics, "writer"), [existingComics]);
   const artistOptions = useMemo(() => getUniqueValues(existingComics, "artist"), [existingComics]);
 
@@ -37,6 +38,7 @@ export function useComicFormOptions(existingComics: ComicBook[]) {
     valueOptions,
     monthOptions,
     yearOptions,
+    typeOptions,
     writerOptions,
     artistOptions,
   };

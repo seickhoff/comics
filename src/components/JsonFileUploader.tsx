@@ -3,7 +3,7 @@ import { useAppContext } from "../hooks/useAppContext";
 import { useToast } from "../context/ToastContext";
 import { Button, Alert, Spinner } from "react-bootstrap";
 import { loadCollectionData } from "../utils/collectionLoader";
-import { defaultColumns, defaultMobileColumns, defaultDesktopColumns } from "../context/AppProvider";
+import { defaultColumns, defaultMobileColumns, defaultDesktopColumns } from "../config/columnDefaults";
 
 export function JsonFileUploader() {
   const {

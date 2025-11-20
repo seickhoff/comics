@@ -298,17 +298,33 @@ export function Settings() {
           </Card>
         </Col>
 
-        {/* Heatmap Colors */}
+        {/* Heatmap Settings */}
         <Col xs={12} lg={6}>
           <Card className="h-100">
             <Card.Header>
-              <strong>Heatmap Colors</strong>
+              <strong>Heatmap Settings</strong>
               <div className="d-none d-md-block text-muted" style={{ fontSize: "0.75rem" }}>
-                Customize heatmap color scheme
+                Customize heatmap appearance
               </div>
             </Card.Header>
             <Card.Body>
               <Row>
+                <Col xs={12} md={6} className="mb-3">
+                  <Form.Group>
+                    <Form.Label style={{ fontSize: "0.875rem" }}>Cell Width (Desktop)</Form.Label>
+                    <Form.Control
+                      type="number"
+                      size="sm"
+                      min="20"
+                      max="60"
+                      value={formData.heatmapCellSize}
+                      onChange={(e) => handleChange("heatmapCellSize", parseInt(e.target.value))}
+                    />
+                    <Form.Text className="text-muted" style={{ fontSize: "0.7rem" }}>
+                      Cell width in pixels (20-60)
+                    </Form.Text>
+                  </Form.Group>
+                </Col>
                 <Col xs={12} md={6} className="mb-3">
                   <Form.Group>
                     <Form.Label style={{ fontSize: "0.875rem" }}>Color Hue (0-360)</Form.Label>

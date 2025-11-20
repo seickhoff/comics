@@ -108,10 +108,10 @@ export const SUMMARY_CONFIG = {
 export const HEATMAP_CONFIG = {
   // Desktop grid
   DESKTOP: {
-    CELL_WIDTH: "40px",
-    CELL_HEIGHT: "40px",
+    CELL_WIDTH: "35px",
+    CELL_HEIGHT: "35px",
     YEAR_LABEL_WIDTH: "60px",
-    MONTH_LABEL_WIDTH: "40px",
+    MONTH_LABEL_WIDTH: "35px",
     FONT_SIZE_BASE: "0.875rem",
     FONT_SIZE_CELL: "0.75rem",
   },
@@ -119,7 +119,7 @@ export const HEATMAP_CONFIG = {
   // Mobile grid
   MOBILE: {
     CELL_WIDTH: "20px",
-    CELL_HEIGHT: "24px",
+    CELL_HEIGHT: "20px",
     YEAR_LABEL_WIDTH: "35px",
     MONTH_LABEL_WIDTH: "20px",
     FONT_SIZE_BASE: "0.65rem",

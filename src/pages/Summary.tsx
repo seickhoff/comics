@@ -541,7 +541,7 @@ function calculateStatistics(comics: ComicBook[]) {
     return sum + value;
   }, 0);
 
-  const averageValue = comics.length > 0 ? Math.round(totalValue / comics.length) : 0;
+  const averageValue = comics.length > 0 ? totalValue / comics.length : 0;
 
   // All valuable comics sorted by value
   const allValuableComics = [...comics].sort((a, b) => Number(b.value || 0) - Number(a.value || 0));

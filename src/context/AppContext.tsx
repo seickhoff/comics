@@ -33,6 +33,7 @@ export type AppSettings = {
   heatmapColorSaturation: string;
   heatmapColorLightnessMin: number;
   heatmapColorLightnessMax: number;
+  heatmapCellSize: number;
 };
 
 // Type for the state

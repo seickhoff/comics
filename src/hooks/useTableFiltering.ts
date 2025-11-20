@@ -7,7 +7,7 @@ interface UseTableFilteringProps {
   useOrFiltering: boolean;
 }
 
-export function useTableFiltering({ data, visibleColumns, filters, useOrFiltering }: UseTableFilteringProps) {
+export function useTableFiltering({ data, filters, useOrFiltering }: UseTableFilteringProps) {
   // Get only columns that have active filters (check all columns, not just visible)
   const columnsWithFilters = (Object.keys(filters) as ColumnKey[])
     .filter((key) => filters[key]?.trim())

@@ -10,8 +10,11 @@ export function Heatmap() {
 
   const heatmapData = calculateHeatmapData(jsonData);
 
-  // Get unique years sorted
-  const years = Array.from(heatmapData.keys()).sort((a, b) => a - b);
+  // Get continuous range of years from min to max (don't skip years)
+  const dataYears = Array.from(heatmapData.keys()).sort((a, b) => a - b);
+  const minYear = dataYears.length > 0 ? dataYears[0] : 0;
+  const maxYear = dataYears.length > 0 ? dataYears[dataYears.length - 1] : 0;
+  const years = minYear > 0 ? Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i) : [];
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   // Handle click on heatmap cell to navigate to maintenance page with filters
@@ -159,7 +162,7 @@ export function Heatmap() {
             <Col>
               <Card>
                 <Card.Body style={{ overflowX: "auto" }}>
-                  <div style={{ minWidth: "800px" }}>
+                  <div style={{ minWidth: "800px", display: "flex", flexDirection: "column", alignItems: "center" }}>
                     {/* Month labels header */}
                     <div className="d-flex mb-2">
                       <div style={{ width: HEATMAP_CONFIG.DESKTOP.YEAR_LABEL_WIDTH, flexShrink: 0 }} />
@@ -168,9 +171,9 @@ export function Heatmap() {
                           key={idx}
                           className="text-center fw-bold"
                           style={{
-                            flex: 1,
+                            width: `${settings.heatmapCellSize}px`,
                             fontSize: HEATMAP_CONFIG.DESKTOP.FONT_SIZE_BASE,
-                            minWidth: HEATMAP_CONFIG.DESKTOP.MONTH_LABEL_WIDTH,
+                            flexShrink: 0,
                             cursor: "pointer",
                           }}
                           title={`View all comics from ${month}`}
@@ -210,9 +213,9 @@ export function Heatmap() {
                                 key={month}
                                 className="d-flex align-items-center justify-content-center position-relative"
                                 style={{
-                                  flex: 1,
-                                  minWidth: HEATMAP_CONFIG.DESKTOP.CELL_WIDTH,
+                                  width: `${settings.heatmapCellSize}px`,
                                   height: HEATMAP_CONFIG.DESKTOP.CELL_HEIGHT,
+                                  flexShrink: 0,
                                   backgroundColor: getColor(count),
                                   border: "1px solid #ddd",
                                   cursor: count > 0 ? "pointer" : "default",

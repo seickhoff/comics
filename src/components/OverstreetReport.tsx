@@ -251,12 +251,11 @@ export default function OverstreetReport({ comics, settings }: OverstreetProps) 
     lines.forEach((line) => allItems.push({ type: "line", left: line.label, right: line.value }));
   });
 
-  // Calculate visual line count for each item (headers = 2-3 lines, regular lines = 1+ lines)
+  // Calculate visual line count for each item
   const getVisualLineCount = (item: PageItem, isFirstItem: boolean) => {
     if (item.type === "header") {
-      // Header has title (1 line) + publisher info (1 line) + spacing
-      // First header has no top margin
-      // Subsequent headers have 1rem top margin which equals roughly 1 line at 0.875rem font with 1.25 line-height
+      // Header: title (1 line) + publisher info (1 line) + blank line separator (1 line)
+      // First header doesn't need blank line before it
       return isFirstItem ? 2 : 3;
     }
     // Regular issue line - calculate how many lines it will take
@@ -336,9 +335,19 @@ export default function OverstreetReport({ comics, settings }: OverstreetProps) 
         const nextItem = allItems[i + 1];
         if (nextItem && nextItem.type === "line") {
           const nextLineCount = getVisualLineCount(nextItem, false);
+
+          // Check if header + one issue line would fit on CURRENT page
+          const wouldFitOnCurrentPage = currentPageLineCount + lineCount + nextLineCount <= LINES_PER_PAGE + 1;
+
+          if (wouldFitOnCurrentPage) {
+            // Header + one issue fits on current page, so keep them together here
+            currentPageItems.push(item);
+            currentPageLineCount += lineCount;
+            continue;
+          }
+
+          // Won't fit on current page - move to next page for orphan prevention
           const headerAsFirstCount = getVisualLineCount(item, true);
-          // If header + at least one line would fit on a new page, move to new page
-          // Otherwise, try to fit the header on current page (orphan prevention)
           if (headerAsFirstCount + nextLineCount <= LINES_PER_PAGE + 1) {
             pages.push(currentPageItems);
             currentPageItems = [];
@@ -400,23 +409,26 @@ export default function OverstreetReport({ comics, settings }: OverstreetProps) 
       {items.map((item, idx) =>
         item.type === "header" ? (
           <div key={idx}>
+            {/* Blank line before subsequent headers */}
+            {idx > 0 && <div className="w-100 px-1" style={{ height: "1.25em" }}></div>}
+            {/* Title line - styled exactly like issue rows */}
             <div
+              className="d-flex align-items-center font-monospace text-nowrap w-100 px-1 line-hover"
               style={{
-                fontWeight: "bold",
-                fontSize: OVERSTREET_CONFIG.FONT_SIZE.DESKTOP_HEADER,
-                marginTop: idx > 0 ? OVERSTREET_CONFIG.SPACING.HEADER_MARGIN_TOP : 0,
                 height: "1.25em",
-                lineHeight: "1.25",
+                lineHeight: "1.25em",
+                fontWeight: "bold",
               }}
             >
               {item.title}
             </div>
+            {/* Publisher/volume line - styled exactly like issue rows */}
             <div
+              className="d-flex align-items-center font-monospace text-nowrap w-100 px-1 line-hover"
               style={{
-                marginBottom: OVERSTREET_CONFIG.SPACING.HEADER_MARGIN_BOTTOM,
-                color: "#666",
                 height: "1.25em",
-                lineHeight: "1.25",
+                lineHeight: "1.25em",
+                color: "#666",
               }}
             >
               ({item.publisher}, v{item.volume})
@@ -436,24 +448,26 @@ export default function OverstreetReport({ comics, settings }: OverstreetProps) 
         {allItems.map((item, idx) =>
           item.type === "header" ? (
             <div key={idx}>
+              {/* Blank line before subsequent headers */}
+              {idx > 0 && <div className="w-100 px-1" style={{ height: "1.25em" }}></div>}
+              {/* Title line - styled exactly like issue rows */}
               <div
+                className="d-flex align-items-center font-monospace text-nowrap w-100 px-1 line-hover"
                 style={{
-                  fontWeight: "bold",
-                  fontSize: OVERSTREET_CONFIG.FONT_SIZE.MOBILE_HEADER,
-                  marginTop: idx > 0 ? OVERSTREET_CONFIG.SPACING.HEADER_MARGIN_TOP : 0,
                   height: "1.25em",
-                  lineHeight: "1.25",
+                  lineHeight: "1.25em",
+                  fontWeight: "bold",
                 }}
               >
                 {item.title}
               </div>
+              {/* Publisher/volume line - styled exactly like issue rows */}
               <div
+                className="d-flex align-items-center font-monospace text-nowrap w-100 px-1 line-hover"
                 style={{
-                  marginBottom: OVERSTREET_CONFIG.SPACING.HEADER_MARGIN_BOTTOM,
-                  color: "#666",
-                  fontSize: OVERSTREET_CONFIG.FONT_SIZE.MOBILE_HEADER,
                   height: "1.25em",
-                  lineHeight: "1.25",
+                  lineHeight: "1.25em",
+                  color: "#666",
                 }}
               >
                 ({item.publisher}, v{item.volume})

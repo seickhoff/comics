@@ -126,6 +126,9 @@ export const TableReport = ({ tableId }: TableReportProps) => {
   // Check if there are active filters
   const hasActiveFilters = Object.values(filters).some((value) => value?.trim());
 
+  // Check if there is an active sort
+  const hasActiveSort = sortConfig.length > 0;
+
   return (
     <>
       {/* Summary Badges */}
@@ -164,7 +167,7 @@ export const TableReport = ({ tableId }: TableReportProps) => {
             <Button variant="outline-secondary" size="sm" onClick={handleResetFilters} disabled={!hasActiveFilters}>
               Reset Filters
             </Button>
-            <Button variant="outline-secondary" size="sm" onClick={handleResetSort}>
+            <Button variant="outline-secondary" size="sm" onClick={handleResetSort} disabled={!hasActiveSort}>
               Reset Sort
             </Button>
           </div>

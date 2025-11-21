@@ -96,19 +96,19 @@ export function JsonFileUploader() {
         (filters, sorting, columns). Legacy files with just comic data are also supported.
       </Alert>
       <div className="d-flex justify-content-center gap-2 mb-3">
-        <Button variant="primary" size="lg" disabled={loading}>
+        <Button variant="outline-secondary" size="lg" disabled={loading}>
           <label htmlFor="file-upload" className="w-100" style={{ cursor: "pointer", margin: 0 }}>
-            {loading ? <Spinner animation="border" size="sm" /> : "Load Collection"}
+            {loading ? <Spinner animation="border" size="sm" /> : "Load"}
           </label>
         </Button>
         <input type="file" id="file-upload" accept=".json" onChange={handleFileChange} hidden disabled={loading} />
 
-        <Button variant="success" size="lg" onClick={handleStartNew} disabled={loading}>
-          New Collection
+        <Button variant="outline-secondary" size="lg" onClick={handleStartNew} disabled={loading}>
+          New
         </Button>
       </div>
       {loading && (
-        <Alert variant="warning" className="mb-0">
+        <Alert variant="light" className="mb-0 border">
           Loading collection...
         </Alert>
       )}

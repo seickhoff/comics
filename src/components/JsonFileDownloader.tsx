@@ -132,7 +132,8 @@ export function JsonFileDownloader() {
       </Alert>
       <Form.Group className="mb-4">
         <Form.Label className="fw-bold">Filename</Form.Label>
-        <InputGroup size="lg">
+        {/* Desktop: inline */}
+        <InputGroup size="lg" className="d-none d-sm-flex">
           <Form.Control
             type="text"
             value={fileName}
@@ -143,13 +144,28 @@ export function JsonFileDownloader() {
             + Timestamp
           </Button>
         </InputGroup>
+        {/* Mobile: stacked */}
+        <div className="d-sm-none">
+          <Form.Control
+            size="lg"
+            type="text"
+            value={fileName}
+            onChange={(e) => setFileName(e.target.value)}
+            placeholder="Enter filename"
+            className="mb-2"
+            style={{ fontSize: "0.9em" }}
+          />
+          <Button variant="outline-secondary" size="lg" onClick={addTimestamp} className="w-100">
+            + Timestamp
+          </Button>
+        </div>
       </Form.Group>
       <div className="d-flex justify-content-center gap-3">
-        <Button variant="success" size="lg" onClick={handleDownload} disabled={!jsonData}>
-          Download File
+        <Button variant="outline-secondary" size="lg" onClick={handleDownload} disabled={!jsonData}>
+          Download
         </Button>
-        <Button variant="outline-primary" size="lg" onClick={handleCopyToClipboard} disabled={!jsonData}>
-          {copySuccess ? "Copied!" : "Copy to Clipboard"}
+        <Button variant="outline-secondary" size="lg" onClick={handleCopyToClipboard} disabled={!jsonData}>
+          {copySuccess ? "Copied!" : "Copy JSON"}
         </Button>
       </div>
     </div>

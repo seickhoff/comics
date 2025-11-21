@@ -11,15 +11,7 @@ interface NavRoute {
 // Define the navRoutes configuration
 const navRoutes: NavRoute[] = [
   { path: "/", label: "Home" },
-  {
-    label: "File",
-    children: [
-      { path: "/file/load", label: "Load from File" },
-      { path: "/file/import", label: "Import from Clipboard" },
-      { path: "/file/export", label: "Export Collection" },
-      { path: "/file/preview", label: "Preview Data" },
-    ],
-  },
+  { path: "/file", label: "File" },
   { path: "/maintenance", label: "Maintenance" },
   { path: "/overstreet", label: "Overstreet" },
   { path: "/summary", label: "Summary" },

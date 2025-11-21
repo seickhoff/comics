@@ -46,16 +46,15 @@ export function JsonDataViewer() {
     <div>
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div>
-          <h5 className="mb-1">JSON Data Preview</h5>
           <p className="text-muted mb-0 small">View the complete export format with all settings and comic data</p>
         </div>
-        <Badge bg="secondary" className="fs-6">
+        <Badge bg="" className="fs-6 border border-secondary text-secondary">
           {comicCount} comics
         </Badge>
       </div>
       <div className="d-flex justify-content-center mb-3">
-        <Button variant="outline-primary" size="lg" onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? "Hide JSON Data" : "Show JSON Data"}
+        <Button variant="outline-secondary" size="lg" onClick={() => setIsOpen(!isOpen)}>
+          {isOpen ? "Hide JSON" : "Show JSON"}
         </Button>
       </div>
       <Collapse in={isOpen}>

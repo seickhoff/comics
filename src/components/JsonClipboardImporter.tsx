@@ -82,16 +82,20 @@ export function JsonClipboardImporter() {
       <Form.Group className="mb-3">
         <Form.Control
           as="textarea"
-          rows={8}
+          rows={3}
           value={pastedJson}
           onChange={(e) => setPastedJson(e.target.value)}
           placeholder="Paste your JSON collection data here..."
         />
       </Form.Group>
-      {error && <Alert variant="danger">{error}</Alert>}
+      {error && (
+        <Alert variant="light" className="border text-danger">
+          {error}
+        </Alert>
+      )}
       <div className="d-flex justify-content-center">
-        <Button variant="primary" size="lg" onClick={handleImport} disabled={!pastedJson.trim()}>
-          Import Collection
+        <Button variant="outline-secondary" size="lg" onClick={handleImport} disabled={!pastedJson.trim()}>
+          Import JSON
         </Button>
       </div>
     </div>

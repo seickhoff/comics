@@ -37,7 +37,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         style={{
           zIndex: 9999,
           position: "fixed",
-          top: "1rem",
+          top: window.innerWidth < 768 ? "4rem" : "1rem",
           right: "1rem",
           display: "flex",
           flexDirection: "column", // stack vertically

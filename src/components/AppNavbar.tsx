@@ -10,7 +10,6 @@ interface NavRoute {
 
 // Define the navRoutes configuration
 const navRoutes: NavRoute[] = [
-  { path: "/", label: "Home" },
   { path: "/file", label: "File" },
   { path: "/maintenance", label: "Maintenance" },
   { path: "/overstreet", label: "Overstreet" },

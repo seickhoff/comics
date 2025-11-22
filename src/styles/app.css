@@ -28,3 +28,86 @@
 .leading-tight {
   line-height: 1.25;
 }
+
+/* Screen-only: hide print view, show screen view */
+.print-only {
+  display: none !important;
+}
+
+.screen-only {
+  display: block !important;
+}
+
+/* Print styles for PDF export */
+@media print {
+  /* Hide screen view, show print view */
+  .screen-only {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  /* Hide elements that shouldn't appear in print */
+  .print-hide,
+  nav,
+  .navbar,
+  button:not(.print-show) {
+    display: none !important;
+  }
+
+  /* Remove page margins and padding */
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Page setup for letter size */
+  @page {
+    size: letter;
+    margin: 0.5in;
+  }
+
+  /* Ensure pages break properly */
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  .page-break-after {
+    page-break-after: always;
+  }
+
+  .page-break-avoid {
+    page-break-inside: avoid;
+  }
+
+  /* Optimize colors for print */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide shadows and borders that waste ink */
+  .shadow,
+  .border {
+    box-shadow: none !important;
+  }
+
+  /* Make containers full width for print */
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* Ensure headings don't break from their content */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+}

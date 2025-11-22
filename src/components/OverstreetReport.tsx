@@ -26,18 +26,24 @@ function Line({
   left,
   right,
   isMobile,
+  isPrint,
   settings,
 }: {
   left: string;
   right: string;
   isMobile?: boolean;
+  isPrint?: boolean;
   settings: AppSettings;
 }) {
   // Calculate the formatted value string (including $ and formatting)
   const formattedValue = `$${formatCurrency(right)}`;
 
   // Total available width
-  const totalWidth = isMobile ? settings.overstreetMaxCharsMobile : settings.overstreetMaxCharsDesktop;
+  // Print view columns are narrower due to two-column layout, reduce by ~3 chars
+  let totalWidth = isMobile ? settings.overstreetMaxCharsMobile : settings.overstreetMaxCharsDesktop;
+  if (isPrint) {
+    totalWidth = totalWidth - 3; // Adjust for narrower print columns
+  }
 
   // Calculate the column position where $ should start (right-aligned with buffer)
   // The $ should start at position: totalWidth - valueLength
@@ -451,97 +457,150 @@ export default function OverstreetReport({ comics, settings }: OverstreetProps) 
     </div>
   );
 
-  // Mobile view: single scrollable column with all content
-  if (isMobile) {
-    return (
-      <div className="font-monospace p-3" style={{ fontSize: OVERSTREET_CONFIG.FONT_SIZE.MOBILE_BASE }}>
-        {allItems.map((item, idx) =>
-          item.type === "header" ? (
-            <div key={idx}>
-              {/* Blank line before subsequent headers */}
-              {idx > 0 && <div className="w-100 px-1" style={{ height: "1.25em" }}></div>}
-              {/* Title line - styled exactly like issue rows */}
-              <div
-                className="d-flex align-items-center font-monospace text-nowrap w-100 px-1 line-hover"
-                style={{
-                  height: "1.25em",
-                  lineHeight: "1.25em",
-                  fontWeight: "bold",
-                }}
-              >
-                {item.title}
-              </div>
-              {/* Publisher/volume line - styled exactly like issue rows */}
-              <div
-                className="d-flex align-items-center font-monospace text-nowrap w-100 px-1 line-hover"
-                style={{
-                  height: "1.25em",
-                  lineHeight: "1.25em",
-                  color: "#666",
-                }}
-              >
-                ({item.publisher}, v{item.volume})
-              </div>
-            </div>
-          ) : (
-            <Line key={idx} left={item.left} right={item.right} isMobile={true} settings={settings} />
-          )
-        )}
-      </div>
-    );
-  }
-
-  // Desktop view: paginated book layout
+  // Render print view (always two-column) and screen view (mobile or desktop)
   return (
     <div>
-      {/* Navigation Controls */}
-      {showNavigation && (
-        <div className="d-flex justify-content-center align-items-center mb-3 gap-3">
-          <Button
-            variant="outline-secondary"
-            onClick={goToPrevious}
-            disabled={currentPage === 0}
-            style={{ width: "120px" }}
-          >
-            <ChevronLeft /> Previous
-          </Button>
-          <Button
-            variant="outline-secondary"
-            onClick={goToNext}
-            disabled={currentPage === totalPages - 1}
-            style={{ width: "120px" }}
-          >
-            Next <ChevronRight />
-          </Button>
+      {/* Print-only view: continuous two-column layout (same for mobile and desktop) */}
+      <div className="print-only">
+        <div
+          className="font-monospace"
+          style={{
+            fontSize: OVERSTREET_CONFIG.FONT_SIZE.DESKTOP_BASE,
+            lineHeight: "1.25",
+            columnCount: 2,
+            columnGap: "1rem",
+            columnFill: "auto",
+          }}
+        >
+          {allItems.map((item, idx) =>
+            item.type === "header" ? (
+              <div key={idx}>
+                {/* Blank line before subsequent headers */}
+                {idx > 0 && <div className="w-100 px-1" style={{ height: "1.25em" }}></div>}
+                {/* Title line - styled exactly like issue rows */}
+                <div
+                  className="d-flex align-items-center font-monospace w-100 px-1"
+                  style={{
+                    minHeight: "1.25em",
+                    lineHeight: "1.25em",
+                    fontWeight: "bold",
+                    breakInside: "avoid",
+                  }}
+                >
+                  {item.title}
+                </div>
+                {/* Publisher/volume line - styled exactly like issue rows */}
+                <div
+                  className="d-flex align-items-center font-monospace w-100 px-1"
+                  style={{
+                    minHeight: "1.25em",
+                    lineHeight: "1.25em",
+                    color: "#666",
+                    breakInside: "avoid",
+                  }}
+                >
+                  ({item.publisher}, v{item.volume})
+                </div>
+              </div>
+            ) : (
+              <Line key={idx} left={item.left} right={item.right} isMobile={false} isPrint={true} settings={settings} />
+            )
+          )}
         </div>
-      )}
+      </div>
 
-      {/* Book Pages Layout - Two columns side by side */}
-      <div
-        className="d-flex gap-4 justify-content-center align-items-start"
-        style={{ minHeight: "70vh", maxWidth: "1000px", margin: "0 auto" }}
-      >
-        {leftPageItems.length > 0 && (
-          <div>
-            <div
-              className="text-center text-muted mb-2"
-              style={{ fontSize: OVERSTREET_CONFIG.FONT_SIZE.DESKTOP_PAGE_NUMBER }}
-            >
-              Page {currentPage + 1}
-            </div>
-            {renderPage(leftPageItems)}
+      {/* Screen-only view: different for mobile vs desktop */}
+      <div className="screen-only">
+        {isMobile ? (
+          // Mobile view: single scrollable column with all content
+          <div className="font-monospace p-3" style={{ fontSize: OVERSTREET_CONFIG.FONT_SIZE.MOBILE_BASE }}>
+            {allItems.map((item, idx) =>
+              item.type === "header" ? (
+                <div key={idx}>
+                  {/* Blank line before subsequent headers */}
+                  {idx > 0 && <div className="w-100 px-1" style={{ height: "1.25em" }}></div>}
+                  {/* Title line - styled exactly like issue rows */}
+                  <div
+                    className="d-flex align-items-center font-monospace text-nowrap w-100 px-1 line-hover"
+                    style={{
+                      height: "1.25em",
+                      lineHeight: "1.25em",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {item.title}
+                  </div>
+                  {/* Publisher/volume line - styled exactly like issue rows */}
+                  <div
+                    className="d-flex align-items-center font-monospace text-nowrap w-100 px-1 line-hover"
+                    style={{
+                      height: "1.25em",
+                      lineHeight: "1.25em",
+                      color: "#666",
+                    }}
+                  >
+                    ({item.publisher}, v{item.volume})
+                  </div>
+                </div>
+              ) : (
+                <Line key={idx} left={item.left} right={item.right} isMobile={true} settings={settings} />
+              )
+            )}
           </div>
-        )}
-        {rightPageItems.length > 0 && (
-          <div>
+        ) : (
+          // Desktop view: paginated book layout
+          <>
+            {/* Navigation Controls */}
+            {showNavigation && (
+              <div className="d-flex justify-content-center align-items-center mb-3 gap-3">
+                <Button
+                  variant="outline-secondary"
+                  onClick={goToPrevious}
+                  disabled={currentPage === 0}
+                  style={{ width: "120px" }}
+                >
+                  <ChevronLeft /> Previous
+                </Button>
+                <Button
+                  variant="outline-secondary"
+                  onClick={goToNext}
+                  disabled={currentPage === totalPages - 1}
+                  style={{ width: "120px" }}
+                >
+                  Next <ChevronRight />
+                </Button>
+              </div>
+            )}
+
+            {/* Book Pages Layout - Two columns side by side */}
             <div
-              className="text-center text-muted mb-2"
-              style={{ fontSize: OVERSTREET_CONFIG.FONT_SIZE.DESKTOP_PAGE_NUMBER }}
+              className="d-flex gap-4 justify-content-center align-items-start"
+              style={{ minHeight: "70vh", maxWidth: "1000px", margin: "0 auto" }}
             >
-              Page {currentPage + 2}
+              {leftPageItems.length > 0 && (
+                <div>
+                  <div
+                    className="text-center text-muted mb-2"
+                    style={{ fontSize: OVERSTREET_CONFIG.FONT_SIZE.DESKTOP_PAGE_NUMBER }}
+                  >
+                    Page {currentPage + 1}
+                  </div>
+                  {renderPage(leftPageItems)}
+                </div>
+              )}
+              {rightPageItems.length > 0 && (
+                <div>
+                  <div
+                    className="text-center text-muted mb-2"
+                    style={{ fontSize: OVERSTREET_CONFIG.FONT_SIZE.DESKTOP_PAGE_NUMBER }}
+                  >
+                    Page {currentPage + 2}
+                  </div>
+                  {renderPage(rightPageItems)}
+                </div>
+              )}
             </div>
-            {renderPage(rightPageItems)}
-          </div>
+          </>
         )}
       </div>
     </div>

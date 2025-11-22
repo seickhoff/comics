@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../hooks/useAppContext";
 import { ComicBook } from "../interfaces/ComicBook";
 import { HEATMAP_CONFIG } from "../config/constants";
+import { EmptyState } from "../components/EmptyState";
 
 export function Heatmap() {
   const { jsonData, setFilters, settings } = useAppContext();
@@ -76,18 +77,10 @@ export function Heatmap() {
 
   return (
     <Container className="mt-4">
-      <h1 className="mb-2">Collection Heatmap</h1>
-
-      {/* Description - Desktop only, directly under header */}
-      <p className="text-muted mb-4 d-none d-md-block">
-        Visualize your collection by publication date. Darker colors indicate more comics published in that month/year.
-      </p>
+      <h1 className="mb-4">Collection Heatmap</h1>
 
       {jsonData.length === 0 ? (
-        <div className="text-center text-muted mt-5">
-          <p className="lead">No comics in collection</p>
-          <p>Load or add comics to see the heatmap</p>
-        </div>
+        <EmptyState />
       ) : (
         <>
           {/* Summary Statistics - Compact */}

@@ -168,8 +168,18 @@ function formatIssueLabel(issue: string): string {
 
 // Build issue lines
 function buildIssueLines(issues: ComicBook[]): { label: string; value: string }[] {
-  const numeric = issues.filter((i) => parseIssue(i.issue) !== null);
-  const nonNumeric = issues.filter((i) => parseIssue(i.issue) === null);
+  // Deduplicate: keep only unique issue+value combinations
+  const uniqueMap = new Map<string, ComicBook>();
+  for (const comic of issues) {
+    const key = `${comic.issue}||${comic.value}`;
+    if (!uniqueMap.has(key)) {
+      uniqueMap.set(key, comic);
+    }
+  }
+  const uniqueIssues = Array.from(uniqueMap.values());
+
+  const numeric = uniqueIssues.filter((i) => parseIssue(i.issue) !== null);
+  const nonNumeric = uniqueIssues.filter((i) => parseIssue(i.issue) === null);
 
   numeric.sort((a, b) => parseIssue(a.issue)! - parseIssue(b.issue)!);
   nonNumeric.sort((a, b) => a.issue.localeCompare(b.issue));

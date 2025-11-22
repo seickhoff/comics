@@ -4,13 +4,13 @@ import OverstreetReport from "../components/OverstreetReport";
 import { EmptyState } from "../components/EmptyState";
 
 export function Overstreet() {
-  const { jsonData, fileName, settings } = useAppContext();
+  const { jsonData, settings } = useAppContext();
 
   return (
     <Container className="mt-4">
-      <h1 className="mb-3">Overstreet Report</h1>
+      <h1 className="mb-4">Overstreet Report</h1>
 
-      {!fileName ? (
+      {jsonData.length === 0 ? (
         <EmptyState />
       ) : (
         <>

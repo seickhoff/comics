@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../hooks/useAppContext";
 import { ComicBook } from "../interfaces/ComicBook";
 import { SUMMARY_CONFIG } from "../config/constants";
+import { EmptyState } from "../components/EmptyState";
 
 export function Summary() {
   const { jsonData, setFilters, settings } = useAppContext();
@@ -108,10 +109,7 @@ export function Summary() {
       <h1 className="mb-4">Collection Summary</h1>
 
       {jsonData.length === 0 ? (
-        <div className="text-center text-muted mt-5">
-          <p className="lead">No comics in collection</p>
-          <p>Load or add comics to see summary statistics</p>
-        </div>
+        <EmptyState />
       ) : (
         <>
           {/* Overview Stats */}

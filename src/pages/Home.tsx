@@ -200,7 +200,7 @@ export function Home() {
               Enter the <strong>Month</strong> and <strong>Year</strong> for the first issue
             </li>
             <li>A blue banner will show how many comics will be created</li>
-            <li>Click "Add Comic" to create all issues at once</li>
+            <li>Click "Add to Collection" to create all issues at once</li>
           </ol>
           <div className="alert alert-secondary mb-0">
             <strong>Note:</strong> The month and year will automatically increment for each issue. When the month

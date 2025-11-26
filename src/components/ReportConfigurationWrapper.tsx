@@ -157,7 +157,7 @@ export default function ReportConfigWrapper(props: ReportConfigurationProps) {
       {/* Add Modal */}
       <Modal show={showAddModal} onHide={handleClose} centered size="xl">
         <Modal.Header closeButton>
-          <Modal.Title>Add Comic</Modal.Title>
+          <Modal.Title>Add to Collection</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <ComicForm

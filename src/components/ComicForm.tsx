@@ -127,7 +127,7 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
       )}
       <Row className="g-3">
         {/* Title */}
-        <Col lg={6}>
+        <Col lg={5}>
           <Form.Label>Title</Form.Label>
           <Form.Control
             list="title-options"
@@ -143,7 +143,7 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
         </Col>
 
         {/* Publisher */}
-        <Col lg={5}>
+        <Col xs={isEdit ? 12 : 9} lg={4}>
           <Form.Label>Publisher</Form.Label>
           <Form.Control
             list="publisher-options"
@@ -159,7 +159,7 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
         </Col>
 
         {/* Volume */}
-        <Col lg={1}>
+        <Col xs={3} lg={1}>
           <Form.Label>Volume</Form.Label>
           <Form.Control
             list="volume-options"
@@ -174,40 +174,8 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
           </datalist>
         </Col>
 
-        {/* Issue */}
-        <Col lg={1}>
-          <Form.Label>Issue</Form.Label>
-          <Form.Control
-            list="issue-options"
-            value={comic.issue || ""}
-            onChange={(e) => handleChange("issue", e.target.value)}
-            placeholder="#"
-          />
-          <datalist id="issue-options">
-            {issueOptions.map((opt) => (
-              <option key={opt} value={opt} />
-            ))}
-          </datalist>
-        </Col>
-
-        {/* Type */}
-        <Col lg={2}>
-          <Form.Label>Type</Form.Label>
-          <Form.Control
-            list="type-options"
-            value={comic.type || ""}
-            onChange={(e) => handleChange("type", e.target.value)}
-            placeholder={isBatchMode ? "No change" : ""}
-          />
-          <datalist id="type-options">
-            {typeOptions.map((opt) => (
-              <option key={opt} value={opt} />
-            ))}
-          </datalist>
-        </Col>
-
         {/* Month */}
-        <Col lg={1}>
+        <Col xs={3} lg={1}>
           <Form.Label>Month</Form.Label>
           <Form.Control
             list="month-options"
@@ -223,7 +191,7 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
         </Col>
 
         {/* Year */}
-        <Col lg={1}>
+        <Col xs={3} lg={1}>
           <Form.Label>Year</Form.Label>
           <Form.Control
             list="year-options"
@@ -238,28 +206,81 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
           </datalist>
         </Col>
 
+        {/* Issue */}
+        <Col xs={3} lg={1}>
+          <Form.Label>Issue</Form.Label>
+          <Form.Control
+            list="issue-options"
+            value={comic.issue || ""}
+            onChange={(e) => handleChange("issue", e.target.value)}
+            placeholder="#"
+          />
+          <datalist id="issue-options">
+            {issueOptions.map((opt) => (
+              <option key={opt} value={opt} />
+            ))}
+          </datalist>
+        </Col>
+
+        {/* Ending Issue - only show in add mode, always visible but disabled until requirements met */}
+        {!isEdit && (
+          <Col xs={3} lg={1}>
+            <Form.Label>End Issue</Form.Label>
+            <Form.Control
+              value={endingIssue}
+              onChange={(e) => setEndingIssue(e.target.value)}
+              placeholder="#"
+              disabled={!comic.issue || !comic.month || !comic.year}
+              title={
+                !comic.issue || !comic.month || !comic.year
+                  ? "Fill Issue, Month, and Year first to enable bulk add"
+                  : "Fill this to add multiple issues in sequence"
+              }
+            />
+            <Form.Text className="text-muted" style={{ fontSize: "0.7rem" }}>
+              Bulk add
+            </Form.Text>
+          </Col>
+        )}
+
+        {/* Type */}
+        <Col xs={5} lg={isEdit ? 2 : 1}>
+          <Form.Label>Type</Form.Label>
+          <Form.Control
+            list="type-options"
+            value={comic.type || ""}
+            onChange={(e) => handleChange("type", e.target.value)}
+            placeholder={isBatchMode ? "Type" : ""}
+          />
+          <datalist id="type-options">
+            {typeOptions.map((opt) => (
+              <option key={opt} value={opt} />
+            ))}
+          </datalist>
+        </Col>
+
         {/* Quantity */}
-        <Col lg={1}>
+        <Col xs={3} lg={1}>
           <Form.Label>Quantity</Form.Label>
           <Form.Control
             type="number"
             min={isBatchMode ? undefined : 1}
             value={comic.quantity ?? ""}
             onChange={(e) => handleChange("quantity", e.target.value === "" ? "" : Number(e.target.value))}
-            placeholder={isBatchMode ? "No change" : "1"}
+            placeholder={isBatchMode ? "Qty" : "1"}
           />
         </Col>
 
         {/* Value */}
-        <Col lg={2}>
+        <Col xs={4} lg={2}>
           <Form.Label>Value ($)</Form.Label>
           <Form.Control
             type="number"
-            step="0.01"
+            step="0.50"
             list="value-options"
             value={comic.value || ""}
             onChange={(e) => handleChange("value", e.target.value)}
-            placeholder={isBatchMode ? "No change" : "0.00"}
+            placeholder={isBatchMode ? "Value" : "0.00"}
           />
           <datalist id="value-options">
             {valueOptions.map((opt) => (
@@ -283,26 +304,6 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
             ))}
           </Form.Select>
         </Col>
-
-        {/* Ending Issue - only show in add mode */}
-        {!isEdit && comic.issue && comic.month && comic.year && (
-          <>
-            <Col lg={1}>
-              <Form.Label>End Issue</Form.Label>
-              <Form.Control
-                value={endingIssue}
-                onChange={(e) => setEndingIssue(e.target.value)}
-                placeholder="#"
-                title="Fill this to add multiple issues in sequence"
-              />
-              <Form.Text className="text-muted" style={{ fontSize: "0.7rem" }}>
-                Bulk add
-              </Form.Text>
-            </Col>
-
-            <Col lg={11} />
-          </>
-        )}
 
         {/* Writers */}
         <Col lg={6}>
@@ -381,7 +382,7 @@ export function ComicForm({ mode, existingComics, initialComic, onSubmit, onCanc
           </Button>
         )}
         <Button type="submit" variant={isEdit ? "info" : "primary"}>
-          {isEdit ? "Save Changes" : "Add Comic"}
+          {isEdit ? "Save Changes" : "Add to Collection"}
         </Button>
       </div>
     </Form>

@@ -9,6 +9,13 @@ export function Settings() {
   const [hasChanges, setHasChanges] = useState(false);
 
   const handleChange = (field: keyof typeof formData, value: string | number) => {
+    // Validate heatmapCellSize range (30-100)
+    if (field === "heatmapCellSize" && typeof value === "number") {
+      if (value < 30 || value > 100) {
+        return; // Reject values outside range
+      }
+    }
+
     setFormData((prev) => ({ ...prev, [field]: value }));
     setHasChanges(true);
   };
@@ -315,13 +322,13 @@ export function Settings() {
                     <Form.Control
                       type="number"
                       size="sm"
-                      min="20"
-                      max="60"
+                      min="30"
+                      max="100"
                       value={formData.heatmapCellSize}
                       onChange={(e) => handleChange("heatmapCellSize", parseInt(e.target.value))}
                     />
                     <Form.Text className="text-muted" style={{ fontSize: "0.7rem" }}>
-                      Cell width in pixels (20-60)
+                      Cell width in pixels (30-100)
                     </Form.Text>
                   </Form.Group>
                 </Col>

@@ -93,6 +93,7 @@ Collections are stored as JSON arrays with the following structure:
     "publisher": "Marvel",
     "volume": "1",
     "issue": "1",
+    "type": "",
     "month": "03",
     "year": "1963",
     "quantity": 1,

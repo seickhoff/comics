@@ -6,7 +6,7 @@ A web-based application for organizing and managing your comic book collection. 
 
 ### Collection Management
 
-- **Add Comics**: Single entry or bulk add consecutive issues with automatic date increment
+- **Add to Collection**: Single entry or bulk add consecutive issues with automatic date increment
 - **Edit & Delete**: Modify individual comics or batch-edit multiple selections
 - **Smart Search**: Regex-powered filtering with AND/OR logic across all fields
 - **Multi-Column Sorting**: Intelligent sorting that handles titles with "The" prefix
@@ -33,14 +33,17 @@ A web-based application for organizing and managing your comic book collection. 
   - Click any cell to filter by specific month/year
   - Identify gaps and collection patterns at a glance
 - **Overstreet Report**: Professional valuation report grouped by Title → Publisher → Volume
+  - Export to PDF via browser print functionality
+  - Two-column format optimized for letter-sized paper
 
 ### Data Management
 
 - Load collections from JSON files or clipboard
 - Export collections with timestamped filenames
 - Preview raw JSON data
-- Column visibility controls
-- Sort preferences and filters are automatically saved with your collection
+- Column visibility controls (mobile and desktop)
+- Sort preferences and filters automatically saved with your collection
+- Configurable settings (cell sizes, colors, character limits)
 
 ## Tech Stack
 
@@ -131,9 +134,10 @@ src/
 
 ### Bulk Add Comics
 
-1. Fill in comic details including issue, month, and year
-2. Enter an ending issue number in the "End Issue" field
-3. Submit to create all comics in the range with auto-incrementing dates
+1. Fill in comic details including Title, Publisher, Volume, Issue, Month, and Year
+2. The "End Issue" field enables after filling Issue, Month, and Year
+3. Enter an ending issue number to create all comics in the range
+4. Dates auto-increment (month/year roll over when reaching 13)
 
 ### Batch Editing
 
